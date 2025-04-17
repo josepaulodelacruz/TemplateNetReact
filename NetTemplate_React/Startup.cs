@@ -52,7 +52,8 @@ namespace NetTemplate_React
 
             app.UseHttpsRedirection();
             // Path to React build folder
-            var clientAppDist = Path.Combine(Directory.GetCurrentDirectory(), "ClientApp", "dist");
+            ///important build the front-end first before publishing the .net project
+            var clientAppDist = Path.Combine(Directory.GetCurrentDirectory(), "ClientApp/FrontEnd", "dist"); 
 
             // Serve static files (CSS, JS, images) from React build
             app.UseStaticFiles(new StaticFileOptions
