@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using NetTemplate_React.Middleware;
 using NetTemplate_React.Services;
 
 namespace NetTemplate_React
@@ -28,11 +29,17 @@ namespace NetTemplate_React
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            // Other service registrations
+            services.AddJwtTokenValidation(Configuration);
+            services.AddMvc();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
+                
             });
 
 
@@ -40,10 +47,8 @@ namespace NetTemplate_React
 
             var conString = Configuration.GetConnectionString("DEV");
 
-            Debug.WriteLine(conString);
-
             //injected services
-            services.AddScoped<IAuthService, AuthService>(options => new AuthService(conString: conString));
+            services.AddScoped<IAuthService, AuthService>(options => new AuthService(conString: conString, configuration: Configuration));
 
         }
 
@@ -85,6 +90,11 @@ namespace NetTemplate_React
                     await context.Response.SendFileAsync(Path.Combine(clientAppDist, "index.html"));
                 }
             });
+
+            app.UseAuthentication();
+
+            // Optional: Custom token validation middleware
+            app.UseMiddleware<TokenValidationMiddleware>();
 
             // Use MVC for API controllers
             app.UseCookiePolicy();

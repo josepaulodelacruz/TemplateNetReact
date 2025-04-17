@@ -19,7 +19,11 @@ namespace NetTemplate_React.Models
         public string Password { get; set; }
 
         [JsonProperty("created_at")]
-        public DateTime CreatedAt { get; set; } 
+        public DateTime CreatedAt { get; set; }
+
+        [JsonProperty("token")]
+        public string Token { get; set; }
+
 
     }
 }

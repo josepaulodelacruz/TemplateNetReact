@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NetTemplate_React.Models;
 using NetTemplate_React.Services;
 using System.Data;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace NetTemplate_React.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase

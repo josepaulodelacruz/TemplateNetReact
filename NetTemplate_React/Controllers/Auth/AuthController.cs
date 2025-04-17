@@ -4,6 +4,7 @@ using NetTemplate_React.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

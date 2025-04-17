@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using NetTemplate_React.Models;
 using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,10 +26,12 @@ namespace NetTemplate_React.Services
     public class AuthService : IAuthService
     {
         private readonly string _conString; 
+        private readonly IConfiguration _configuration;
 
-        public AuthService (string conString) 
+        public AuthService (string conString, IConfiguration configuration) 
         {
             _conString = conString;
+            _configuration = configuration;
         }
 
         public async Task<Response> Test()
@@ -166,21 +172,31 @@ namespace NetTemplate_React.Services
                         // Trim the stored password to remove any whitespace that might be causing issues
                         storedHashedPassword = storedHashedPassword.Trim();
 
-                        // Add proper debugging to see exact values
-                        Debug.WriteLine($"User input password: {user.Password}");
-                        Debug.WriteLine($"Stored hashed password: {storedHashedPassword}");
-
                         // Verify hashed password using BCrypt
                         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(user.Password, storedHashedPassword);
-                        Debug.WriteLine($"Password valid: {isPasswordValid}");
 
                         if (!isPasswordValid) throw new Exception("Invalid Username or Password");
+
+                        // Generate JWT token
+                        var token = GenerateJwtToken(dataTable.Rows[0]);
+
+
+                        // Create response data with user info and token
+                        var responseData = new User()
+                        {
+                            Id = int.Parse(dataTable.Rows[0]["ID"].ToString()),
+                            Username = dataTable.Rows[0]["USERNAME"].ToString(),
+                            // Add other user fields you want to return, but NOT the password
+                            CreatedAt = DateTime.Parse(dataTable.Rows[0]["CREATED_AT"].ToString()),
+                            Token = token
+
+                        };
 
                         return new Response(
                             success: true,
                             debugScript: commandText,
                             message: "Successfully Logged in",
-                            body: dataTable
+                            body: responseData 
                         );
                     }
                 }
@@ -203,6 +219,46 @@ namespace NetTemplate_React.Services
                     body: null
                 );
             }
+        }
+
+        private string GenerateJwtToken(DataRow user)
+        {
+            // Get JWT settings from configuration
+            var secretKey = _configuration["JwtSettings:SecretKey"];
+            var issuer = _configuration["JwtSettings:Issuer"];
+            var audience = _configuration["JwtSettings:Audience"];
+
+            // Get expiry minutes from config or use default of 60 minutes
+            int expiryMinutes = 60;
+            if (int.TryParse(_configuration["JwtSettings:ExpiryMinutes"], out int configExpiryMinutes))
+            {
+                expiryMinutes = configExpiryMinutes;
+            }
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            // Create claims
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user["ID"].ToString()),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user["USERNAME"].ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                // You can add more claims here as needed, such as roles
+                // Example: new Claim(ClaimTypes.Role, user["ROLE"].ToString())
+            };
+
+            // Create the token
+            var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(expiryMinutes),
+                signingCredentials: creds
+            );
+
+            // Return the serialized token
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
     }
