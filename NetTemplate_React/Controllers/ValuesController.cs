@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections;
-using System.Collections.Generic;
+using NetTemplate_React.Models;
+using NetTemplate_React.Services;
+using System.Data;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,11 +12,17 @@ namespace NetTemplate_React.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly IAuthService _service;
+        public ValuesController(IAuthService service)
+        {
+            _service = service;
+        }
+
         // GET: api/<ValuesController>
         [HttpGet]
-        public string Get()
+        public async Task<Response> Get()
         {
-            return "hello world"; 
+            return await _service.Test();
         }
 
         // GET api/<ValuesController>/5
