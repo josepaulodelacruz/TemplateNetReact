@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IO;
 using NetTemplate_React.Middleware;
 using NetTemplate_React.Services;
 
@@ -96,10 +97,13 @@ namespace NetTemplate_React
             // Optional: Custom token validation middleware
             app.UseMiddleware<TokenValidationMiddleware>();
 
+
             // Use MVC for API controllers
             app.UseCookiePolicy();
 
             app.UseAPILogger();
+
+            //app.UseResponseCapture();
 
             app.UseMvc();
         }

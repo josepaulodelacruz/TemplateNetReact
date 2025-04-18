@@ -1,5 +1,5 @@
 ﻿@hostname=localhost:44393
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6Ijg5NjEzZjMwLThmOGUtNDJmYi1iMWY2LTlkZTIzODYzMzNmNyIsImV4cCI6MTc0NDk1MTcwMywiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.e8oQKcKyxxMiefkOjhvyb_4MdkAd-lWIAW9EmIoHzkc
+@token=eyJs123123hbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjA0MmFmNjgxLTNkZmItNGIwNy05M2I3LTAzNmFiMWQyMGY5NCIsImV4cCI6MTc0NDk4MjU2NSwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.4CU5AQrky_KjqFyrJNFI_nJTwaINGSfjfZBnuOckyrs
 
 GET https://{{hostname}}/api/auth
 Content-Type: application/json
@@ -9,7 +9,7 @@ Content-Type: application/json
 POST https://{{hostname}}/api/auth/register
 Content-Type: application/json
 {
-  "username": "admin",
+  "username": "jmdelacruz",
   "password": "password"
 }
 

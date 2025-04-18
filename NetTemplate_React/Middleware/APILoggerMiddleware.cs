@@ -10,6 +10,8 @@ using System;
 using Microsoft.AspNetCore.Http.Internal;
 using System.Security.Claims;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IO;
 
 namespace NetTemplate_React.Middleware
 {
@@ -21,6 +23,8 @@ namespace NetTemplate_React.Middleware
         private readonly ILogger _logger;
         private readonly string _connectionString; // Connection string for the database
         private readonly string _tableName; // Name of the table to log to
+        private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager;
+        private int MaxBodyLength = 1500;
 
         // Constructor for the middleware, injects dependencies
         public APILoggerMiddleware(RequestDelegate next, ILoggerFactory loggerFactory, IConfiguration configuration)
@@ -30,6 +34,7 @@ namespace NetTemplate_React.Middleware
             // Use IConfiguration to get the connection string.  This is the preferred way.
             _connectionString = configuration.GetConnectionString("DEV"); //Make sure you have this in appsettings.json
             _tableName = configuration.GetValue<string>("APILogger:TableName") ?? "APILogs"; //Gets the table name from config
+            _recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
         }
 
         // Method to handle each HTTP request
@@ -66,41 +71,61 @@ namespace NetTemplate_React.Middleware
             context.Items["RequestStartTime"] = startTime;
             context.Items["UserId"] = userId; //Store userId
 
-            try
-            {
-                // Call the next middleware in the pipeline
-                await _next(context);
-            }
-            finally
-            {
-                stopwatch.Stop(); // Stop the timer
-                DateTime endTime = DateTime.UtcNow;
-                // Calculate the duration of the request
-                TimeSpan duration = stopwatch.Elapsed;
-                userId = (string)context.Items["UserId"]; //Retrieve userId
-                // Get the start time from the context
-                startTime = (DateTime)context.Items["RequestStartTime"];
+            // Get original response body stream
+            var originalBodyStream = context.Response.Body;
 
-                string responseBody = null; 
+            // Create a new memory stream for the response
+            using (var responseBody = _recyclableMemoryStreamManager.GetStream())
+            {
+                // Replace the response body with our memory stream
+                context.Response.Body = responseBody;
 
-                // Prepare log message for the end of the request
-                var logEndEntry = new LogEntry
+                try
                 {
-                    Timestamp = endTime,
-                    EventType = "RequestEnd",
-                    Message = $"Request ended: {context.Request.Method} {context.Request.Path} in {duration.TotalMilliseconds}ms. Status Code: {context.Response.StatusCode}",
-                    RequestPath = context.Request.Path,
-                    RequestMethod = context.Request.Method,
-                    Body = responseBody, 
-                    ResponseStatusCode = context.Response.StatusCode,
-                    Duration = (long)duration.TotalMilliseconds,
-                    UserId = userId
-                };
-                // Log the end of the request to the database
-                await LogToDatabase(logEndEntry);
+                    // Call the next middleware in the pipeline
+                    await _next(context);
+                }
+                finally
+                {
+                    stopwatch.Stop(); // Stop the timer
+                    DateTime endTime = DateTime.UtcNow;
+                    // Calculate the duration of the request
+                    TimeSpan duration = stopwatch.Elapsed;
+                    userId = (string)context.Items["UserId"]; //Retrieve userId
+                    // Get the start time from the context
+                    startTime = (DateTime)context.Items["RequestStartTime"];
+
+                    // Capture the response body
+                    string responseBodyContent = await ReadResponseBody(context.Response);
+
+                    // Prepare log message for the end of the request
+                    var logEndEntry = new LogEntry
+                    {
+                        Timestamp = endTime,
+                        EventType = "RequestEnd",
+                        Message = $"Request ended: {context.Request.Method} {context.Request.Path} in {duration.TotalMilliseconds}ms. Status Code: {context.Response.StatusCode}",
+                        RequestPath = context.Request.Path,
+                        RequestMethod = context.Request.Method,
+                        Body = responseBodyContent, // Include the response body in the log
+                        ResponseStatusCode = context.Response.StatusCode,
+                        Duration = (long)duration.TotalMilliseconds,
+                        UserId = userId
+                    };
+
+                    // Log the end of the request to the database
+                    await LogToDatabase(logEndEntry);
+
+                    // Copy the modified response body to the original stream
+                    responseBody.Seek(0, SeekOrigin.Begin);
+                    await responseBody.CopyToAsync(originalBodyStream);
+
+                    // Restore the original response body
+                    context.Response.Body = originalBodyStream;
+                }
             }
         }
 
+        // Helper method to read the response body
         private async Task<string> ReadResponseBody(HttpResponse response)
         {
             // Check if response.Body is null
@@ -117,12 +142,10 @@ namespace NetTemplate_React.Middleware
             }
 
             response.Body.Seek(0, SeekOrigin.Begin);
-            string text = await new System.IO.StreamReader(response.Body, Encoding.UTF8, true, 1024, true).ReadToEndAsync();
+            string text = await new StreamReader(response.Body, Encoding.UTF8, true, 1024, true).ReadToEndAsync();
             response.Body.Seek(0, SeekOrigin.Begin);
             return string.IsNullOrEmpty(text) ? null : text;
         }
-
-
 
         // Helper method to read the request body
         private async Task<string> ReadRequestBody(HttpRequest request)
@@ -131,7 +154,7 @@ namespace NetTemplate_React.Middleware
             request.EnableRewind();
 
             // Read the request body
-            using (var reader = new System.IO.StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
+            using (var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
             {
                 string body = await reader.ReadToEndAsync();
                 // Reset the position of the stream to allow for further processing
@@ -232,6 +255,12 @@ namespace NetTemplate_React.Middleware
         public static IApplicationBuilder UseAPILogger(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<APILoggerMiddleware>();
+        }
+
+        public static IServiceCollection AddAPILogger(this IServiceCollection services)
+        {
+            services.AddSingleton<RecyclableMemoryStreamManager>();
+            return services;
         }
     }
 
