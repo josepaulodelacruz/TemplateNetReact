@@ -1,5 +1,5 @@
 ﻿@hostname=localhost:44393
-
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImFlMDRmMWQyLWY5NTktNDNjZi04NzIxLTI3MjZhODM2NzllMCIsImV4cCI6MTc0NDk0MzczMSwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0._srjMWOYoqpBP8Mg0J69BkMkGeZ4r9idMmMkb-lVmPE
 
 GET https://{{hostname}}/api/auth
 Content-Type: application/json
@@ -9,7 +9,7 @@ Content-Type: application/json
 POST https://{{hostname}}/api/auth/register
 Content-Type: application/json
 {
-  "username": "jmdelacruz",
+  "username": "admin",
   "password": "password"
 }
 
@@ -19,8 +19,11 @@ POST https://{{hostname}}/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "jmdelacruz",
+  "username": "admin",
   "password": "password"
 }
 
 ###
+
+GET https://{{hostname}}/api/values
+Authorization: Bearer {{token}} 

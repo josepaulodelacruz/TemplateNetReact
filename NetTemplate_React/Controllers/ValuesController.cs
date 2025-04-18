@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using NetTemplate_React.Models;
 using NetTemplate_React.Services;
 using System.Data;
+using System.Diagnostics;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -24,6 +27,8 @@ namespace NetTemplate_React.Controllers
         [HttpGet]
         public async Task<Response> Get()
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Debug.WriteLine($"User ID: {userId}");
             return await _service.Test();
         }
 

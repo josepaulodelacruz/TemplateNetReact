@@ -189,7 +189,6 @@ namespace NetTemplate_React.Services
                             // Add other user fields you want to return, but NOT the password
                             CreatedAt = DateTime.Parse(dataTable.Rows[0]["CREATED_AT"].ToString()),
                             Token = token
-
                         };
 
                         return new Response(

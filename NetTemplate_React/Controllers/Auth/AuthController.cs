@@ -47,8 +47,6 @@ namespace NetTemplate_React.Controllers.Auth
             return new OkObjectResult(response);
         }
 
-
-
     }
 
 }
