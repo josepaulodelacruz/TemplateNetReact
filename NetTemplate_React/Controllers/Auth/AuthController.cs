@@ -44,6 +44,12 @@ namespace NetTemplate_React.Controllers.Auth
         public async Task<IActionResult> Login([FromBody] User user)
         {
             Models.Response response = await _service.Login(user);
+
+            if(!response.Success)
+            {
+                return new BadRequestObjectResult(response);
+            }
+
             return new OkObjectResult(response);
         }
 

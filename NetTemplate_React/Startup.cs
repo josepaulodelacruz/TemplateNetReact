@@ -99,6 +99,8 @@ namespace NetTemplate_React
             // Use MVC for API controllers
             app.UseCookiePolicy();
 
+            app.UseAPILogger();
+
             app.UseMvc();
         }
     }
