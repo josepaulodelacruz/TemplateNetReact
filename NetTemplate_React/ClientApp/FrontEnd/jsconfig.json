@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".", //  Crucial:  Root for resolving non-absolute imports
+    "paths": {
+      "~/*": ["./src/*"],      // Map "~" to "src" (or your main source dir)
+      "*": ["./*"] //makes all imports relative to baseUrl
+    }
+  },
+  "include": ["./src/**/*" /* Add other relevant folders */],
+  "exclude": ["node_modules", "dist", "build", "scripts"]
+}
+
