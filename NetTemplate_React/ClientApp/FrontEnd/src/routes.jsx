@@ -8,7 +8,6 @@ const Router = createBrowserRouter([
   {
     path: StringRoutes.initial,
     Component: InitialPage
-
   },
   {
     path: StringRoutes.test,

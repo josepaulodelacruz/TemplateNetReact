@@ -22,9 +22,9 @@ const InitialPage = () => {
             <a href='#pricing' className='text-gray-700 hover:text-blue-500'>
               Pricing
             </a>
-            <Button href='#contact' className='text-gray-700 hover:text-blue-500'>
+            <a href='#contact' className='text-gray-700 hover:text-blue-500'>
               Contact
-            </Button>
+            </a>
             <NavLink to={StringRoutes.login} className='bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400'>
               Login
             </NavLink>
