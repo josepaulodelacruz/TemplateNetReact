@@ -1,7 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router'
 import StringRoutes from '~/Constants/StringRoutes'
-import { Button } from '~/components/ui/button'
 
 /**
  * Sample page only
