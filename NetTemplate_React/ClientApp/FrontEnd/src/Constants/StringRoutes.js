@@ -1,8 +1,11 @@
 class StringRoutes {
-  static initial = '/'
+  static initial = '/home'
   static test = '/test'
 
   static login = '/login'
+
+  static dashboard = '/';
+  static settings = '/settings';
 
   /**
    * Retrieves the current sub-route from a given pathname.

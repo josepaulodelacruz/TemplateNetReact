@@ -2,10 +2,6 @@ import React, { useState } from 'react'
 import {
   UserIcon,
   LayoutDashboardIcon,
-  FileTextIcon,
-  FuelIcon,
-  WrenchIcon,
-  PackageIcon,
   SettingsIcon,
   ChevronDown,
   ChevronUp,
@@ -46,7 +42,7 @@ const NavItemWithDropdown = ({
       <NavLink
         to={'#'}
         className={({ isActive }) =>
-          `px-4 py-2 flex flex-row items-center text-gray-800 cursor-pointer ${stringRoutes.getRootRoute(pathname).includes(StringRoutes.settings) ? 'bg-blue-100 text-blue-800' : 'text-gray-600 hover:bg-blue-50'}`
+          `px-4 py-2 flex flex-row items-center text-gray-800 cursor-pointer ${stringRoutes.getRootRoute(pathname).includes(StringRoutes.settings) ? 'bg-gradient-to-r from-[#007a7e] to-[#00595c] text-white' : 'text-gray-600 hover:bg-[#00595c]/10'}`
         }
         onClick={toggleDropdown}
       >
@@ -93,7 +89,7 @@ const NavItem = ({ icon, text, active = false, indented = false, url = "" }) => 
       <NavLink
         to={url}
         className={({ isActive }) =>
-          `cursor-pointer flex items-center px-4 py-2 ${isActive ? 'bg-blue-100 text-blue-800' : 'text-gray-600 hover:bg-blue-50'}`
+          `cursor-pointer flex items-center px-4 py-2 ${isActive ? 'bg-[#007a7e] text-white font-bold' : 'text-white font-bold hover:bg-[#00595c]/10'}`
         }
       >
         <span className="mr-3">{icon}</span>
@@ -109,7 +105,7 @@ const NavItem = ({ icon, text, active = false, indented = false, url = "" }) => 
   )
 }
 
-const AdminNavItem = () => {
+const AdminNavItem = ({ onSetClearToken }) => {
   const { isOpen } = useToggleDrawer();
   const navigate = useNavigate();
 
@@ -127,7 +123,7 @@ const AdminNavItem = () => {
       <DropdownTrigger>
         <li className="flex flex-row items-center px-3">
           <span className='mr-2'>
-            <UserIcon size={24} />
+            <UserIcon size={24} color="white" />
           </span>
           <div
             style={{
@@ -137,11 +133,10 @@ const AdminNavItem = () => {
             }}
           >
             <div className="flex items-center">
-              <span className="font-medium text-gray-700">Super Amdin</span>
+              <span className="font-medium text-white">Super Amdin</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 ml-1"
-                fill="none"
+                className="h-4 w-4 ml-1 fill-white stroke-white"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
@@ -153,7 +148,7 @@ const AdminNavItem = () => {
                 />
               </svg>
             </div>
-            <p className="text-xs text-gray-600">Users</p>
+            <p className="text-xs text-gray-200">Users</p>
           </div>
         </li>
       </DropdownTrigger>
@@ -166,17 +161,17 @@ const AdminNavItem = () => {
 }
 
 const SidebarContent = ({ compactMode = false }) => {
-  const { isOpen, toggleDrawer } = useToggleDrawer();
+  const { isOpen } = useToggleDrawer();
 
   // Force isOpen to true when in compact mode (for drawer view)
   const displayOpen = compactMode ? true : isOpen;
 
   return (
-    <div className="bg-blue-50 flex flex-col h-full">
+    <div className="bg-gradient-to-b from-[#00595c] to-[#003335] flex flex-col h-full text-white">
       <div className="p-4">
         <div className="flex items-center">
           <img
-            src="https://placehold.co/40x40/FFB000/000000.png?text=F"
+            src="https://placehold.co/40x40/ffffff/000000.png?text=PA"
             alt="Fortunewell Logo"
             className="mr-2"
           />
@@ -188,9 +183,9 @@ const SidebarContent = ({ compactMode = false }) => {
               transition: 'transform 0.3s ease, opacity 0.3s ease',
             }}
           >
-            <h1 className="text-lg font-bold text-blue-900">Fortunewell</h1>
-            <p className="text-xs text-gray-600">
-              Integrated Fuel Management System
+            <h1 className="text-lg font-bold text-white">PA ADMIN TEMPLATE</h1>
+            <p className="text-xs text-gray-200">
+              Default Template for PA systems using React/NET
             </p>
           </div>
         </div>
@@ -200,44 +195,30 @@ const SidebarContent = ({ compactMode = false }) => {
         <ul>
           <AdminNavItem />
           <NavItem
-            icon={<LayoutDashboardIcon size={18} />}
+            icon={<LayoutDashboardIcon size={18} color="white" />}
             text="Dashboard"
             url={StringRoutes.dashboard}
           />
           <NavItem
-            icon={<FileTextIcon size={18} />}
-            text="Sales Transactions"
-            url={StringRoutes.salesTransactions}
-          />
-          <NavItem
-            icon={<FuelIcon size={18} />}
-            text="Fuel Management"
-            url={StringRoutes.fuelManagement}
-          />
-          <NavItem
-            icon={<WrenchIcon size={18} />}
-            text="Service Management"
-            url={StringRoutes.serviceManagement}
-          />
-          <NavItem
-            icon={<PackageIcon size={18} />}
-            text="Inventory Management"
-            url={StringRoutes.inventoryManagement}
+            icon={<SettingsIcon size={18} color="white" />}
+            text="Settings"
+            url={StringRoutes.settings}
           />
         </ul>
 
         <ul>
           <NavItemWithDropdown
-            hdrIcon={<SettingsIcon size={18} />}
+            hdrIcon={<SettingsIcon size={18} color="white" />}
             text='Settings'
           >
             <NavLink
               to={StringRoutes.settings}
-              className='flex items-center pt-1 '>
+              className='flex items-center pt-1 hover:bg-[#00595c]/10'
+            >
               <span className='mr-3'>
-                <Users size={18} />
+                <Users size={18} color="white" />
               </span>
-              <span className='text-sm text-default-600'>
+              <span className='text-sm text-gray-200'>
                 Users
               </span>
             </NavLink>
@@ -245,36 +226,36 @@ const SidebarContent = ({ compactMode = false }) => {
 
           <NavItemWithDropdown
             text="Setup"
-            hdrIcon={<SettingsIcon color='black' size={18} />}>
+            hdrIcon={<SettingsIcon color='white' size={18} />}>
             <NavLink
               to={StringRoutes.stationList}
-              className='flex items-center py-2 '>
+              className='flex items-center py-2 hover:bg-[#00595c]/10'
+            >
               <span className='mr-3'>
-                <Users size={18} />
+                <Users size={18} color="white" />
               </span>
-              <span className='text-sm text-default-600'>
+              <span className='text-sm text-gray-200'>
                 Stations
               </span>
             </NavLink>
             <NavLink
               to={StringRoutes.globalSetup}
-              className='flex items-center py-2'>
+              className='flex items-center py-2 hover:bg-[#00595c]/10'>
               <span className='mr-3'>
-                <Users size={18} />
+                <Users size={18} color="white" />
               </span>
-              <span className='text-sm text-default-600'>
+              <span className='text-sm text-gray-200'>
                 Global Records
               </span>
             </NavLink>
           </NavItemWithDropdown>
-
         </ul>
       </nav>
     </div>
   );
 };
 
-const Sidebar = ({ screenSize = "desktop", drawerSize = "md" }) => {
+const Sidebar = ({ screenSize = "desktop", drawerSize = "md", onSetClearToken }) => {
   const { isOpen, toggleDrawer, isCompactSidebarOpen, onManageSidebarOpen } = useToggleDrawer();
 
   const shouldShowDrawer = screenSize === 'mobile' || screenSize === 'tablet';

@@ -3,6 +3,12 @@ import InitialPage from '~/Pages/InitialPage'
 import StringRoutes from '~/Constants/StringRoutes'
 import LoginPage from '~/Pages/Auth/LoginPage'
 import DashboardLayout from './Layouts/DashboardLayout'
+import Settings from './Pages/Settings'
+
+const DASHBOARD_ROUTES = [
+  { index: true, element: <div>Dashboard </div> },
+  { path: 'settings', Component: Settings }
+]
 
 const Router = createBrowserRouter([
   {
@@ -18,11 +24,9 @@ const Router = createBrowserRouter([
     Component: LoginPage
   },
   {
-    path: '/dashboard',
+    path: StringRoutes.dashboard,
     Component: DashboardLayout,
-    children: [
-      { index: true, element: <div>Dashboard </div>}
-    ]
+    children: DASHBOARD_ROUTES
   }
 ])
 
