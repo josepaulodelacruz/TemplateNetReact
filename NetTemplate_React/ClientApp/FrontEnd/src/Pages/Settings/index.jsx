@@ -25,9 +25,9 @@ const Settings = () => {
             Settings
           </NavLink>
           <NavLink
-            to={'permissions'} // Points to "settings/permissions"
+            to={'Permission'} // Points to "settings/permissions"
             className={({ isActive }) =>
-              stringRoutes.getCurrentSubRoute(pathname).includes(StringRoutes.permission)
+              isActive 
                 ? "border-b-2 pb-3 border-primary font-normal text-primary"
                 : "text-gray-500 pb-3"
             }

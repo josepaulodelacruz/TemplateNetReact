@@ -7,6 +7,10 @@ class StringRoutes {
   static dashboard = '/';
   static settings = '/settings';
 
+  static setup = '/setup';
+  static users = '/setup/users';
+  static modules = '/setup/modules';
+
   /**
    * Retrieves the current sub-route from a given pathname.
    *

@@ -1,5 +1,3 @@
-import { NavLink, useLocation } from "react-router";
-import StringRoutes from "~/Constants/StringRoutes";
 
 const NavbarTabs = ({
   children

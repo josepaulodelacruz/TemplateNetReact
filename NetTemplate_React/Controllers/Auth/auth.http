@@ -1,5 +1,5 @@
 ﻿@hostname=localhost:44393
-@token=eyJs123123hbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjA0MmFmNjgxLTNkZmItNGIwNy05M2I3LTAzNmFiMWQyMGY5NCIsImV4cCI6MTc0NDk4MjU2NSwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.4CU5AQrky_KjqFyrJNFI_nJTwaINGSfjfZBnuOckyrs
+@token=null
 
 GET https://{{hostname}}/api/auth
 Content-Type: application/json

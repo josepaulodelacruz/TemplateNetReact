@@ -6,6 +6,7 @@ import {
   ChevronDown,
   ChevronUp,
   Users,
+  Wrench,
 } from 'lucide-react'
 import useToggleDrawer from '~/Hooks/Sidenav/useToggleDrawer'
 import { useLocation, useNavigate, NavLink } from 'react-router';
@@ -83,13 +84,15 @@ const NavItemWithDropdown = ({
 
 const NavItem = ({ icon, text, active = false, indented = false, url = "" }) => {
   const { isOpen } = useToggleDrawer();
+  const { pathname } = useLocation();
+  const stringRoutes = new StringRoutes();
 
   return (
     <li>
       <NavLink
         to={url}
         className={({ isActive }) =>
-          `cursor-pointer flex items-center px-4 py-2 ${isActive ? 'bg-[#007a7e] text-white font-bold' : 'text-white font-bold hover:bg-[#00595c]/10'}`
+          `cursor-pointer flex items-center mx-2 px-2 py-2 rounded ${active ? 'bg-[#003B3D] text-white font-normal' : 'text-white font-normal hover:bg-[#00595c]'}`
         }
       >
         <span className="mr-3">{icon}</span>
@@ -162,6 +165,8 @@ const AdminNavItem = ({ onSetClearToken }) => {
 
 const SidebarContent = ({ compactMode = false }) => {
   const { isOpen } = useToggleDrawer();
+  const { pathname } = useLocation();
+  const stringRoutes = new StringRoutes();
 
   // Force isOpen to true when in compact mode (for drawer view)
   const displayOpen = compactMode ? true : isOpen;
@@ -198,11 +203,19 @@ const SidebarContent = ({ compactMode = false }) => {
             icon={<LayoutDashboardIcon size={18} color="white" />}
             text="Dashboard"
             url={StringRoutes.dashboard}
+            active={stringRoutes.getRootRoute(pathname) === ''}
           />
           <NavItem
             icon={<SettingsIcon size={18} color="white" />}
             text="Settings"
             url={StringRoutes.settings}
+            active={stringRoutes.getRootRoute(pathname) === 'settings'}
+          />
+          <NavItem
+            icon={<Wrench size={18} color="white" />}
+            text="Setup"
+            url={StringRoutes.setup}
+            active={stringRoutes.getRootRoute(pathname) === 'setup'}
           />
         </ul>
 

@@ -3,11 +3,21 @@ import InitialPage from '~/Pages/InitialPage'
 import StringRoutes from '~/Constants/StringRoutes'
 import LoginPage from '~/Pages/Auth/LoginPage'
 import DashboardLayout from './Layouts/DashboardLayout'
-import Settings from './Pages/Settings'
+import Settings from '~/Pages/Settings'
+import Setup from '~/Pages/Setup'
 
 const DASHBOARD_ROUTES = [
   { index: true, element: <div>Dashboard </div> },
-  { path: 'settings', Component: Settings }
+  { path: 'settings', Component: Settings },
+  { 
+    path: StringRoutes.setup, 
+    Component: Setup,
+    children: [
+      { path: StringRoutes.users, element: <div>Users</div>},
+      { path: StringRoutes.modules, element: <div>Modules</div>}
+    ]
+    
+  },
 ]
 
 const Router = createBrowserRouter([
