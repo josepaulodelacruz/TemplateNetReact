@@ -9,4 +9,3 @@
   "include": ["./src/**/*" /* Add other relevant folders */],
   "exclude": ["node_modules", "dist", "build", "scripts"]
 }
-
