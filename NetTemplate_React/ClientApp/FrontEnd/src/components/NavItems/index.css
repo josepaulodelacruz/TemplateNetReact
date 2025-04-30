@@ -1,4 +1,3 @@
-
 .nav-item-container {
   margin: 0 1rem;
   cursor: pointer;
@@ -6,7 +5,8 @@
 
   &:hover {
     background-color: var(--mantine-color-default-hover);
-    border-radius: 0.2rem; /* Slightly smoother */
+    border-radius: 0.2rem;
+    /* Slightly smoother */
   }
 
   .nav-item-icon-container {
@@ -29,7 +29,7 @@
   border-left: 1px solid var(--mantine-color-default-border);
 }
 
-.nav-collapsible-items-container > a {
+.nav-collapsible-items-container>a {
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -41,5 +41,11 @@
     background-color: var(--mantine-color-default-hover);
     border-radius: 0.2rem;
   }
+
 }
 
+
+a.active {
+  background-color: var(--mantine-color-default-hover);
+  border-radius: 0.2rem;
+}

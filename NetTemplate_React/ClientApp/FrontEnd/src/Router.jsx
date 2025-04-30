@@ -1,7 +1,10 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import StringRoutes from '~/constants/StringRoutes';
 import DashboardLayout from "~/layouts/DasboardLayout";
+
+//Setup
 import Setup from "~/pages/Setup";
+import User from "./sub_pages/Setup/User";
 
 const DASHBOARD_ROUTES = [
 
@@ -10,7 +13,7 @@ const DASHBOARD_ROUTES = [
     path: StringRoutes.setup, 
     Component: Setup,
     children: [
-      { path: StringRoutes.users, element: <div>Users</div>},
+      { path: StringRoutes.users, Component: User},
       { path: StringRoutes.modules, element: <div>Modules</div>}
     ]
     

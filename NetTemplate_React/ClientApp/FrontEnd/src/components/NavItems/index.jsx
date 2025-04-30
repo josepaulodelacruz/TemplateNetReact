@@ -22,7 +22,7 @@ const NavItems = ({
     <Box >
       <Group className='nav-item-container' py={5} align='center' justify='space-between' onClick={toggle}>
         <Group align='center' justify='center'>
-          <Box className='nav-item-icon-container' p={3} >
+          <Box className='nav-item-icon-container' p={5} >
             <Center>
               {leftIcon}
             </Center>
