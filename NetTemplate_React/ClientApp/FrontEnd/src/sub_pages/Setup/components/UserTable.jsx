@@ -2,7 +2,6 @@ import {
   ScrollArea,
   Table
 } from '@mantine/core'
-import { useState } from 'react';
 
 const data = [
   {
@@ -158,7 +157,6 @@ const data = [
 ];
 
 const UserTable = () => {
-  const [scrolled, setScrolled] = useState(false);
 
   const rows = data.map((row) => (
     <Table.Tr key={row.name}>

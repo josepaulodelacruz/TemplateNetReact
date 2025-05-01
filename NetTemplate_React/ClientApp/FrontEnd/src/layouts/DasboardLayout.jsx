@@ -1,10 +1,9 @@
-import { AppShell, Burger, Group, ScrollArea, Skeleton, Space, Text, TextInput, useMantineTheme } from '@mantine/core';
+import { AppShell, Burger, Group, ScrollArea, Space, Text } from '@mantine/core';
 import { useDisclosure, useHeadroom } from '@mantine/hooks';
-import { Outlet } from 'react-router';
 import { NavItems } from '~/components/NavItems';
 import { NavLink, useOutlet, useLocation } from 'react-router';
 import StringRoutes from '~/constants/StringRoutes';
-import { LayoutDashboardIcon, SettingsIcon } from 'lucide-react';
+import { LayoutDashboardIcon, WrenchIcon } from 'lucide-react';
 import { SwitchTransition, CSSTransition } from 'react-transition-group';
 import { useRef } from 'react';
 import '../index.css';
@@ -40,7 +39,7 @@ const DashboardLayout = () => {
           <NavItems leftIcon={<LayoutDashboardIcon size={18} />} label="Dashboard" >
             <NavLink to={StringRoutes.dashboard}>Dashboard</NavLink>
           </NavItems>
-          <NavItems leftIcon={<SettingsIcon size={18} />} label="Settings" >
+          <NavItems leftIcon={<WrenchIcon size={18} />} label="Setup" >
             <NavLink to={StringRoutes.users}> Users </NavLink>
             <NavLink to={StringRoutes.modules}> Modules </NavLink>
           </NavItems>

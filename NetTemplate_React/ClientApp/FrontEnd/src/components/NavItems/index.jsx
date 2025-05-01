@@ -3,9 +3,7 @@ import {
   Text,
   Collapse,
   Box,
-  AccordionChevron,
   Center,
-  useMantineTheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import './index.css';
