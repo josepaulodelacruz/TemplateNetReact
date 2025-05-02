@@ -8,6 +8,8 @@ import User from "~/sub_pages/Setup/User";
 import Modules from "~/sub_pages/Setup/Modules";
 import ModulesInitialPage from "~/sub_pages/Setup/ModulesInitialPage.jsx";
 import ModulesFormPage from "~/sub_pages/Setup/ModulesFormPage";
+import { Component } from "lucide-react";
+import Login from "./pages/Auth/Login";
 
 const DASHBOARD_ROUTES = [
 
@@ -35,6 +37,10 @@ const router = createBrowserRouter([
     path: StringRoutes.dashboard,
     Component: DashboardLayout,
     children: DASHBOARD_ROUTES
+  },
+  {
+    path: StringRoutes.login,
+    Component: Login,
   }
 ])
 

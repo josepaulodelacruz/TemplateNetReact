@@ -2,6 +2,9 @@
 
 class StringRoutes {
 
+  //auth
+  static login = '/login';
+
   static dashboard = '/'; 
 
   static setup = '/setup';
