@@ -1,6 +1,5 @@
 import { Container, Text, Title } from "@mantine/core";
 import { Outlet, useLocation } from "react-router";
-import '../../index.css'
 
 const Modules = () => {
   const { pathname } = useLocation();

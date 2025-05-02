@@ -8,7 +8,7 @@ import { theme } from './theme.ts'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <MantineProvider defaultColorScheme='dark' theme={theme}>
+    <MantineProvider defaultColorScheme='light' theme={theme}>
       <App />
     </MantineProvider>
   </StrictMode>,

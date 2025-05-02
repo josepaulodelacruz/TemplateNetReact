@@ -4,20 +4,22 @@ import {
   Text,
   Box,
   MultiSelect,
-  Paper,
+  Card,
   Space,
   Table,
   Flex,
   Button,
-  Group
+  Group,
+  UnstyledButton
 } from "@mantine/core";
+import { ChevronLeft } from "lucide-react";
 import { NavLink } from "react-router";
 import StringRoutes from "~/constants/StringRoutes";
 
 const ModulesInitialPage = () => {
   return (
     <>
-      <Title size={'50'} p={0} fw={700}>Modules</Title>
+      <Title component={'span'} style={{ viewTransitionName: 'mdl-header' }} size={50} fw={700}>Modules</Title>
       <Text size={'sm'}>Setup for modules</Text>
       <Flex justify="space-between" direction={{ base: 'column', md: 'row' }}>
         <Box w={{ base: '100%', md: 400 }} >
@@ -30,14 +32,14 @@ const ModulesInitialPage = () => {
         </Box>
         <Box mt={{ base: 20, md: 0 }}>
           <Group justify="flex-end">
-            <Button component={NavLink} to={StringRoutes.modules_form} >
+            <Button component={NavLink} to={StringRoutes.modules_form} viewTransition >
               Add Module
             </Button>
           </Group>
         </Box>
       </Flex>
       <Space h={20} />
-      <Paper p={0}>
+      <Card  p={0}>
         <Table stickyHeader stickyHeaderOffset={0}>
           <Table.Thead>
             <Table.Tr>
@@ -57,7 +59,7 @@ const ModulesInitialPage = () => {
             </Table.Tr>
           </Table.Tbody>
         </Table>
-      </Paper>
+      </Card>
     </>
   )
 }

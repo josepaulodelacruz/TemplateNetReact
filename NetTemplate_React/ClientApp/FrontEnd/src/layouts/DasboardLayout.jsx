@@ -1,10 +1,10 @@
 import { AppShell, Burger, Group, ScrollArea, Space, Text } from '@mantine/core';
 import { useDisclosure, useHeadroom } from '@mantine/hooks';
 import { NavItems } from '~/components/NavItems';
-import { NavLink, useOutlet, useLocation } from 'react-router';
+import { NavLink, useOutlet, useLocation, Outlet } from 'react-router';
 import StringRoutes from '~/constants/StringRoutes';
 import { LayoutDashboardIcon, WrenchIcon } from 'lucide-react';
-import { SwitchTransition, CSSTransition } from 'react-transition-group';
+// import { SwitchTransition, CSSTransition } from 'react-transition-group';
 import { useRef } from 'react';
 import '../index.css';
 
@@ -12,9 +12,9 @@ const DashboardLayout = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const pinned = useHeadroom({ fixedAt: 120 })
-  const currentOutlet = useOutlet();
-  const location = useLocation();
-  const ref = useRef(null);
+  // const currentOutlet = useOutlet();
+  // const location = useLocation();
+  // const ref = useRef(null);
 
   return (
     <AppShell
@@ -47,19 +47,7 @@ const DashboardLayout = () => {
         </ScrollArea>
       </AppShell.Navbar>
       <AppShell.Main>
-        <SwitchTransition>
-          <CSSTransition
-            key={location.pathname}
-            classNames="fade"
-            unmountOnExit
-            nodeRef={ref}
-            timeout={300}
-          >
-            <div ref={ref}>
-              {currentOutlet}
-            </div>
-          </CSSTransition>
-        </SwitchTransition>
+        <Outlet />
       </AppShell.Main>
     </AppShell>
   );
