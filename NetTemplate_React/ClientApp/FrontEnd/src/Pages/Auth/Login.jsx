@@ -9,6 +9,7 @@ import {
   Space,
   Checkbox,
   Divider,
+  ScrollArea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { HomeIcon, LockIcon, Mail, PhoneCall } from "lucide-react";
@@ -18,6 +19,7 @@ import { useState } from "react";
 import useAuth from "~/hooks/Auth/useAuth";
 import { useNavigate } from "react-router";
 import StringRoutes from "~/constants/StringRoutes";
+import packageJson from '../../../package.json';
 
 const formWidth = {
   sm: '100%',
@@ -45,7 +47,7 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const valid = form.validate();
-    if(valid) {
+    if (valid) {
       manageLogin();
     }
   }
@@ -59,7 +61,7 @@ const Login = () => {
         notifications.show({
           color: 'green',
           title: "Success",
-          message: "Please wait to redirect you to the dashboard" 
+          message: "Please wait to redirect you to the dashboard"
         });
 
         setTimeout(() => {
@@ -80,11 +82,10 @@ const Login = () => {
 
   return (
     <Container h={'100vh'} >
-      <Flex direction={"column"} h={"80%"} align="center" justify="center">
-
+      <Flex direction={"column"} h={"100%"} align="center" justify="center">
         <Group justify="center" align="center">
           <HomeIcon />
-          <Title fw={500}>Default Name</Title>
+          <Title fw={500}>{packageJson.name}</Title>
         </Group>
         <form onSubmit={handleSubmit}>
           <Flex direction="column" >

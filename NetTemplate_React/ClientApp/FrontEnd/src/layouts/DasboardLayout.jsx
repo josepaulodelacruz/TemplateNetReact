@@ -58,7 +58,7 @@ const DashboardLayout = () => {
             <NavLink to={StringRoutes.modules}> Modules </NavLink>
           </NavItems>
         </ScrollArea>
-        <Menu position="right-end">
+        <Menu position="top-end">
           <Menu.Target>
             <Paper radius="xs">
               <Group justify='space-between'>
