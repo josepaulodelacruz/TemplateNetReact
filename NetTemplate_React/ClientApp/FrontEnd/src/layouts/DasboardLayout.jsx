@@ -1,4 +1,4 @@
-import { Menu, AppShell, Burger, Card, Paper, Group, ScrollArea, Space, Text } from '@mantine/core';
+import { Menu, AppShell, Burger, Chip, Paper, Group, ScrollArea, Space, Text } from '@mantine/core';
 import { useDisclosure, useHeadroom } from '@mantine/hooks';
 import { NavItems } from '~/components/NavItems';
 import { NavLink, Outlet, useNavigate } from 'react-router';
@@ -7,6 +7,7 @@ import { ChevronRight, HistoryIcon, LayoutDashboardIcon, LogOutIcon, WrenchIcon 
 import '../index.css';
 import useAuth from '~/hooks/Auth/useAuth';
 import { useEffect } from 'react';
+import packageJson from '../../package.json';
 
 const DashboardLayout = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
@@ -39,7 +40,11 @@ const DashboardLayout = () => {
         <Group h="100%" px="md" >
           <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
           <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
-          <Text size="lg" fw={700}>Template Dashboard</Text>
+          <Text size="lg" fw={700}>{packageJson.name}</Text>
+          <Chip disabled={true}>
+            {packageJson.version}
+          </Chip>
+
         </Group>
       </AppShell.Header>
       <AppShell.Navbar >
