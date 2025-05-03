@@ -6,7 +6,7 @@ const useLoginMutation = () => {
     mutationFn: async (params) => {
       return client.post('/auth/login', params);
     },
-    onSuccess: (_) => {},
+    onSuccess: () => {},
   })
 
 }

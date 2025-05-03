@@ -1,9 +1,9 @@
 import { Menu, AppShell, Burger, Card, Paper, Group, ScrollArea, Space, Text } from '@mantine/core';
 import { useDisclosure, useHeadroom } from '@mantine/hooks';
 import { NavItems } from '~/components/NavItems';
-import { NavLink, useOutlet, useLocation, Outlet, useNavigate } from 'react-router';
+import { NavLink, Outlet, useNavigate } from 'react-router';
 import StringRoutes from '~/constants/StringRoutes';
-import { ChevronRight, HistoryIcon, LayoutDashboardIcon, LogOutIcon, UsersIcon, WrenchIcon } from 'lucide-react';
+import { ChevronRight, HistoryIcon, LayoutDashboardIcon, LogOutIcon, WrenchIcon } from 'lucide-react';
 import '../index.css';
 import useAuth from '~/hooks/Auth/useAuth';
 import { useEffect } from 'react';
