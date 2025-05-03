@@ -1,0 +1,13 @@
+
+.error-container {
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  background-color: #fcd5d5; /* Darker red */
+}
+
+.error-text {
+  font-size: 0.875rem; /* Equivalent to `text-sm` */
+  font-weight: 600; /* Equivalent to `font-semibold` */
+  color: #4b5563;
+}
+

@@ -1,22 +1,22 @@
 import {
-  Container,
   Title,
   Text,
   Box,
   MultiSelect,
   Card,
   Space,
-  Table,
   Flex,
   Button,
   Group,
-  UnstyledButton
 } from "@mantine/core";
-import { ChevronLeft } from "lucide-react";
 import { NavLink } from "react-router";
 import StringRoutes from "~/constants/StringRoutes";
+import ModuleItemsTable from "./components/ModuleItemsTable";
+
+
 
 const ModulesInitialPage = () => {
+
   return (
     <>
       <Title component={'span'} style={{ viewTransitionName: 'mdl-header' }} size={50} fw={700}>Modules</Title>
@@ -39,26 +39,8 @@ const ModulesInitialPage = () => {
         </Box>
       </Flex>
       <Space h={20} />
-      <Card  p={0}>
-        <Table stickyHeader stickyHeaderOffset={0}>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>ID</Table.Th>
-              <Table.Th>Name</Table.Th>
-              <Table.Th>Parent Module</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            <Table.Tr>
-              <Table.Td>1</Table.Td>
-              <Table.Td>
-                <Text size="sm" fw={300}>Dashboard</Text>
-              </Table.Td>
-              <Table.Td>
-              </Table.Td>
-            </Table.Tr>
-          </Table.Tbody>
-        </Table>
+      <Card p={0}>
+        <ModuleItemsTable />
       </Card>
     </>
   )

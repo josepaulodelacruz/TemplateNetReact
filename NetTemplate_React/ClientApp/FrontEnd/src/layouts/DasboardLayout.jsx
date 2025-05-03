@@ -60,7 +60,7 @@ const DashboardLayout = () => {
         </ScrollArea>
         <Menu position="top-end">
           <Menu.Target>
-            <Paper radius="xs">
+            <Paper  style={{cursor: 'pointer'}} radius="xs">
               <Group justify='space-between'>
                 <Text>Default User</Text>
                 <ChevronRight />

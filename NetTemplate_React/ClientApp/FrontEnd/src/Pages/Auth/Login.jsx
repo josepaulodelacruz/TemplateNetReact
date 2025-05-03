@@ -47,12 +47,11 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const valid = form.validate();
-    if (valid) {
-      manageLogin();
-    }
+
+    if (valid) onManageLogin();
   }
 
-  const manageLogin = () => {
+  const onManageLogin = () => {
     setIsLoading(true);
     loginMutation.mutate(form.getValues(), {
       onSuccess: (response) => {

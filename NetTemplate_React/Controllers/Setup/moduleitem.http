@@ -1,0 +1,19 @@
+﻿@hostname=localhost:44393
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImQ4OTIxNmJjLWE4MzctNDc5NS04NWVjLTA3Y2NkNDcxYmUwNyIsImV4cCI6MTc0NjI4MzIyMywiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.wG4ScLWKsddWH7lA0NFmeKeTvkBBlpGCK4HAwveABII
+
+###
+GET https://{{hostname}}/api/ModuleItems
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+###
+
+###
+POST https://{{hostname}}/api/ModuleItems
+Content-Type: application/json
+Authorization: Bearer {{token}}
+{
+  "name": "Setup",
+  "parent_id": null,
+  "parent_name": null 
+}
+###
