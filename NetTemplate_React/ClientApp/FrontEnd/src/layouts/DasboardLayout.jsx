@@ -1,20 +1,29 @@
-import { AppShell, Burger, Group, ScrollArea, Space, Text } from '@mantine/core';
+import { Menu, AppShell, Burger, Card, Paper, Group, ScrollArea, Space, Text } from '@mantine/core';
 import { useDisclosure, useHeadroom } from '@mantine/hooks';
 import { NavItems } from '~/components/NavItems';
-import { NavLink, useOutlet, useLocation, Outlet } from 'react-router';
+import { NavLink, useOutlet, useLocation, Outlet, useNavigate } from 'react-router';
 import StringRoutes from '~/constants/StringRoutes';
-import { LayoutDashboardIcon, WrenchIcon } from 'lucide-react';
-// import { SwitchTransition, CSSTransition } from 'react-transition-group';
-import { useRef } from 'react';
+import { ChevronRight, HistoryIcon, LayoutDashboardIcon, LogOutIcon, UsersIcon, WrenchIcon } from 'lucide-react';
 import '../index.css';
+import useAuth from '~/hooks/Auth/useAuth';
+import { useEffect } from 'react';
 
 const DashboardLayout = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const pinned = useHeadroom({ fixedAt: 120 })
-  // const currentOutlet = useOutlet();
-  // const location = useLocation();
-  // const ref = useRef(null);
+  const { token, onSetClearToken } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (token === null) {
+      navigate(StringRoutes.login);
+    }
+  }, [token, navigate])
+
+  const handleLogout = () => {
+    onSetClearToken();
+  }
 
   return (
     <AppShell
@@ -34,7 +43,7 @@ const DashboardLayout = () => {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar >
-        <ScrollArea>
+        <ScrollArea h={'100%'}>
           <Space h={15} />
           <NavItems leftIcon={<LayoutDashboardIcon size={18} />} label="Dashboard" >
             <NavLink to={StringRoutes.dashboard}>Dashboard</NavLink>
@@ -43,8 +52,27 @@ const DashboardLayout = () => {
             <NavLink to={StringRoutes.users}> Users </NavLink>
             <NavLink to={StringRoutes.modules}> Modules </NavLink>
           </NavItems>
-
         </ScrollArea>
+        <Menu position="right-end">
+          <Menu.Target>
+            <Paper radius="xs">
+              <Group justify='space-between'>
+                <Text>Default User</Text>
+                <ChevronRight />
+              </Group>
+            </Paper>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item leftSection={<HistoryIcon />}>
+              View History
+            </Menu.Item>
+            <Menu.Item onClick={handleLogout} leftSection={<LogOutIcon />}>
+              Logout
+            </Menu.Item>
+          </Menu.Dropdown>
+
+        </Menu>
+
       </AppShell.Navbar>
       <AppShell.Main>
         <Outlet />

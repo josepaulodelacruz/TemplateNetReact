@@ -43,6 +43,13 @@ namespace NetTemplate_React
                 
             });
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder => builder.WithOrigins("http://localhost:5173") //add front end url if deployed
+                    .AllowAnyHeader()
+                    .AllowAnyMethod());
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -103,7 +110,8 @@ namespace NetTemplate_React
 
             app.UseAPILogger();
 
-            //app.UseResponseCapture();
+
+            app.UseCors("AllowSpecificOrigin");
 
             app.UseMvc();
         }
