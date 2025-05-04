@@ -1,4 +1,4 @@
-import { Table, Skeleton, Text } from "@mantine/core";
+import { Table, Skeleton, Text, UnstyledButton, Button } from "@mantine/core";
 import { useEffect } from "react";
 import ErrorElement from "~/components/ErrorElement";
 import useGetModuleItems from "~/hooks/Setup/Modules/useGetModuleItems";
@@ -26,7 +26,6 @@ const ModuleItemsTable = () => {
     return <ErrorElement>{error.response?.data.message || error.message}</ErrorElement>
   }
 
-
   const rows = data.body?.map((module, index) => {
     return (
       <Table.Tr key={index}>
@@ -35,6 +34,11 @@ const ModuleItemsTable = () => {
           <Text size="sm" fw={300}>{module.name}</Text>
         </Table.Td>
         <Table.Td>
+        </Table.Td>
+        <Table.Td align="center">
+          <Button variant="light" size="xs">
+            View
+          </Button>
         </Table.Td>
       </Table.Tr>
     )
@@ -47,6 +51,7 @@ const ModuleItemsTable = () => {
           <Table.Th>ID</Table.Th>
           <Table.Th>Name</Table.Th>
           <Table.Th>Parent Module</Table.Th>
+          <Table.Th style={{textAlign: 'center'}}>Action</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>

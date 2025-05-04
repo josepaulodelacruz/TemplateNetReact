@@ -13,7 +13,7 @@ namespace NetTemplate_React.Services.Setup
 {
     public interface IModuleItemService
     {
-        Task<Response> GetModules();
+        Task<Response> GetModules(string id = null);
 
         Task<Response> AddModuleItem(ModuleItem moduleItem);
     }
@@ -28,7 +28,7 @@ namespace NetTemplate_React.Services.Setup
             _conString = conString;
             _configuration = configuration;
         }
-        public async Task<Response> GetModules()
+        public async Task<Response> GetModules(string id = null)
         {
             try
             {
@@ -37,10 +37,12 @@ namespace NetTemplate_React.Services.Setup
                 {
                     await con.OpenAsync();
 
-                    string commandText = "SELECT * FROM ModuleItems";
+                    string commandText = "SELECT * FROM ModuleItems WHERE @ID IS NULL OR ID = @ID";
 
                     using (SqlCommand cmd = new SqlCommand(commandText, con))
                     {
+                        cmd.Parameters.AddWithValue("@ID", (object) id ?? DBNull.Value);
+
                         using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
                             while(await reader.ReadAsync())
@@ -71,7 +73,7 @@ namespace NetTemplate_React.Services.Setup
             {
                 return new Response(
                     success: false,
-                    debugScript: null,
+                    debugScript: ex.Message,
                     message: ex.Message,
                     body: null
                 );
@@ -80,7 +82,7 @@ namespace NetTemplate_React.Services.Setup
             {
                 return new Response(
                     success: false,
-                    debugScript: null,
+                    debugScript: ex.Message,
                     message: ex.Message,
                     body: null
                 );

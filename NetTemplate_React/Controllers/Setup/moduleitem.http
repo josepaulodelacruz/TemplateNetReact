@@ -16,3 +16,10 @@ Authorization: Bearer {{token}}
   "parent_id": null,
 }
 ###
+
+
+###
+GET https://{{hostname}}/api/ModuleItems/3
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+###
