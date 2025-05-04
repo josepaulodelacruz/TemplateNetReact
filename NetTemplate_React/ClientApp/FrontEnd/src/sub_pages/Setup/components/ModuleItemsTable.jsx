@@ -1,9 +1,22 @@
 import { Table, Skeleton, Text } from "@mantine/core";
+import { useEffect } from "react";
 import ErrorElement from "~/components/ErrorElement";
 import useGetModuleItems from "~/hooks/Setup/Modules/useGetModuleItems";
+import useModuleItems from "~/hooks/Setup/Modules/useModuleItems";
 
 const ModuleItemsTable = () => {
-  const { data, isLoading, isError, error } = useGetModuleItems();
+  const { onSetModules } = useModuleItems();
+  const { data, isLoading, isSuccess, isError, error } = useGetModuleItems();
+
+  useEffect(() => {
+    if (isSuccess) {
+      const items = data.body?.map((item) => ({
+        value: item.id.toString(),
+        label: item.name,
+      }))
+      onSetModules(items);
+    }
+  }, [isSuccess])
 
   if (isLoading) {
     return <Skeleton height={50} />
@@ -12,6 +25,7 @@ const ModuleItemsTable = () => {
   if (isError) {
     return <ErrorElement>{error.response?.data.message || error.message}</ErrorElement>
   }
+
 
   const rows = data.body?.map((module, index) => {
     return (

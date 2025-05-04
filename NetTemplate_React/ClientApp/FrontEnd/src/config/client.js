@@ -24,6 +24,20 @@ client.interceptors.request.use(
   }
 );
 
+client.interceptors.response.use(
+  (config) => config,
+  (error) => {
+    const invalidStatus = [403, 401];
+    if (
+      error.response?.status &&
+      invalidStatus.includes(error.response?.status)
+    )
+      useAuth.getState().onSetClearToken();
+
+    return Promise.reject(error);
+  }
+);
+
 
 export default client;
 

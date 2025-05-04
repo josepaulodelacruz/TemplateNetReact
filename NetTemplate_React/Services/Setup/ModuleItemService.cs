@@ -115,19 +115,28 @@ namespace NetTemplate_React.Services.Setup
             }
             catch (SqlException ex)
             {
+                if (ex.Number == 2627)
+                {
+                    return new Response(
+                        success: false,
+                        debugScript: ex.Message,
+                        message: "Module name already exist.",
+                        body: null
+                    );
+                } // SQL Error Code for UNIQUE constraint violation
+
                 return new Response(
                     success: false,
-                    debugScript: "",
+                    debugScript: ex.Message,
                     message: $"SQL Error: {ex.Message}",
                     body: null
                 );
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Unexpected Error: {ex.Message}");
                 return new Response(
                     success: false,
-                    debugScript: "",
+                    debugScript: ex.Message,
                     message: $"Unexpected Error: {ex.Message}",
                     body: null
                 );

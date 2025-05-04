@@ -1,5 +1,5 @@
 ﻿@hostname=localhost:44393
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImQ4OTIxNmJjLWE4MzctNDc5NS04NWVjLTA3Y2NkNDcxYmUwNyIsImV4cCI6MTc0NjI4MzIyMywiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.wG4ScLWKsddWH7lA0NFmeKeTvkBBlpGCK4HAwveABII
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6Ijk2NDNkZjQzLWM1NTktNDYzMy1hODQ3LWY4ZjMwOWY0ZjA2YiIsImV4cCI6MTc0NjMzMTQ2OCwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.N5ULatMafFh6i5bSYZZouQGrhnrgrR3DtJIEuXJuH0E
 
 ###
 GET https://{{hostname}}/api/ModuleItems
@@ -12,8 +12,7 @@ POST https://{{hostname}}/api/ModuleItems
 Content-Type: application/json
 Authorization: Bearer {{token}}
 {
-  "name": "Setup",
+  "name": "test 123",
   "parent_id": null,
-  "parent_name": null 
 }
 ###

@@ -9,7 +9,6 @@ import {
   Space,
   Checkbox,
   Divider,
-  ScrollArea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { HomeIcon, LockIcon, Mail, PhoneCall } from "lucide-react";
