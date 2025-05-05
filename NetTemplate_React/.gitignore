@@ -487,3 +487,6 @@ $RECYCLE.BIN/
 # exlucde react build 
 */build/
 */dist/
+
+#exlucde appsettings.json env variables
+appsettings.json

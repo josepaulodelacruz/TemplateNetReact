@@ -1,5 +1,5 @@
 ﻿@hostname=localhost:44393
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6Ijk2NDNkZjQzLWM1NTktNDYzMy1hODQ3LWY4ZjMwOWY0ZjA2YiIsImV4cCI6MTc0NjMzMTQ2OCwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.N5ULatMafFh6i5bSYZZouQGrhnrgrR3DtJIEuXJuH0E
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImQ2NjY3MDlkLTk5M2YtNGQyMC04YzIyLWMwN2NlZGViYTFiZCIsImV4cCI6MTc0NjQ0MDU3NCwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.wj6TcDq1SCxlLhnH-_jA088ul5F2QSkmn7qYj3hPJv0
 
 ###
 GET https://{{hostname}}/api/ModuleItems
@@ -17,9 +17,28 @@ Authorization: Bearer {{token}}
 }
 ###
 
-
 ###
 GET https://{{hostname}}/api/ModuleItems/3
 Content-Type: application/json
 Authorization: Bearer {{token}} 
 ###
+
+###
+PUT https://{{hostname}}/api/ModuleItems/2
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+{
+  "name": "test 123",
+  "parent_id": 2,
+  "parent_name": "Setup"
+}
+###
+
+###
+DELETE https://{{hostname}}/api/ModuleItems/1
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+###
+
+
+

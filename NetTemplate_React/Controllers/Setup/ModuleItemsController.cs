@@ -55,14 +55,24 @@ namespace NetTemplate_React.Controllers.Setup
 
         // PUT api/<ModuleItemsController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(int id, [FromBody] ModuleItem body)
         {
+            var response = await _service.EditModuleItem(id, body);
+
+            if (!response.Success) return new BadRequestObjectResult(response);
+
+            return new OkObjectResult(response);
         }
 
         // DELETE api/<ModuleItemsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            var response = await _service.DeleteModuleItem(id);
+
+            if (!response.Success) return new BadRequestObjectResult(response);
+
+            return new OkObjectResult(response);
         }
     }
 }

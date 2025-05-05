@@ -16,6 +16,10 @@ namespace NetTemplate_React.Services.Setup
         Task<Response> GetModules(string id = null);
 
         Task<Response> AddModuleItem(ModuleItem moduleItem);
+
+        Task<Response> EditModuleItem(int id, ModuleItem  moduleItem);
+
+        Task<Response> DeleteModuleItem(int id);
     }
 
     public class ModuleItemService : IModuleItemService
@@ -30,6 +34,7 @@ namespace NetTemplate_React.Services.Setup
         }
         public async Task<Response> GetModules(string id = null)
         {
+            string commandText = "SELECT * FROM ModuleItems WHERE @ID IS NULL OR ID = @ID";
             try
             {
                 List<ModuleItem> ModuleItems = new List<ModuleItem>();
@@ -37,7 +42,6 @@ namespace NetTemplate_React.Services.Setup
                 {
                     await con.OpenAsync();
 
-                    string commandText = "SELECT * FROM ModuleItems WHERE @ID IS NULL OR ID = @ID";
 
                     using (SqlCommand cmd = new SqlCommand(commandText, con))
                     {
@@ -55,9 +59,18 @@ namespace NetTemplate_React.Services.Setup
                                     ParentName = reader.IsDBNull(reader.GetOrdinal("PARENT_NAME")) ? null : reader["PARENT_NAME"].ToString(),
                                 });
                             }
-
                         }
-                        
+                    }
+
+                    //throw error if no module id is found
+                    if(id != null && ModuleItems.Count == 0)
+                    {
+                        return new Response(
+                            success: false,
+                            debugScript: commandText,
+                            message: "No module found",
+                            body: null
+                        );
                     }
 
                     return new Response(
@@ -73,7 +86,7 @@ namespace NetTemplate_React.Services.Setup
             {
                 return new Response(
                     success: false,
-                    debugScript: ex.Message,
+                    debugScript: commandText,
                     message: ex.Message,
                     body: null
                 );
@@ -82,7 +95,7 @@ namespace NetTemplate_React.Services.Setup
             {
                 return new Response(
                     success: false,
-                    debugScript: ex.Message,
+                    debugScript: commandText,
                     message: ex.Message,
                     body: null
                 );
@@ -145,8 +158,104 @@ namespace NetTemplate_React.Services.Setup
             }
         }
 
+        public async Task<Response> EditModuleItem(int id, ModuleItem  moduleItem)
+        {
+            string commandText = "UPDATE ModuleItems \n" +
+                "SET " +
+                "    NAME = @NAME" +
+                ",   PARENT_ID = @PARENT_ID" +
+                ",   PARENT_NAME = @PARENT_NAME \n" +
+                "WHERE ID = @ID";
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conString))
+                {
+                    await con.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand(commandText, con))
+                    {
+                        cmd.Parameters.AddWithValue("@NAME", moduleItem.Name);
+                        cmd.Parameters.Add(new SqlParameter("@parent_name", SqlDbType.NVarChar) { Value = (object)moduleItem.ParentName ?? DBNull.Value });
+                        cmd.Parameters.Add(new SqlParameter("@parent_id", SqlDbType.Int) { Value =  (object)moduleItem.ParentId ?? DBNull.Value});
+                        cmd.Parameters.AddWithValue("@ID", id);
+
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                return new Response(
+                    success: true,
+                    debugScript: commandText,
+                    message: "Successfully Update module item.",
+                    body: null
+                );
+
+            } 
+            catch (SqlException ex)
+            {
+                return new Response(
+                    success: false,
+                    debugScript: commandText,
+                    message: ex.Message,
+                    body: null
+                );
+            }
+            catch (Exception ex)
+            {
+                return new Response(
+                    success: false,
+                    debugScript: commandText,
+                    message: ex.Message,
+                    body: null
+                );
+            }
+        }
 
 
+        public async Task<Response> DeleteModuleItem(int id)
+        {
+            string commandText = "DELETE FROM ModuleItems WHERE ID = @ID";
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conString))
+                {
+                    await con.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand(commandText, con))
+                    {
+                        cmd.Parameters.AddWithValue("@ID", id);
+
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                return new Response(
+                    success: true,
+                    debugScript: commandText,
+                    message: "Successfully deleted module item",
+                    body: null
+                );
+            } 
+            catch (SqlException ex)
+            {
+                return new Response(
+                    success: false,
+                    debugScript: commandText,
+                    message: ex.Message,
+                    body: null
+                );
+            } 
+            catch (Exception ex)
+            {
+                return new Response(
+                    success: false,
+                    debugScript: commandText,
+                    message: ex.Message,
+                    body: null
+                );
+            }
+        }
 
     }
 }

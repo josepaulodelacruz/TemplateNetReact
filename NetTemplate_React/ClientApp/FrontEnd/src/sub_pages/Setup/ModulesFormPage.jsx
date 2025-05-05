@@ -10,16 +10,20 @@ import {
   TextInput,
   Space,
   Select,
-  Loader
+  Loader,
+  Skeleton
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import ErrorElement from "~/components/ErrorElement";
+import useGetModuleItemById from "~/hooks/Setup/Modules/useGetModuleItemById";
 import useGetModuleItems from "~/hooks/Setup/Modules/useGetModuleItems";
 import useModuleItemsAddMutation from "~/hooks/Setup/Modules/useModuleItemsAddMutation";
+import { useQueryClient } from "@tanstack/react-query";
+import QueryKeys from "~/Constants/QueryKeys";
 
 const SelectModule = ({ form }) => {
   const { data, isLoading, isError, isSuccess } = useGetModuleItems();
@@ -44,7 +48,6 @@ const SelectModule = ({ form }) => {
     return <ErrorElement >Something went wrong!</ErrorElement>
   }
 
-
   return (
     <Select
       key={form.key('parent_id')}
@@ -57,7 +60,10 @@ const SelectModule = ({ form }) => {
 }
 
 const ModulesFormPage = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data, isError, isSuccess, isLoading, error } = useGetModuleItemById();
   const addModuleMutation = useModuleItemsAddMutation();
   const form = useForm({
     mode: 'uncontrolled',
@@ -67,11 +73,26 @@ const ModulesFormPage = () => {
     }
   });
 
+  useEffect(() => {
+    if (id === undefined) {
+      queryClient.invalidateQueries([QueryKeys.MODULE_ITEM_ID]);
+      form.reset();
+    }
+  }, [id])
+
+  useEffect(() => {
+    if (isSuccess) {
+      form.reset();
+      form.setValues(data.body[0]);
+    }
+  }, [isLoading])
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    //add module item
-    onManageAdd();
+    return id === undefined ? 
+      onManageAdd() :
+      onManageEdit();
   }
 
   const onManageAdd = () => {
@@ -88,7 +109,6 @@ const ModulesFormPage = () => {
         }, 500)
       },
       onError: (error) => {
-        console.log(error);
         notifications.show({
           color: 'red',
           title: "Failed Attempt!",
@@ -96,6 +116,10 @@ const ModulesFormPage = () => {
         })
       }
     })
+  }
+
+  const onManageEdit = () => {
+    
 
   }
 
@@ -108,39 +132,44 @@ const ModulesFormPage = () => {
         <Title component={'span'} style={{ viewTransitionName: 'mdl-header' }} size={50} fw={700}>Modules</Title>
       </Group>
       <Text size={'sm'}>Add new module</Text>
-      <Center>
-        <Container w={'30rem'} mt={30} >
-          <form onSubmit={handleSubmit}>
-            <Card shadow="sm">
-              <Text fw={700}>Add New Module</Text>
-              <Space h={'sm'} />
-              <TextInput
-                withAsterisk
-                size="lg"
-                key={form.key('name')}
-                required
-                placeholder="Enter module name"
-                label="Module Name"
-                {...form.getInputProps('name')}
-              />
-              <Space h={'sm'} />
-              <SelectModule
-                form={form}
-              />
+      {
+        isError ?
+          <ErrorElement>{error.response.data?.message || error.message}</ErrorElement>
+          : <Center>
+            <Container w={'30rem'} mt={30} >
+              <form onSubmit={handleSubmit}>
+                <Card shadow="sm">
+                  <Text fw={700}>Add New Module</Text>
+                  <Space h={'sm'} />
+                  <TextInput
+                    withAsterisk
+                    size="lg"
+                    key={form.key('name')}
+                    required
+                    placeholder="Enter module name"
+                    label="Module Name"
+                    rightSection={isLoading ? <Loader size="xs" /> : null}
+                    {...form.getInputProps('name')}
+                  />
+                  <Space h={'sm'} />
+                  <SelectModule
+                    form={form}
+                  />
 
-              <Space h={'sm'} />
-              <Group justify="flex-end">
-                <Button onClick={() => navigate(-1)} variant="outline" color="default">
-                  Cancel
-                </Button>
-                <Button type="submit">
-                  Add
-                </Button>
-              </Group>
-            </Card>
-          </form>
-        </Container>
-      </Center>
+                  <Space h={'sm'} />
+                  <Group justify="flex-end">
+                    <Button onClick={() => navigate(-1)} variant="outline" color="default">
+                      Cancel
+                    </Button>
+                    <Button type="submit">
+                      Add
+                    </Button>
+                  </Group>
+                </Card>
+              </form>
+            </Container>
+          </Center>
+      }
     </>
   )
 }

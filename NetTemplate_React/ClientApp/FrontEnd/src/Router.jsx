@@ -24,7 +24,7 @@ const DASHBOARD_ROUTES = [
         Component: Modules,
         children: [
           { index: true, Component: ModulesInitialPage },
-          { path: StringRoutes.modules_form, Component: ModulesFormPage },
+          { path: `${StringRoutes.modules_form}/:id?`, Component: ModulesFormPage },
         ]
       }
     ]

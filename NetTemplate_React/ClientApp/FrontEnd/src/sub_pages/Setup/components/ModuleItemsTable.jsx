@@ -1,6 +1,8 @@
 import { Table, Skeleton, Text, UnstyledButton, Button } from "@mantine/core";
 import { useEffect } from "react";
+import { Link } from "react-router";
 import ErrorElement from "~/components/ErrorElement";
+import StringRoutes from "~/constants/StringRoutes";
 import useGetModuleItems from "~/hooks/Setup/Modules/useGetModuleItems";
 import useModuleItems from "~/hooks/Setup/Modules/useModuleItems";
 
@@ -36,7 +38,7 @@ const ModuleItemsTable = () => {
         <Table.Td>
         </Table.Td>
         <Table.Td align="center">
-          <Button variant="light" size="xs">
+          <Button component={Link} to={`${StringRoutes.modules_form}/${module.id}`} variant="light" size="xs">
             View
           </Button>
         </Table.Td>
