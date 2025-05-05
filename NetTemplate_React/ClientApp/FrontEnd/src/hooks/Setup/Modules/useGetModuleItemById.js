@@ -14,7 +14,6 @@ const useGetModuleItemById = () => {
       return response.data;
     },
     enabled: (id === undefined ? false : true), // if true fetch on page mount
-    staleTime: 0,
   })
 }
 

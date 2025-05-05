@@ -25,6 +25,7 @@ import useGetModuleItems from "~/hooks/Setup/Modules/useGetModuleItems";
 import useModuleItemsAddMutation from "~/hooks/Setup/Modules/useModuleItemsAddMutation";
 import { useQueryClient } from "@tanstack/react-query";
 import QueryKeys from "~/Constants/QueryKeys";
+import useModuleItemDeleteMutation from "~/hooks/Setup/Modules/useModuleItemDeleteMutation";
 
 const SelectModule = ({ form }) => {
   const { data, isLoading, isError, isSuccess } = useGetModuleItems();
@@ -66,6 +67,7 @@ const ModulesFormPage = () => {
   const queryClient = useQueryClient();
   const { data, isError, isSuccess, isLoading, error } = useGetModuleItemById();
   const addModuleMutation = useModuleItemsAddMutation();
+  const deleteModuleMutation = useModuleItemDeleteMutation();
   const [opened, { open, close }] = useDisclosure(false);
   const form = useForm({
     mode: 'uncontrolled',
@@ -125,6 +127,31 @@ const ModulesFormPage = () => {
 
   }
 
+  const onManageDelete = async () => {
+    if (id === undefined) return;
+    deleteModuleMutation.mutate(id, {
+      onSuccess: (response) => {
+        queryClient.invalidateQueries([QueryKeys.MODULE_ITEMS])
+        notifications.show({
+          color: 'green',
+          title: "Success",
+          message: response.message,
+        });
+        close();
+        setTimeout(() => {
+          navigate(-1);
+        }, 500)
+      },
+      onError: (error) => {
+        notifications.show({
+          color: 'red',
+          title: "Failed",
+          message: error.response?.data?.message || error.message,
+        })
+      }
+    })
+  }
+
   return (
     <>
       <Group>
@@ -159,43 +186,45 @@ const ModulesFormPage = () => {
                   />
 
                   <Space h={'lg'} />
-                  <Group justify="space-between">
-                    <Button onClick={open} variant="light" color="red">
-                      Delete...
-                    </Button>
-                    <div>
+                  <Group justify="flex-end" flex={1}>
+                    {
+                      id !== undefined &&
+                      <Group flex={1}>
+                        <Button onClick={open} variant="light" color="red">
+                          Delete...
+                        </Button>
+                      </Group>
+                    }
+
+                    <Group>
                       <Button onClick={() => navigate(-1)} variant="outline" color="default">
                         Cancel
                       </Button>
                       <Button type="submit">
                         Add
                       </Button>
-                    </div>
+                    </Group>
                   </Group>
                 </Card>
               </form>
             </Container>
           </Center>
       }
-
-
       <Modal
-         overlayProps={{
+        overlayProps={{
           backgroundOpacity: 0.55,
           blur: 3,
         }}
         opened={opened} onClose={close} title="Delete Module Item">
-        <Title size="md">Are you sure you want to delete this Module</Title>
-        <Space h={'lg'}/>
+        <Title size="md">Are you sure you want to delete this Module?</Title>
+        <Space h={'lg'} />
         <Group justify="flex-end">
           <Button onClick={close} color="default">
             Cancel
           </Button>
-          <Button color="red" variant="outline">
+          <Button onClick={onManageDelete} color="red" variant="outline">
             Confirmed
           </Button>
-
-
         </Group>
       </Modal>
     </>

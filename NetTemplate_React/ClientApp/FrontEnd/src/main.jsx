@@ -17,12 +17,12 @@ const client = new QueryClient({
 })
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <MantineProvider defaultColorScheme='dark' theme={theme}>
       <Notifications />
       <QueryClientProvider client={client} >
         <App />
       </QueryClientProvider>
     </MantineProvider>
-  </StrictMode>,
+  // </StrictMode>,
 )
