@@ -1,4 +1,4 @@
-import { Table, Skeleton, Text, UnstyledButton, Button } from "@mantine/core";
+import { Table, Skeleton, Text, UnstyledButton, Button, Pill } from "@mantine/core";
 import { useEffect } from "react";
 import { Link } from "react-router";
 import ErrorElement from "~/components/ErrorElement";
@@ -36,6 +36,12 @@ const ModuleItemsTable = () => {
           <Text size="sm" fw={300}>{module.name}</Text>
         </Table.Td>
         <Table.Td>
+          {
+            module.parent_name &&
+            <Pill onChange={null} size="sm">
+              {module.parent_name}
+            </Pill>
+          }
         </Table.Td>
         <Table.Td align="center">
           <Button component={Link} to={`${StringRoutes.modules_form}/${module.id}`} variant="light" size="xs">
@@ -53,7 +59,7 @@ const ModuleItemsTable = () => {
           <Table.Th>ID</Table.Th>
           <Table.Th>Name</Table.Th>
           <Table.Th>Parent Module</Table.Th>
-          <Table.Th style={{textAlign: 'center'}}>Action</Table.Th>
+          <Table.Th style={{ textAlign: 'center' }}>Action</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>

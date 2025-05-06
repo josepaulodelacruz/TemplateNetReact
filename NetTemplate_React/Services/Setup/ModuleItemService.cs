@@ -34,7 +34,16 @@ namespace NetTemplate_React.Services.Setup
         }
         public async Task<Response> GetModules(string id = null)
         {
-            string commandText = "SELECT * FROM ModuleItems WHERE @ID IS NULL OR ID = @ID";
+            //string commandText = "SELECT * FROM ModuleItems WHERE @ID IS NULL OR ID = @ID";
+            string commandText =
+                "SELECT " +
+                    "main.[ID], " +
+                    "main.[NAME], " +
+                    "main.[PARENT_ID], " +
+                    "sec.[NAME] AS [PARENT_NAME] " +
+                "FROM [dbo].[ModuleItems] main " +
+                "LEFT JOIN [dbo].[ModuleItems] sec ON main.[PARENT_ID] = sec.[ID] " +
+                "WHERE @ID IS NULL OR main.[ID] = @ID";
             try
             {
                 List<ModuleItem> ModuleItems = new List<ModuleItem>();
