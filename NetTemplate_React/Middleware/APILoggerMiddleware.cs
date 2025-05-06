@@ -16,264 +16,391 @@ using Microsoft.IO;
 namespace NetTemplate_React.Middleware
 {
     // Middleware class to log API requests
-    // Middleware class to log API requests
     public class APILoggerMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
-        private readonly string _connectionString; // Connection string for the database
-        private readonly string _tableName; // Name of the table to log to
+        private readonly string _connectionString;
+        private readonly string _tableName;
         private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager;
-        private int MaxBodyLength = 1500;
+        private readonly int _maxBodyLength;
 
-        // Constructor for the middleware, injects dependencies
         public APILoggerMiddleware(RequestDelegate next, ILoggerFactory loggerFactory, IConfiguration configuration)
         {
-            _next = next;
-            _logger = loggerFactory.CreateLogger<APILoggerMiddleware>();
-            // Use IConfiguration to get the connection string.  This is the preferred way.
-            _connectionString = configuration.GetConnectionString("DEV"); //Make sure you have this in appsettings.json
-            _tableName = configuration.GetValue<string>("APILogger:TableName") ?? "APILogs"; //Gets the table name from config
+            _next = next ?? throw new ArgumentNullException(nameof(next));
+            _logger = loggerFactory?.CreateLogger<APILoggerMiddleware>() ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _connectionString = configuration.GetConnectionString("DEV") ?? throw new InvalidOperationException("Connection string 'DEV' not found in configuration");
+            _tableName = configuration.GetValue<string>("APILogger:TableName") ?? "APILogs";
             _recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
+            _maxBodyLength = configuration.GetValue<int>("APILogger:MaxBodyLength", 1500);
         }
 
-        // Method to handle each HTTP request
         public async Task Invoke(HttpContext context)
         {
-            // Check if logging is enabled (optional, based on a configuration)
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (!IsLoggingEnabled())
             {
-                await _next(context); // Skip logging if not enabled
+                await _next(context).ConfigureAwait(false);
                 return;
             }
 
-            var stopwatch = Stopwatch.StartNew(); // Start timer to measure duration
-            string requestBody = await ReadRequestBody(context.Request); // Read the request body
-            DateTime startTime = DateTime.UtcNow; // Record the start time
-            string userId = GetUserId(context); // Get User ID
+            var stopwatch = Stopwatch.StartNew();
+            DateTime startTime = DateTime.UtcNow;
+            string userId = GetUserId(context);
 
-            // Prepare log message for the start of the request
-            var logStartEntry = new LogEntry
-            {
-                Timestamp = startTime,
-                EventType = "RequestStart",
-                Message = $"Request started: {context.Request.Method} {context.Request.Path}",
-                RequestPath = context.Request.Path,
-                RequestMethod = context.Request.Method,
-                Body = requestBody,
-                UserId = userId
-            };
-
-            // Log the start of the request to the database
-            await LogToDatabase(logStartEntry);
-
-            // Store the start time in the context for later use
+            // Store values in context items for later use
             context.Items["RequestStartTime"] = startTime;
-            context.Items["UserId"] = userId; //Store userId
+            context.Items["UserId"] = userId;
+
+            // Read request body - only if needed and within size limits
+            string requestBody = null;
+            if (ShouldCaptureRequestBody(context.Request))
+            {
+                requestBody = await ReadRequestBodyAsync(context.Request).ConfigureAwait(false);
+            }
+
+            // Log request start (fire and forget to avoid delaying the request)
+            // In .NET 2.1, we'll use Task.Factory.StartNew instead of Task.Run for better compatibility
+            var requestStartTask = Task.Factory.StartNew(async () =>
+            {
+                try
+                {
+                    var logStartEntry = new LogEntry
+                    {
+                        Timestamp = startTime,
+                        EventType = "RequestStart",
+                        Message = $"Request started: {context.Request.Method} {context.Request.Path}",
+                        RequestPath = context.Request.Path,
+                        RequestMethod = context.Request.Method,
+                        Body = TruncateIfNeeded(requestBody),
+                        UserId = userId
+                    };
+
+                    await LogToDatabaseAsync(logStartEntry).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error logging request start");
+                }
+            }).Unwrap(); // Important to unwrap the nested Task from the async lambda
 
             // Get original response body stream
             var originalBodyStream = context.Response.Body;
 
-            // Create a new memory stream for the response
-            using (var responseBody = _recyclableMemoryStreamManager.GetStream())
+            // Use memory stream only if we need to capture the response
+            if (ShouldCaptureResponseBody(context.Request))
             {
-                // Replace the response body with our memory stream
-                context.Response.Body = responseBody;
+                using (var responseBody = _recyclableMemoryStreamManager.GetStream())
+                {
+                    try
+                    {
+                        // Replace response body with memory stream
+                        context.Response.Body = responseBody;
 
+                        // Call next middleware
+                        await _next(context).ConfigureAwait(false);
+
+                        // Capture response body
+                        string responseBodyContent = await ReadResponseBodyAsync(context.Response).ConfigureAwait(false);
+
+                        // Log request completion (fire and forget)
+                        stopwatch.Stop();
+                        DateTime endTime = DateTime.UtcNow;
+                        TimeSpan duration = stopwatch.Elapsed;
+
+                        var requestEndTask = Task.Factory.StartNew(async () =>
+                        {
+                            try
+                            {
+                                var logEndEntry = new LogEntry
+                                {
+                                    Timestamp = endTime,
+                                    EventType = "RequestEnd",
+                                    Message = $"Request ended: {context.Request.Method} {context.Request.Path} in {duration.TotalMilliseconds}ms. Status Code: {context.Response.StatusCode}",
+                                    RequestPath = context.Request.Path,
+                                    RequestMethod = context.Request.Method,
+                                    Body = TruncateIfNeeded(responseBodyContent),
+                                    ResponseStatusCode = context.Response.StatusCode,
+                                    Duration = (long)duration.TotalMilliseconds,
+                                    UserId = userId
+                                };
+
+                                await LogToDatabaseAsync(logEndEntry).ConfigureAwait(false);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Error logging request end");
+                            }
+                        }).Unwrap();
+
+                        // Copy response to original stream
+                        responseBody.Position = 0;
+                        await responseBody.CopyToAsync(originalBodyStream).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        // Always restore original response body
+                        context.Response.Body = originalBodyStream;
+                    }
+                }
+            }
+            else
+            {
+                // If we're not capturing the response, just call next and log the completion
                 try
                 {
-                    // Call the next middleware in the pipeline
-                    await _next(context);
+                    await _next(context).ConfigureAwait(false);
                 }
                 finally
                 {
-                    stopwatch.Stop(); // Stop the timer
+                    stopwatch.Stop();
                     DateTime endTime = DateTime.UtcNow;
-                    // Calculate the duration of the request
                     TimeSpan duration = stopwatch.Elapsed;
-                    userId = (string)context.Items["UserId"]; //Retrieve userId
-                    // Get the start time from the context
-                    startTime = (DateTime)context.Items["RequestStartTime"];
 
-                    // Capture the response body
-                    string responseBodyContent = await ReadResponseBody(context.Response);
-
-                    // Prepare log message for the end of the request
-                    var logEndEntry = new LogEntry
+                    var requestEndTask = Task.Factory.StartNew(async () =>
                     {
-                        Timestamp = endTime,
-                        EventType = "RequestEnd",
-                        Message = $"Request ended: {context.Request.Method} {context.Request.Path} in {duration.TotalMilliseconds}ms. Status Code: {context.Response.StatusCode}",
-                        RequestPath = context.Request.Path,
-                        RequestMethod = context.Request.Method,
-                        Body = responseBodyContent, // Include the response body in the log
-                        ResponseStatusCode = context.Response.StatusCode,
-                        Duration = (long)duration.TotalMilliseconds,
-                        UserId = userId
-                    };
+                        try
+                        {
+                            var logEndEntry = new LogEntry
+                            {
+                                Timestamp = endTime,
+                                EventType = "RequestEnd",
+                                Message = $"Request ended: {context.Request.Method} {context.Request.Path} in {duration.TotalMilliseconds}ms. Status Code: {context.Response.StatusCode}",
+                                RequestPath = context.Request.Path,
+                                RequestMethod = context.Request.Method,
+                                ResponseStatusCode = context.Response.StatusCode,
+                                Duration = (long)duration.TotalMilliseconds,
+                                UserId = userId
+                            };
 
-                    // Log the end of the request to the database
-                    await LogToDatabase(logEndEntry);
-
-                    // Copy the modified response body to the original stream
-                    responseBody.Seek(0, SeekOrigin.Begin);
-                    await responseBody.CopyToAsync(originalBodyStream);
-
-                    // Restore the original response body
-                    context.Response.Body = originalBodyStream;
+                            await LogToDatabaseAsync(logEndEntry).ConfigureAwait(false);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error logging request end");
+                        }
+                    }).Unwrap();
                 }
             }
         }
 
-        // Helper method to read the response body
-        private async Task<string> ReadResponseBody(HttpResponse response)
+        private bool ShouldCaptureRequestBody(HttpRequest request)
         {
-            // Check if response.Body is null
-            if (response.Body == null)
-            {
-                return null;
-            }
+            // Implement logic to determine if this request body should be captured
+            // For example, don't capture file uploads or form posts
+            if (request.ContentLength.HasValue && request.ContentLength.Value > _maxBodyLength)
+                return false;
 
-            // Check if the response body is readable
-            if (!response.Body.CanRead)
-            {
-                _logger.LogWarning("Response body is not readable.");
-                return null;
-            }
+            string contentType = request.ContentType?.ToLower() ?? string.Empty;
 
-            response.Body.Seek(0, SeekOrigin.Begin);
-            string text = await new StreamReader(response.Body, Encoding.UTF8, true, 1024, true).ReadToEndAsync();
-            response.Body.Seek(0, SeekOrigin.Begin);
-            return string.IsNullOrEmpty(text) ? null : text;
+            if (contentType.StartsWith("multipart/form-data") ||
+                contentType.StartsWith("application/octet-stream"))
+                return false;
+
+            return true;
         }
 
-        // Helper method to read the request body
-        private async Task<string> ReadRequestBody(HttpRequest request)
+        private bool ShouldCaptureResponseBody(HttpRequest request)
         {
-            // Ensure the request body can be read multiple times
-            request.EnableRewind();
+            // Implement logic to determine if the response for this request should be captured
+            // For example, don't capture responses for file downloads
+            string path = request.Path.ToString().ToLower();
 
-            // Read the request body
-            using (var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
+            // Don't capture files or static content
+            if (path.Contains("/api/files/") ||
+                path.Contains("/static/") ||
+                path.EndsWith(".jpg") ||
+                path.EndsWith(".pdf") ||
+                path.EndsWith(".png"))
+                return false;
+
+            return true;
+        }
+
+        private string TruncateIfNeeded(string content)
+        {
+            if (string.IsNullOrEmpty(content))
+                return content;
+
+            return content.Length <= _maxBodyLength
+                ? content
+                : content.Substring(0, _maxBodyLength) + "... [truncated]";
+        }
+
+        private async Task<string> ReadResponseBodyAsync(HttpResponse response)
+        {
+            if (response.Body == null || !response.Body.CanRead)
             {
-                string body = await reader.ReadToEndAsync();
-                // Reset the position of the stream to allow for further processing
+                return null;
+            }
+
+            response.Body.Position = 0;
+
+            // Use a reasonable buffer size
+            using (var reader = new StreamReader(
+                response.Body,
+                Encoding.UTF8,
+                detectEncodingFromByteOrderMarks: false,
+                bufferSize: 4096,
+                leaveOpen: true))
+            {
+                var body = await reader.ReadToEndAsync().ConfigureAwait(false);
+                response.Body.Position = 0;
+
+                return string.IsNullOrEmpty(body) ? null : body;
+            }
+        }
+
+        private async Task<string> ReadRequestBodyAsync(HttpRequest request)
+        {
+            // In .NET Core 2.1, use EnableBuffering() instead of EnableRewind()
+            EnableRequestBuffering(request);
+
+            using (var reader = new StreamReader(
+                request.Body,
+                Encoding.UTF8,
+                detectEncodingFromByteOrderMarks: false,
+                bufferSize: 4096,
+                leaveOpen: true))
+            {
+                var body = await reader.ReadToEndAsync().ConfigureAwait(false);
+
+                // Reset position
                 request.Body.Position = 0;
+
                 return body;
             }
         }
 
-        // Helper method to log to the database
-        private async Task LogToDatabase(LogEntry logEntry)
+        // Helper method to enable request buffering (compatible with .NET Core 2.1)
+        private void EnableRequestBuffering(HttpRequest request)
         {
-            // Use a try-catch block to handle database connection errors
+            // .NET Core 2.1 does not have EnableBuffering extension method
+            // so we need to check if the stream supports seeking and if not, wrap it
+            if (request.Body.CanSeek)
+            {
+                request.Body.Position = 0;
+            }
+            else
+            {
+                // Create a new memory stream to replace the request body
+                var memoryStream = _recyclableMemoryStreamManager.GetStream();
+
+                // Copy the original stream to the memory stream
+                request.Body.CopyToAsync(memoryStream).GetAwaiter().GetResult();
+
+                // Reset the position of the memory stream
+                memoryStream.Position = 0;
+
+                // Replace the request body with the memory stream
+                request.Body = memoryStream;
+            }
+        }
+
+        private async Task LogToDatabaseAsync(LogEntry logEntry)
+        {
             try
             {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using (var connection = new SqlConnection(_connectionString))
                 {
-                    await connection.OpenAsync(); // Open the database connection asynchronously
+                    await connection.OpenAsync().ConfigureAwait(false);
 
-                    // SQL query to insert log data into the specified table
-                    string sql = $"INSERT INTO {_tableName} (Timestamp, EventType, Message, RequestPath, RequestMethod, Body, ResponseStatusCode, Duration, UserId) " +
-                                 "VALUES (@Timestamp, @EventType, @Message, @RequestPath, @RequestMethod, @Body, @ResponseStatusCode, @Duration, @UserId)";
+                    string sql = $@"
+                    INSERT INTO {_tableName} 
+                    (Timestamp, EventType, Message, RequestPath, RequestMethod, Body, ResponseStatusCode, Duration, UserId) 
+                    VALUES 
+                    (@Timestamp, @EventType, @Message, @RequestPath, @RequestMethod, @Body, @ResponseStatusCode, @Duration, @UserId)";
 
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    using (var command = new SqlCommand(sql, connection))
                     {
-                        // Add parameters to the SQL command to prevent SQL injection
                         command.Parameters.AddWithValue("@Timestamp", logEntry.Timestamp);
                         command.Parameters.AddWithValue("@EventType", logEntry.EventType);
-                        command.Parameters.AddWithValue("@Message", logEntry.Message);
-                        command.Parameters.AddWithValue("@RequestPath", logEntry.RequestPath);
-                        command.Parameters.AddWithValue("@RequestMethod", logEntry.RequestMethod);
-                        command.Parameters.AddWithValue("@Body", logEntry.Body ?? (object)DBNull.Value); // Handle nulls
-                        command.Parameters.AddWithValue("@ResponseStatusCode", logEntry.ResponseStatusCode ?? (object)DBNull.Value); // Handle nulls
-                        command.Parameters.AddWithValue("@Duration", logEntry.Duration ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@UserId", logEntry.UserId ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@Message", (object)logEntry.Message ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@RequestPath", (object)logEntry.RequestPath ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@RequestMethod", (object)logEntry.RequestMethod ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Body", (object)logEntry.Body ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@ResponseStatusCode", (object)logEntry.ResponseStatusCode ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Duration", (object)logEntry.Duration ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@UserId", (object)logEntry.UserId ?? DBNull.Value);
 
-                        await command.ExecuteNonQueryAsync(); // Execute the query asynchronously
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Log any database errors
-                _logger.LogError($"Error logging to database: {ex.Message}");
-                // IMPORTANT:  Do NOT re-throw the exception here.  The middleware should not interrupt the request flow
-                // if the logging fails.  Logging failures should be isolated.
+                _logger.LogError(ex, "Error logging to database");
             }
         }
 
-        // Helper method to check if logging is enabled (optional, based on configuration)
         private bool IsLoggingEnabled()
         {
-            // Example: Check for an "EnableAPILogging" key in the configuration
-            //  return _configuration.GetValue<bool>("EnableAPILogging");
-            // Or, you could have a section:
-            // "APILogger": {
-            //    "Enabled": true,
-            // }
-            // return _configuration.GetValue<bool>("APILogger:Enabled");
-
-            // For this example, we'll just return true.  You should replace this with your actual configuration check.
+            // Implement your configuration check
             return true;
         }
 
         private string GetUserId(HttpContext context)
         {
-            //Default return
-            string userId = null;
-
-            //Try to get user ID from claims.  This is the most common way to get the user's ID.
             if (context.User?.Identity != null && context.User.Identity.IsAuthenticated)
             {
-                //Common claim types are NameIdentifier, Sid, and sometimes UserID.
-                userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId))
-                    userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value;
-                if (string.IsNullOrEmpty(userId))
-                    userId = context.User.FindFirst("UserID")?.Value; // Fallback to "UserID" claim
+                string userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrEmpty(userId))
+                    return userId;
+
+                userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value;
+                if (!string.IsNullOrEmpty(userId))
+                    return userId;
+
+                userId = context.User.FindFirst("UserID")?.Value;
+                if (!string.IsNullOrEmpty(userId))
+                    return userId;
             }
 
-            //If claims don't work, try to get it from the request headers.  This is less common, and less secure.
-            if (string.IsNullOrEmpty(userId))
-            {
-                userId = context.Request.Headers["UserId"]; // Or "X-User-Id", "Authorization", etc.
-                if (string.IsNullOrEmpty(userId))
-                    userId = context.Request.Headers["X-User-Id"];
-            }
-            //If still null, try the query string
-            if (string.IsNullOrEmpty(userId))
-                userId = context.Request.Query["userId"];
+            string headerUserId = context.Request.Headers["UserId"];
+            if (!string.IsNullOrEmpty(headerUserId))
+                return headerUserId;
 
-            return userId;
+            headerUserId = context.Request.Headers["X-User-Id"];
+            if (!string.IsNullOrEmpty(headerUserId))
+                return headerUserId;
+
+            return context.Request.Query["userId"];
         }
     }
 
-    // Extension method to add the middleware to the application pipeline
     public static class APILoggerMiddlewareExtensions
     {
         public static IApplicationBuilder UseAPILogger(this IApplicationBuilder builder)
         {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
             return builder.UseMiddleware<APILoggerMiddleware>();
         }
 
         public static IServiceCollection AddAPILogger(this IServiceCollection services)
         {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
             services.AddSingleton<RecyclableMemoryStreamManager>();
             return services;
         }
     }
 
-    // Class to represent the log data
     public class LogEntry
     {
         public DateTime Timestamp { get; set; }
-        public string EventType { get; set; } // "RequestStart" or "RequestEnd"
+        public string EventType { get; set; }
         public string Message { get; set; }
         public string RequestPath { get; set; }
         public string RequestMethod { get; set; }
         public string Body { get; set; }
-        public int? ResponseStatusCode { get; set; } // Make it nullable
+        public int? ResponseStatusCode { get; set; }
         public long? Duration { get; set; }
         public string UserId { get; set; }
     }
