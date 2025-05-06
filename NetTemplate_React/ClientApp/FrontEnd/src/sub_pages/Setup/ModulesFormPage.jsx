@@ -26,6 +26,7 @@ import useModuleItemsAddMutation from "~/hooks/Setup/Modules/useModuleItemsAddMu
 import { useQueryClient } from "@tanstack/react-query";
 import QueryKeys from "~/Constants/QueryKeys";
 import useModuleItemDeleteMutation from "~/hooks/Setup/Modules/useModuleItemDeleteMutation";
+import useModuleItemEditMutation from "~/hooks/Setup/Modules/useModuleItemEditMutation";
 
 const SelectModule = ({ form }) => {
   const { data, isLoading, isError, isSuccess } = useGetModuleItems();
@@ -67,6 +68,7 @@ const ModulesFormPage = () => {
   const queryClient = useQueryClient();
   const { data, isError, isSuccess, isLoading, error } = useGetModuleItemById();
   const addModuleMutation = useModuleItemsAddMutation();
+  const editModuleMutation = useModuleItemEditMutation();
   const deleteModuleMutation = useModuleItemDeleteMutation();
   const [opened, { open, close }] = useDisclosure(false);
   const form = useForm({
@@ -123,7 +125,29 @@ const ModulesFormPage = () => {
   }
 
   const onManageEdit = () => {
+    if (id === undefined) retrun;
 
+    editModuleMutation.mutate(form.getValues(), {
+      onSuccess: (response) => {
+        notifications.show({
+          color: "green",
+          title: "Success",
+          message: response.message,
+        })
+
+        close();
+        setTimeout(() => {
+          navigate(-1);
+        }, 1000);
+      },
+      onError: (error) => {
+        notifications.show({
+          color: 'red',
+          title: "Failed",
+          message: error.message
+        })
+      }
+    })
 
   }
 
@@ -201,7 +225,7 @@ const ModulesFormPage = () => {
                         Cancel
                       </Button>
                       <Button type="submit">
-                        Add
+                        {id === undefined ? 'Add' : 'Edit'}
                       </Button>
                     </Group>
                   </Group>

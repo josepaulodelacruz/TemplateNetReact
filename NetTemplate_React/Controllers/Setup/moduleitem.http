@@ -1,5 +1,5 @@
 ﻿@hostname=localhost:44393
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImQ2NjY3MDlkLTk5M2YtNGQyMC04YzIyLWMwN2NlZGViYTFiZCIsImV4cCI6MTc0NjQ0MDU3NCwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.wj6TcDq1SCxlLhnH-_jA088ul5F2QSkmn7qYj3hPJv0
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjcyNDQ5ZmI2LTE0M2YtNDdjZi1hMDVjLWRhOGY0ZDNmMjQ5OSIsImV4cCI6MTc0NjQ5ODExMywiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.2siU3c5FGgBl8vhl8Nwur8c2yUtiBKmP0A6Vrb-IpSQ
 
 ###
 GET https://{{hostname}}/api/ModuleItems
@@ -24,13 +24,13 @@ Authorization: Bearer {{token}}
 ###
 
 ###
-PUT https://{{hostname}}/api/ModuleItems/2
+PUT https://{{hostname}}/api/ModuleItems/6
 Content-Type: application/json
 Authorization: Bearer {{token}} 
 {
-  "name": "test 123",
-  "parent_id": 2,
-  "parent_name": "Setup"
+  "name": "Modules",
+  "parent_id": 5,
+  "parent_name": "Dashboard"
 }
 ###
 

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import client from "~/config/client";
-import QueryKeys from "~/constants/QueryKeys";
+import QueryKeys from "~/Constants/QueryKeys";
 
 const useGetModuleItemById = () => {
   const { id } = useParams();

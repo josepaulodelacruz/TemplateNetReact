@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+#exclude appsettings.json
+./NetTemplate_React/appsettings.json
