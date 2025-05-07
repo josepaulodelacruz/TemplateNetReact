@@ -1,4 +1,4 @@
-import { Table, Skeleton, Text, UnstyledButton, Button, Pill } from "@mantine/core";
+import { Table, Skeleton, Text, Button, Pill } from "@mantine/core";
 import { useEffect } from "react";
 import { Link } from "react-router";
 import ErrorElement from "~/components/ErrorElement";
@@ -30,10 +30,10 @@ const ModuleItemsTable = () => {
 
   const rows = data.body?.map((module, index) => {
     return (
-      <Table.Tr key={index}>
+      <Table.Tr style={{viewTransitionName: `module-${module.id}`}} key={index}>
         <Table.Td>{module.id}</Table.Td>
-        <Table.Td>
-          <Text size="sm" fw={300}>{module.name}</Text>
+        <Table.Td >
+          <Text size="sm"  fw={300}>{module.name}</Text>
         </Table.Td>
         <Table.Td>
           {
@@ -44,7 +44,7 @@ const ModuleItemsTable = () => {
           }
         </Table.Td>
         <Table.Td align="center">
-          <Button component={Link} to={`${StringRoutes.modules_form}/${module.id}`} variant="light" size="xs">
+          <Button component={Link} viewTransition to={`${StringRoutes.modules_form}/${module.id}`} variant="light" size="xs">
             View
           </Button>
         </Table.Td>
@@ -53,7 +53,7 @@ const ModuleItemsTable = () => {
   })
 
   return (
-    <Table stickyHeader stickyHeaderOffset={0}>
+    <Table stickyHeader >
       <Table.Thead>
         <Table.Tr>
           <Table.Th>ID</Table.Th>

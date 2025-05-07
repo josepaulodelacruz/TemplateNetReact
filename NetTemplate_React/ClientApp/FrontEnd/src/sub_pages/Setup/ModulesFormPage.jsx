@@ -188,8 +188,8 @@ const ModulesFormPage = () => {
       {
         isError ?
           <ErrorElement>{error.response.data?.message || error.message}</ErrorElement>
-          : <Center>
-            <Container w={'30rem'} mt={30} >
+          : <Center style={{viewTransitionName: `module-${id}`}}>
+            <Container  w={'30rem'} mt={30} >
               <form onSubmit={handleSubmit}>
                 <Card shadow="sm">
                   <Text fw={700}>Add New Module</Text>
