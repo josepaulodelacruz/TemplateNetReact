@@ -1,0 +1,7 @@
+﻿@hostname=localhost:44393
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjY1NTBlZjVkLWYwN2ItNGJjYy1hOTNjLWI1MDUzMDQ3NmM0YiIsImV4cCI6MTc0NjcxMzU2NywiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.QOePlmZFuXROCgWvqEuyxr8vEuWe7vDXen_yJI5axOA
+###
+GET https://{{hostname}}/api/User/
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+###

@@ -1,18 +1,36 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using NetTemplate_React.Services.Setup;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace NetTemplate_React.Controllers.Setup
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly IUserService _service;
+
+        public UserController(IUserService service)
+        {
+            _service = service;
+        }
+
         // GET: api/<UserController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> Get()
         {
-            return new string[] { "value1", "value2" };
+            var response = await _service.GetUsers();
+
+            if (!response.Success)
+            {
+                return new BadRequestObjectResult(response);
+            }
+
+            return new OkObjectResult(response);
         }
 
         // GET api/<UserController>/5
@@ -40,4 +58,6 @@ namespace NetTemplate_React.Controllers.Setup
         {
         }
     }
+
 }
+

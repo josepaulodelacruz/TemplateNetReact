@@ -21,6 +21,9 @@ namespace NetTemplate_React.Models
         [JsonProperty("created_at")]
         public DateTime CreatedAt { get; set; }
 
+        [JsonProperty("role")]
+        public string Role { get; set; }
+
         [JsonProperty("token")]
         public string Token { get; set; }
 
