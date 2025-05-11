@@ -1,32 +1,34 @@
 import {
   Container,
-  Stack,
-  Text,
   Title,
   TextInput,
   Box,
-  Card
+  Card,
+  Group,
 } from "@mantine/core";
 import UserTable from "./components/UserTable";
 
 
-export default function User() {
+const User = () => {
   return (
     <Container fluid>
-      <Stack>
-        <Title size={'50'} p={0} fw={700}>User Accounts</Title>
-        <Text size="xl" fw={500}>List of account</Text>
-        <Box
-          w={{ sm: '100%', md: '20em' }} >
-          <TextInput
-            variant="default"
-            placeholder="User"
-          />
-        </Box>
-        <Card p={0} shadow="sm">
-          <UserTable />
-        </Card>
-      </Stack>
-    </Container>
+      <Group>
+        <Title size={50} fw={700} style={{ viewTransitionName: 'usr-header' }}>Users Accounts</Title>
+      </Group>
+      <Box
+        py={20}
+        w={{ sm: '100%', md: '20em' }} >
+        <TextInput
+          variant="default"
+          placeholder="User"
+        />
+      </Box>
+      <Card p={0} shadow="xs">
+        <UserTable />
+      </Card>
+
+    </Container >
   )
 }
+
+export default User;

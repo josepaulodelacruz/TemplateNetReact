@@ -8,8 +8,10 @@ import User from "~/sub_pages/Setup/User";
 import Modules from "~/sub_pages/Setup/Modules";
 import ModulesInitialPage from "~/sub_pages/Setup/ModulesInitialPage.jsx";
 import ModulesFormPage from "~/sub_pages/Setup/ModulesFormPage";
-import { Component } from "lucide-react";
 import Login from "./pages/Auth/Login";
+import UserTab from "./sub_pages/Setup/UserTab";
+import UserPermission from "./sub_pages/Setup/UserPermission";
+import UserHistory from "./sub_pages/Setup/UserHistory";
 
 const DASHBOARD_ROUTES = [
 
@@ -19,6 +21,21 @@ const DASHBOARD_ROUTES = [
     Component: Setup,
     children: [
       { path: StringRoutes.users, Component: User },
+      {
+        path: `${StringRoutes.users_tab}`,
+        Component: UserTab,
+        children: [
+
+          {
+            path: `${StringRoutes.users_permission}/:id?`,
+            Component: UserPermission,
+          },
+          {
+            path: `${StringRoutes.users_history}/:id?`,
+            Component: UserHistory,
+          }
+        ]
+      },
       {
         path: StringRoutes.modules,
         Component: Modules,
