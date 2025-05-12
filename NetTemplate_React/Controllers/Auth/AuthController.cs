@@ -50,6 +50,8 @@ namespace NetTemplate_React.Controllers.Auth
                 return new BadRequestObjectResult(response);
             }
 
+            await _service.GenerateSession((User)response.Body); //generate new session
+
             return new OkObjectResult(response);
         }
 

@@ -35,9 +35,14 @@ namespace NetTemplate_React.Controllers.Setup
 
         // GET api/<UserController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
-            return "value";
+            var response = await _service.GetUsers(id);
+
+            if (!response.Success) return new BadRequestObjectResult(response);
+
+            return new OkObjectResult(response);
+
         }
 
         // POST api/<UserController>

@@ -62,6 +62,7 @@ namespace NetTemplate_React
             //setups
             services.AddScoped<IModuleItemService, ModuleItemService>(options => new ModuleItemService(conString: conString, configuration: Configuration));
             services.AddScoped<IUserService, UserService>(options => new UserService(conString: conString, configuration: Configuration));
+            services.AddScoped<IUserPermissionService, UserPermissionService>(options => new UserPermissionService(conString: conString, config: Configuration));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

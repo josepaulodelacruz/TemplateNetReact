@@ -307,7 +307,7 @@ namespace NetTemplate_React.Middleware
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
-                    await connection.OpenAsync().ConfigureAwait(false);
+                    await connection.OpenAsync().ConfigureAwait(true);
 
                     string sql = $@"
                     INSERT INTO {_tableName} 
@@ -327,7 +327,7 @@ namespace NetTemplate_React.Middleware
                         command.Parameters.AddWithValue("@Duration", (object)logEntry.Duration ?? DBNull.Value);
                         command.Parameters.AddWithValue("@UserId", (object)logEntry.UserId ?? DBNull.Value);
 
-                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(true);
                     }
                 }
             }

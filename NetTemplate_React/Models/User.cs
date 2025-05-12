@@ -27,6 +27,10 @@ namespace NetTemplate_React.Models
         [JsonProperty("token")]
         public string Token { get; set; }
 
+        [JsonProperty("session_date")]
+        public DateTime? SessionDate { get; set; }
 
+        [JsonProperty("is_active")]
+        public bool IsActive { get; set; }
     }
 }

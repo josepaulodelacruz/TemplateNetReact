@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Outlet, useNavigate, useParams } from "react-router";
 import StringRoutes from "~/constants/StringRoutes";
 import UserCard from "./components/UserCard";
+import useGetUserById from "~/hooks/Setup/User/useGetUserById";
 
 
 const UserTab = () => {

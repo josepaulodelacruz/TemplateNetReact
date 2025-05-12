@@ -20,6 +20,8 @@ namespace NetTemplate_React.Services
         Task<Response> Register(User user);
 
         Task<Response> Login(User user);
+        Task<Response> GenerateSession(User user);
+
 
     }
 
@@ -180,7 +182,6 @@ namespace NetTemplate_React.Services
                         // Generate JWT token
                         var token = GenerateJwtToken(dataTable.Rows[0]);
 
-
                         // Create response data with user info and token
                         var responseData = new User()
                         {
@@ -199,6 +200,51 @@ namespace NetTemplate_React.Services
                         );
                     }
                 }
+            }
+            catch (SqlException ex)
+            {
+                return new Response(
+                    success: false,
+                    debugScript: commandText,
+                    message: $"SQL Error: {ex.Message}",
+                    body: null
+                );
+            }
+            catch (Exception ex)
+            {
+                return new Response(
+                    success: false,
+                    debugScript: commandText,
+                    message: $"Error: {ex.Message}",
+                    body: null
+                );
+            }
+        }
+
+        public async Task<Response> GenerateSession(User user)
+        {
+            var commandText = "insert into UserSessions([USER_ID])\r\nVALUES (@USER_ID)\r\n";
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conString))
+                {
+                    await con.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand(commandText, con))
+                    {
+                        cmd.Parameters.AddWithValue("@USER_ID", user.Id);
+
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                return new Response(
+                    success: true,
+                    debugScript: commandText,
+                    message: "Successfully created user session",
+                    body: null
+                );
             }
             catch (SqlException ex)
             {

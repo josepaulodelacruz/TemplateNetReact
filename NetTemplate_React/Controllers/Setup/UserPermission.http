@@ -1,0 +1,8 @@
+﻿@hostname=localhost:44393
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjJhOTlhNWZiLWFiMWUtNDMxNS1hOTcyLTYzNzY1OWY3ZDM1OSIsImV4cCI6MTc0NzA1ODcwNCwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.nYer2UyHhDDGg7vsNAsKnJ7El9MS9rqh_C661If-T74
+
+###
+GET https://{{hostname}}/api/UserPermission/
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+###
