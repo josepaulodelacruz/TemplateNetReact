@@ -1,9 +1,12 @@
-
+import { 
+  Container,
+} from "@mantine/core";
 const UserHistory = () => {
   return (
-    <div>
-      user
-    </div>
+    <Container fluid>
+      
+
+    </Container>
   )
 } 
 
