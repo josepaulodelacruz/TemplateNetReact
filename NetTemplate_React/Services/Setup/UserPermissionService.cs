@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using NetTemplate_React.Models;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ namespace NetTemplate_React.Services.Setup
         public async Task<Response> GetPermission(string id = null)
         {
             DataTable dataTable = new DataTable();
+            List<UserPermission> permission = new List<UserPermission>();
             string commandText = "[dbo].[NSP_UserPermission]";
             try
             {
@@ -39,12 +41,25 @@ namespace NetTemplate_React.Services.Setup
                     {
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("@FLAG", "GET PERMISSION");
-                        cmd.Parameters.AddWithValue("@USER_ID", id);
+                        cmd.Parameters.AddWithValue("@USER_ID", (object)id ?? DBNull.Value);
 
                         using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
-                            dataTable.Load(reader);
+                            while (await reader.ReadAsync())
+                            {
+                                permission.Add(new UserPermission()
+                                {
+                                    Id = int.Parse(reader["ID"].ToString()),
+                                    Name = reader["Name"].ToString(),
+                                    UserId = reader.IsDBNull(reader.GetOrdinal("USER_ID")) ? null : reader["USER_ID"].ToString(),
+                                    Create = reader.GetInt32(reader.GetOrdinal("CREATE")) == 1,
+                                    Read = reader.GetInt32(reader.GetOrdinal("Read")) == 1,
+                                    Update = reader.GetInt32(reader.GetOrdinal("Update")) == 1,
+                                    Delete = reader.GetInt32(reader.GetOrdinal("Delete")) == 1,
+                                });
+                            }
                         }
+
                     }
                 }
 
@@ -52,7 +67,7 @@ namespace NetTemplate_React.Services.Setup
                     success: true,
                     debugScript: commandText,
                     message: "Successfully fetch permissions",
-                    body: dataTable
+                    body: permission 
                 );
             } 
             catch (SqlException Ex)
@@ -73,8 +88,6 @@ namespace NetTemplate_React.Services.Setup
                     body: null
                 );
             }
-
-
         }
     }
 }

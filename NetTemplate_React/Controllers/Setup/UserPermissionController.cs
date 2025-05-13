@@ -22,7 +22,7 @@ namespace NetTemplate_React.Controllers.Setup
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id = null)
         {
-            var response = await _service.GetPermission();
+            var response = await _service.GetPermission(id);
 
             if (!response.Success) return new BadRequestObjectResult(response);
 

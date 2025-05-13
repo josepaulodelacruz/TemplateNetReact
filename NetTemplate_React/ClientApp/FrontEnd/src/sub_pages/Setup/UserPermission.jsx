@@ -8,46 +8,91 @@ import {
   Button,
   Table,
   Space,
-  Flex
+  Flex,
+  Notification
 } from "@mantine/core";
 import { useParams } from "react-router";
+import { useState, useEffect } from "react";
 import ErrorElement from "~/components/ErrorElement";
 import TableSkeleton from "~/components/Loading/TableSkeleton";
 import useGetUserPermission from "~/hooks/Setup/Permissions/useGetUserPermission";
+import axios from "axios"; // Assuming axios is used for API calls
 
-const UserPermissionTable = () => {
-  const { id } = useParams()
+const UserPermissionTable = ({ permissions, setPermissions, selected, setSelected }) => {
+  const { id } = useParams();
   const { data, isLoading, isError, error } = useGetUserPermission(id);
 
+  useEffect(() => {
+    if (data?.body) {
+      setPermissions(data.body);
+    }
+  }, [data, setPermissions]);
+
   if (isLoading) {
-    return <TableSkeleton />
+    return <TableSkeleton />;
   }
 
   if (isError) {
-    return <ErrorElement>Someting went wrong</ErrorElement>
+    return <ErrorElement>Something went wrong</ErrorElement>;
   }
 
-  const rows = Array.isArray(data.body) && data.body.length > 0 && data.body?.map((item) => {
+  const handlePermissionChange = (permissionId, field, value) => {
+    setPermissions(prev => 
+      prev.map(permission => 
+        permission.id === permissionId ? { ...permission, [field]: value } : permission
+      )
+    );
+  };
+
+  const handleSelect = (permissionId) => {
+    setSelected(prev => {
+      if (prev.includes(permissionId)) {
+        return prev.filter(id => id !== permissionId);
+      } else {
+        return [...prev, permissionId];
+      }
+    });
+  };
+
+  const rows = Array.isArray(permissions) && permissions.length > 0 && permissions.map((item) => {
     return (
-      <Table.Tr h={45} key={item.id} >
+      <Table.Tr h={45} key={item.id}>
         <Table.Td align="center">
-          <Checkbox />
+          <Checkbox 
+            checked={selected.includes(item.id)}
+            onChange={() => handleSelect(item.id)}
+          />
         </Table.Td>
         <Table.Td>
           <Title size="sm" fw={500}>{item.name}</Title>
         </Table.Td>
         <Table.Td valign="middle" align="center">
           <Flex direction={{base: 'column', md: 'row'}} gap={20} justify="center">
-            <Checkbox label="Create" />
-            <Checkbox label="Read" />
-            <Checkbox label="Update" />
-            <Checkbox label="Delete" />
+            <Checkbox 
+              label="Create" 
+              checked={item.create === true}
+              onChange={(e) => handlePermissionChange(item.id, 'create', e.currentTarget.checked)}
+            />
+            <Checkbox 
+              label="Read" 
+              checked={item.read === true}
+              onChange={(e) => handlePermissionChange(item.id, 'read', e.currentTarget.checked)}
+            />
+            <Checkbox 
+              label="Update" 
+              checked={item.update === true}
+              onChange={(e) => handlePermissionChange(item.id, 'update', e.currentTarget.checked)}
+            />
+            <Checkbox 
+              label="Delete" 
+              checked={item.delete === true}
+              onChange={(e) => handlePermissionChange(item.id, 'delete', e.currentTarget.checked)}
+            />
           </Flex>
-
         </Table.Td>
       </Table.Tr>
-    )
-  })
+    );
+  });
 
   return (
     <Table>
@@ -62,48 +107,141 @@ const UserPermissionTable = () => {
         {rows}
       </Table.Tbody>
     </Table>
-  )
-
-}
+  );
+};
 
 const UserPermission = () => {
+  const { id } = useParams();
+  const [permissions, setPermissions] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [notification, setNotification] = useState(null);
+  const [bulkActions, setBulkActions] = useState({
+    create: false,
+    read: false,
+    update: false,
+    delete: false
+  });
 
-  const handleSave = () => {
-  }
+  const handleBulkActionChange = (action, value) => {
+    setBulkActions(prev => ({
+      ...prev,
+      [action]: value
+    }));
+  };
+
+  const applyToSelected = () => {
+    if (selected.length === 0) {
+      setNotification({
+        type: 'warning',
+        message: 'Please select at least one item'
+      });
+      return;
+    }
+
+    setPermissions(prev => 
+      prev.map(permission => {
+        if (selected.includes(permission.id)) {
+          return {
+            ...permission,
+            create: bulkActions.create,
+            read: bulkActions.read,
+            update: bulkActions.update,
+            delete: bulkActions.delete
+          };
+        }
+        return permission;
+      })
+    );
+
+    setNotification({
+      type: 'success',
+      message: 'Permissions applied to selected items'
+    });
+  };
+
+  const handleSave = async () => {
+    try {
+      // API endpoint to save permissions
+      
+      console.log(permissions);
+      throw new Error("Something went wrong");
+
+      setNotification({
+        type: 'success',
+        message: 'Permissions saved successfully'
+      });
+    } catch (error) {
+      console.error('Error saving permissions:', error);
+      
+      setNotification({
+        type: 'error',
+        message: 'Failed to save permissions'
+      });
+    }
+  };
 
   return (
     <Container fluid p={0}>
+      {notification && (
+        <Notification 
+          color={notification.type === 'success' ? 'green' : notification.type === 'warning' ? 'yellow' : 'red'}
+          onClose={() => setNotification(null)}
+          mb={10}
+        >
+          {notification.message}
+        </Notification>
+      )}
+      
       <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="flex-end">
-        <Paper w={{ base: '100%', md: '50%' }} mt={10} radius="xs">
+        <Paper w={{ base: '100%', md: '50%' }} mt={10} radius="xs" p="md">
           <Title size="lg">Actions</Title>
           <Group justify="space-between">
             <Group>
-              <Checkbox label="Create" />
-              <Checkbox label="Read" />
-              <Checkbox label="Update" />
-              <Checkbox label="Delete" />
+              <Checkbox 
+                label="Create" 
+                checked={bulkActions.create}
+                onChange={(e) => handleBulkActionChange('create', e.currentTarget.checked)}
+              />
+              <Checkbox 
+                label="Read" 
+                checked={bulkActions.read}
+                onChange={(e) => handleBulkActionChange('read', e.currentTarget.checked)}
+              />
+              <Checkbox 
+                label="Update" 
+                checked={bulkActions.update}
+                onChange={(e) => handleBulkActionChange('update', e.currentTarget.checked)}
+              />
+              <Checkbox 
+                label="Delete" 
+                checked={bulkActions.delete}
+                onChange={(e) => handleBulkActionChange('delete', e.currentTarget.checked)}
+              />
             </Group>
-            <Button variant="outline">
-              Apply to all Selected
+            <Button 
+              variant="outline"
+              onClick={applyToSelected}
+              disabled={selected.length === 0}
+            >
+              Apply to all Selected ({selected.length})
             </Button>
           </Group>
         </Paper>
-
         <Button onClick={handleSave}>
           Save
         </Button>
-
       </Flex>
-
-
       <Space h={'lg'} />
-
       <Card p={0}>
-        <UserPermissionTable />
+        <UserPermissionTable 
+          permissions={permissions} 
+          setPermissions={setPermissions} 
+          selected={selected} 
+          setSelected={setSelected} 
+        />
       </Card>
-
     </Container>
-  )
-}
+  );
+};
 
 export default UserPermission;

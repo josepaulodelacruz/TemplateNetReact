@@ -28,6 +28,10 @@ const UserCard = ({
     return <ErrorElement>{error.response.data?.message || error.message}</ErrorElement>
   }
 
+  if(data.body.length <= 0) {
+    return <ErrorElement>No user found</ErrorElement>
+  }
+
   return (
     <Box style={{ viewTransitionName: `usr-card-profile-${id}` }} py={15}>
       <Card shadow="xs" w={{ base: '100%', md: '40%' }}>
@@ -41,19 +45,19 @@ const UserCard = ({
               <Text fw={300} color="blue">delacruzjosepaulo@gmail.com</Text>
             </Stack>
           </Flex>
-          <Switch size="xl" checked={data.body[0].is_active} onLabel="Active" offLabel="Inactive" />
+          <Switch size="xl" checked={data.body[0]?.is_active} onLabel="Active" offLabel="Inactive" />
         </Flex>
 
         <Divider my={15} />
 
         <Group justify="space-between">
           <Text variant="text">Last Login:</Text>
-          <Text variant="gradient">{moment(data.body[0].session_date).calendar()}</Text>
+          <Text variant="gradient">{moment(data.body[0]?.session_date).calendar()}</Text>
         </Group>
 
         <Group justify="space-between">
           <Text>Role:</Text>
-          <Pill>{data.body[0].role}</Pill>
+          <Pill>{data.body[0]?.role}</Pill>
         </Group>
 
         <Group justify="space-between">
