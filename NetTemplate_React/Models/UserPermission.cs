@@ -5,7 +5,10 @@ namespace NetTemplate_React.Models
     public class UserPermission
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public string Id { get; set; }
+
+        [JsonProperty("module_id")]
+        public int ModuleId { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }

@@ -16,7 +16,7 @@ import { useState, useEffect } from "react";
 import ErrorElement from "~/components/ErrorElement";
 import TableSkeleton from "~/components/Loading/TableSkeleton";
 import useGetUserPermission from "~/hooks/Setup/Permissions/useGetUserPermission";
-import axios from "axios"; // Assuming axios is used for API calls
+import useSavePermissionMutation from "~/hooks/Setup/Permissions/useSavePermissionMutation";
 
 const UserPermissionTable = ({ permissions, setPermissions, selected, setSelected }) => {
   const { id } = useParams();
@@ -37,9 +37,9 @@ const UserPermissionTable = ({ permissions, setPermissions, selected, setSelecte
   }
 
   const handlePermissionChange = (permissionId, field, value) => {
-    setPermissions(prev => 
-      prev.map(permission => 
-        permission.id === permissionId ? { ...permission, [field]: value } : permission
+    setPermissions(prev =>
+      prev.map(permission =>
+        permission.module_id === permissionId ? { ...permission, [field]: value } : permission
       )
     );
   };
@@ -56,37 +56,37 @@ const UserPermissionTable = ({ permissions, setPermissions, selected, setSelecte
 
   const rows = Array.isArray(permissions) && permissions.length > 0 && permissions.map((item) => {
     return (
-      <Table.Tr h={45} key={item.id}>
+      <Table.Tr h={45} key={item.module_id} >
         <Table.Td align="center">
-          <Checkbox 
-            checked={selected.includes(item.id)}
-            onChange={() => handleSelect(item.id)}
+          <Checkbox
+            checked={selected.includes(item.module_id)}
+            onChange={() => handleSelect(item.module_id)}
           />
         </Table.Td>
         <Table.Td>
           <Title size="sm" fw={500}>{item.name}</Title>
         </Table.Td>
         <Table.Td valign="middle" align="center">
-          <Flex direction={{base: 'column', md: 'row'}} gap={20} justify="center">
-            <Checkbox 
-              label="Create" 
+          <Flex direction={{ base: 'column', md: 'row' }} gap={20} justify="center">
+            <Checkbox
+              label="Create"
               checked={item.create === true}
-              onChange={(e) => handlePermissionChange(item.id, 'create', e.currentTarget.checked)}
+              onChange={(e) => handlePermissionChange(item.module_id, 'create', e.currentTarget.checked)}
             />
-            <Checkbox 
-              label="Read" 
+            <Checkbox
+              label="Read"
               checked={item.read === true}
-              onChange={(e) => handlePermissionChange(item.id, 'read', e.currentTarget.checked)}
+              onChange={(e) => handlePermissionChange(item.module_id, 'read', e.currentTarget.checked)}
             />
-            <Checkbox 
-              label="Update" 
+            <Checkbox
+              label="Update"
               checked={item.update === true}
-              onChange={(e) => handlePermissionChange(item.id, 'update', e.currentTarget.checked)}
+              onChange={(e) => handlePermissionChange(item.module_id, 'update', e.currentTarget.checked)}
             />
-            <Checkbox 
-              label="Delete" 
+            <Checkbox
+              label="Delete"
               checked={item.delete === true}
-              onChange={(e) => handlePermissionChange(item.id, 'delete', e.currentTarget.checked)}
+              onChange={(e) => handlePermissionChange(item.module_id, 'delete', e.currentTarget.checked)}
             />
           </Flex>
         </Table.Td>
@@ -121,6 +121,7 @@ const UserPermission = () => {
     update: false,
     delete: false
   });
+  const savePermissionMutation = useSavePermissionMutation();
 
   const handleBulkActionChange = (action, value) => {
     setBulkActions(prev => ({
@@ -138,18 +139,19 @@ const UserPermission = () => {
       return;
     }
 
-    setPermissions(prev => 
+    setPermissions(prev =>
       prev.map(permission => {
-        if (selected.includes(permission.id)) {
+        if (selected.includes(permission.module_id)) {
           return {
             ...permission,
+            user_id: id,
             create: bulkActions.create,
             read: bulkActions.read,
             update: bulkActions.update,
             delete: bulkActions.delete
           };
         }
-        return permission;
+        return { ...permission, user_id: id, };
       })
     );
 
@@ -160,30 +162,28 @@ const UserPermission = () => {
   };
 
   const handleSave = async () => {
-    try {
-      // API endpoint to save permissions
-      
-      console.log(permissions);
-      throw new Error("Something went wrong");
-
-      setNotification({
-        type: 'success',
-        message: 'Permissions saved successfully'
-      });
-    } catch (error) {
-      console.error('Error saving permissions:', error);
-      
-      setNotification({
-        type: 'error',
-        message: 'Failed to save permissions'
-      });
-    }
+    console.log(permissions);
+    savePermissionMutation.mutate(permissions, {
+      onSuccess: (response) => {
+        console.log(response)
+        setNotification({
+          type: 'success',
+          message: 'Permissions saved successfully'
+        });
+      },
+      onError: () => {
+        setNotification({
+          type: 'error',
+          message: 'Failed to save permissions'
+        });
+      }
+    })
   };
 
   return (
     <Container fluid p={0}>
       {notification && (
-        <Notification 
+        <Notification
           color={notification.type === 'success' ? 'green' : notification.type === 'warning' ? 'yellow' : 'red'}
           onClose={() => setNotification(null)}
           mb={10}
@@ -191,34 +191,34 @@ const UserPermission = () => {
           {notification.message}
         </Notification>
       )}
-      
+
       <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="flex-end">
         <Paper w={{ base: '100%', md: '50%' }} mt={10} radius="xs" p="md">
           <Title size="lg">Actions</Title>
           <Group justify="space-between">
             <Group>
-              <Checkbox 
-                label="Create" 
+              <Checkbox
+                label="Create"
                 checked={bulkActions.create}
                 onChange={(e) => handleBulkActionChange('create', e.currentTarget.checked)}
               />
-              <Checkbox 
-                label="Read" 
+              <Checkbox
+                label="Read"
                 checked={bulkActions.read}
                 onChange={(e) => handleBulkActionChange('read', e.currentTarget.checked)}
               />
-              <Checkbox 
-                label="Update" 
+              <Checkbox
+                label="Update"
                 checked={bulkActions.update}
                 onChange={(e) => handleBulkActionChange('update', e.currentTarget.checked)}
               />
-              <Checkbox 
-                label="Delete" 
+              <Checkbox
+                label="Delete"
                 checked={bulkActions.delete}
                 onChange={(e) => handleBulkActionChange('delete', e.currentTarget.checked)}
               />
             </Group>
-            <Button 
+            <Button
               variant="outline"
               onClick={applyToSelected}
               disabled={selected.length === 0}
@@ -233,11 +233,11 @@ const UserPermission = () => {
       </Flex>
       <Space h={'lg'} />
       <Card p={0}>
-        <UserPermissionTable 
-          permissions={permissions} 
-          setPermissions={setPermissions} 
-          selected={selected} 
-          setSelected={setSelected} 
+        <UserPermissionTable
+          permissions={permissions}
+          setPermissions={setPermissions}
+          selected={selected}
+          setSelected={setSelected}
         />
       </Card>
     </Container>

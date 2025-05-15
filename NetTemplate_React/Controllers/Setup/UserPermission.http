@@ -1,10 +1,63 @@
 ﻿@hostname=localhost:44393
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjE4NWZiNTYxLWQ0MzMtNDgyMS05ZTIyLTA1ZDY3NzA0NmEzZiIsImV4cCI6MTc0NzE0NTAxMSwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.GwC-K0eP3CZEy1tMd5a3BfPGfZLuEuyOnOdnqikCC7Y
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImMwYmFlOTdhLWNiNzgtNGQwOS04MTliLWRiZmU4N2NlNjMxNCIsImV4cCI6MTc0NzMxNzg1NywiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.XaLAsxxBclEcYTCUXWNMN6lWZowIS-lsleAVPMcsYqQ
 
 
 ###
 GET https://{{hostname}}/api/UserPermission/45
 Content-Type: application/json
 Authorization: Bearer {{token}} 
+###
+
+###
+POST https://{{hostname}}/api/UserPermission
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+[
+    {
+        "id": 1,
+        "name": "Dashboard",
+        "user_id": null,
+        "create": true,
+        "read": true,
+        "update": false,
+        "delete": false
+    },
+    {
+        "id": 2,
+        "name": "Setup",
+        "user_id": null,
+        "create": true,
+        "read": true,
+        "update": false,
+        "delete": false
+    },
+    {
+        "id": 3,
+        "name": "Users",
+        "user_id": null,
+        "create": false,
+        "read": false,
+        "update": false,
+        "delete": false
+    },
+    {
+        "id": 4,
+        "name": "Permissions",
+        "user_id": null,
+        "create": false,
+        "read": false,
+        "update": false,
+        "delete": false
+    },
+    {
+        "id": 5,
+        "name": "History",
+        "user_id": null,
+        "create": false,
+        "read": false,
+        "update": false,
+        "delete": false
+    }
+]
 ###
 

@@ -13,6 +13,7 @@ namespace NetTemplate_React.Services.Setup
     {
         Task<Response> GetPermission(string id = null);
 
+        Task<Response> SavePermission(List<UserPermission> permissions);
     }
 
     public class UserPermissionService : IUserPermissionService
@@ -49,7 +50,8 @@ namespace NetTemplate_React.Services.Setup
                             {
                                 permission.Add(new UserPermission()
                                 {
-                                    Id = int.Parse(reader["ID"].ToString()),
+                                    Id = reader.IsDBNull(reader.GetOrdinal("ID")) ? null : reader["ID"].ToString(),
+                                    ModuleId = reader.GetInt32(reader.GetOrdinal("MODULE_ID")),
                                     Name = reader["Name"].ToString(),
                                     UserId = reader.IsDBNull(reader.GetOrdinal("USER_ID")) ? null : reader["USER_ID"].ToString(),
                                     Create = reader.GetInt32(reader.GetOrdinal("CREATE")) == 1,
@@ -89,5 +91,78 @@ namespace NetTemplate_React.Services.Setup
                 );
             }
         }
+
+        public async Task<Response> SavePermission(List<UserPermission> permissions)
+        {
+            var dtPermissions = new DataTable();
+            dtPermissions.Columns.Add("ID");
+            dtPermissions.Columns.Add("USER_ID");
+            dtPermissions.Columns.Add("MODULE_ID");
+            dtPermissions.Columns.Add("CREATE");
+            dtPermissions.Columns.Add("READ");
+            dtPermissions.Columns.Add("UPDATE");
+            dtPermissions.Columns.Add("DELETE");
+
+            foreach (UserPermission permission in permissions)
+            {
+                dtPermissions.Rows.Add(new object[]
+                {
+                    permission.Id,
+                    permission.UserId, 
+                    permission.ModuleId, 
+                    permission.Create, 
+                    permission.Read, 
+                    permission.Update, 
+                    permission.Delete,
+                });
+            }
+            string commandText = "[dbo].[NSP_UserPermission]";
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conString))
+                {
+                    await con.OpenAsync();
+
+                    
+
+                    using (SqlCommand cmd = new SqlCommand(commandText, con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@FLAG", "SAVE PERMISSIONS");
+                        cmd.Parameters.AddWithValue("@USER_PERMISSION", dtPermissions);
+
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                return new Response(
+                    success: true,
+                    debugScript: commandText,
+                    message: "Successfully save user permission",
+                    body: dtPermissions 
+                );
+
+            } 
+            catch (SqlException Ex)
+            {
+                return new Response(
+                    success: false,
+                    message: Ex.Message,
+                    debugScript: commandText,
+                    body: null
+                );
+            }
+            catch (Exception Ex)
+            {
+                return new Response(
+                    success: false,
+                    message: Ex.Message,
+                    debugScript: commandText,
+                    body: null
+                );
+            }
+
+        }
+
     }
 }

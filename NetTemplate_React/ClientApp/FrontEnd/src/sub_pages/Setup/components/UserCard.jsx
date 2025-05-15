@@ -1,4 +1,4 @@
-import { Avatar, Container, Flex, Pill, Stack, Text, Card, Group, Title, Box, Switch, Divider, Skeleton } from "@mantine/core";
+import { Avatar, Container, Space, Flex, Pill, Stack, Text, Card, Group, Title, Box, Switch, Divider, Skeleton } from "@mantine/core";
 import ErrorElement from "~/components/ErrorElement";
 import useGetUserById from "~/hooks/Setup/User/useGetUserById";
 import moment from "moment";
@@ -11,7 +11,7 @@ const UserCard = ({
   if (isLoading) {
     return (
       <Box style={{ viewTransitionName: `usr-card-profile-${id}` }}>
-        <Card shadow="xs" w={{ base: '100%', md: '40%' }} >
+        <Card shadow="xs" w={{ base: '100%', md: '40%' }} h={200} >
           <Flex direction="row" gap={20}>
             <Skeleton w={50} h={50} circle />
             <Stack flex={1} p={0} m={0} gap={5}>
@@ -19,6 +19,11 @@ const UserCard = ({
               <Skeleton h={30} w={'40%'} />
             </Stack>
           </Flex>
+          <Stack>
+              <Space size="lg"/>
+              <Skeleton h={30} />
+              <Skeleton h={30} />
+          </Stack>
         </Card>
       </Box>
     )

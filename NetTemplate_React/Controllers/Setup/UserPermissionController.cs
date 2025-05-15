@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NetTemplate_React.Models;
 using NetTemplate_React.Services.Setup;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -31,8 +33,13 @@ namespace NetTemplate_React.Controllers.Setup
 
         // POST api/<UserPermissionController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] List<UserPermission> permissions)
         {
+            var response = await _service.SavePermission(permissions);
+
+            if (!response.Success) return new BadRequestObjectResult(response);
+
+            return new OkObjectResult(response);
         }
 
         // PUT api/<UserPermissionController>/5
