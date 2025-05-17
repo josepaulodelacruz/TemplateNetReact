@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 
 namespace NetTemplate_React.Models
 {
@@ -40,17 +41,61 @@ namespace NetTemplate_React.Models
         [JsonProperty("permissions")]
         public List<UserPermission> Permissions = new List<UserPermission>(); 
 
+        public static User TransformUser(DataTable dt)
+        {
+            User user = new User();
+
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                var userData = dt.Rows.Cast<DataRow>()
+                    .GroupBy(row => new
+                    {
+                        Id = int.Parse(row["ID"].ToString()),
+                        Username = row["USERNAME"].ToString(),
+                        CreatedAt = Convert.ToDateTime(row["CREATED_AT"].ToString()),
+                        IsActive = Convert.ToInt32(row["IS_ACTIVE"]) == 1
+                    })
+                    .Select(group => new User()
+                    {
+                        Id = group.Key.Id,
+                        Username = group.Key.Username,
+                        CreatedAt = group.Key.CreatedAt,
+                        IsActive = group.Key.IsActive,
+                        Permissions = group.Any(row => row["p_id"] != DBNull.Value) ?
+                        group.Select(row => new UserPermission()
+                        {
+                            Id = row["p_id"].ToString(),
+                            Name = row["NAME"].ToString(),
+                            UserId = row["USER_ID"].ToString(),
+                            ModuleId = int.Parse(row["MODULE_ID"].ToString()),
+                            Create = Convert.ToInt32(row["CREATE"]) == 1,
+                            Read = Convert.ToInt32(row["READ"]) == 1,
+                            Update = Convert.ToInt32(row["UPDATE"]) == 1,
+                            Delete = Convert.ToInt32(row["Delete"]) == 1
+                        }).ToList() : new List<UserPermission>(),
+                    }).FirstOrDefault(); // Assuming you want to transform the first distinct user
+
+                if (userData != null)
+                {
+                    user = userData;
+                }
+            }
+
+            return user;
+        }
+
         public static List<UserPermission> AttachedPermissionInUser(DataTable dt)
         {
             List<UserPermission> permissions = new List<UserPermission>();
 
-            if (dt == null || dt.Rows.Count == 0) return permissions;
+            var a = dt?.Rows.Cast<DataRow>().FirstOrDefault(row => !row.IsNull("p_id"));
+           
+            if (a == null) return permissions; 
 
-            //error when creating new user no permission when loggin in
             permissions = dt.Rows.Cast<DataRow>()
                 .GroupBy(row => new
                 {
-                    id = row["id"].ToString(),
+                    id = row["p_id"].ToString(),
                     user_id = row["USER_ID"].ToString(),
                     module_id = int.Parse(row["MODULE_ID"].ToString()),
                     name = row["name"].ToString(),

@@ -157,7 +157,9 @@ namespace NetTemplate_React.Services
                 "usr.[USERNAME], " +
                 "usr.[CREATED_AT], " +
                 "usr.[PASSWORD], " +
+                "usr.[IS_ACTIVE], " +
                 "mdl.[NAME], " +
+                "usp.[ID] as [p_id], " +
                 "usp.* " +
                 "FROM USERS usr " +
                 "LEFT JOIN UserPermissions usp " +
@@ -190,18 +192,8 @@ namespace NetTemplate_React.Services
                         // Generate JWT token
                         var token = GenerateJwtToken(dataTable.Rows[0]);
                         // Create response data with user info and token
-
-                        List<UserPermission> permissions = User.AttachedPermissionInUser(dataTable);
-
-                        var responseData = new User()
-                        {
-                            Id = Convert.ToInt32(dataTable.Rows[0]["ID"]),
-                            Username = dataTable.Rows[0]["USERNAME"].ToString(),
-                            // Add other user fields you want to return, but NOT the password
-                            CreatedAt = Convert.ToDateTime(dataTable.Rows[0]["CREATED_AT"]),
-                            Token = token,
-                            Permissions = permissions,
-                        };
+                        var responseData = User.TransformUser(dataTable);
+                        responseData.Token = token;
 
                         return new Response(
                             success: true,

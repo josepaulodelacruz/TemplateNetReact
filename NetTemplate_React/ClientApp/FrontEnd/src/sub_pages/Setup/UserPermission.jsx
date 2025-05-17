@@ -198,7 +198,7 @@ const UserPermission = () => {
       )}
 
       <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="flex-end">
-        <Paper w={{ base: '100%', md: '50%' }} mt={10} radius="xs" p="md">
+        <Paper shadow="sm" w={{ base: '100%', md: '50%' }} mt={10} radius="xs" p="md">
           <Title size="lg">Actions</Title>
           <Group justify="space-between">
             <Group>
@@ -237,7 +237,7 @@ const UserPermission = () => {
         </Button>
       </Flex>
       <Space h={'lg'} />
-      <Card p={0}>
+      <Card shadow="sm" p={0}>
         <UserPermissionTable
           permissions={permissions}
           setPermissions={setPermissions}
