@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NetTemplate_React.Models;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -151,7 +152,19 @@ namespace NetTemplate_React.Services
         public async Task<Response> Login(Models.User user)
         {
             var dataTable = new DataTable();
-            var commandText = "SELECT * FROM USERS WHERE [USERNAME] = @username";
+            var commandText = "SELECT " +
+                "usr.[ID], " +
+                "usr.[USERNAME], " +
+                "usr.[CREATED_AT], " +
+                "usr.[PASSWORD], " +
+                "mdl.[NAME], " +
+                "usp.* " +
+                "FROM USERS usr " +
+                "LEFT JOIN UserPermissions usp " +
+                "ON usr.[ID] = usp.[USER_ID] " +
+                "LEFT JOIN ModuleItems mdl " +
+                "ON usp.[MODULE_ID] = mdl.[ID]" +
+                "WHERE usr.[USERNAME] = @username";
             try
             {
                 using (SqlConnection con = new SqlConnection(_conString))
@@ -168,28 +181,26 @@ namespace NetTemplate_React.Services
                         {
                             throw new Exception("Invalid Username or Password");
                         }
-
                         string storedHashedPassword = dataTable.Rows[0]["PASSWORD"].ToString();
-
                         // Trim the stored password to remove any whitespace that might be causing issues
                         storedHashedPassword = storedHashedPassword.Trim();
-
                         // Verify hashed password using BCrypt
                         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(user.Password, storedHashedPassword);
-
                         if (!isPasswordValid) throw new Exception("Invalid Username or Password");
-
                         // Generate JWT token
                         var token = GenerateJwtToken(dataTable.Rows[0]);
-
                         // Create response data with user info and token
+
+                        List<UserPermission> permissions = User.AttachedPermissionInUser(dataTable);
+
                         var responseData = new User()
                         {
-                            Id = int.Parse(dataTable.Rows[0]["ID"].ToString()),
+                            Id = Convert.ToInt32(dataTable.Rows[0]["ID"]),
                             Username = dataTable.Rows[0]["USERNAME"].ToString(),
                             // Add other user fields you want to return, but NOT the password
-                            CreatedAt = DateTime.Parse(dataTable.Rows[0]["CREATED_AT"].ToString()),
-                            Token = token
+                            CreatedAt = Convert.ToDateTime(dataTable.Rows[0]["CREATED_AT"]),
+                            Token = token,
+                            Permissions = permissions,
                         };
 
                         return new Response(

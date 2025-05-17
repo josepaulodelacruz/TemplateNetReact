@@ -17,10 +17,12 @@ import ErrorElement from "~/components/ErrorElement";
 import TableSkeleton from "~/components/Loading/TableSkeleton";
 import useGetUserPermission from "~/hooks/Setup/Permissions/useGetUserPermission";
 import useSavePermissionMutation from "~/hooks/Setup/Permissions/useSavePermissionMutation";
+import { useQueryClient } from "@tanstack/react-query";
+import QueryKeys from "~/constants/QueryKeys";
 
 const UserPermissionTable = ({ permissions, setPermissions, selected, setSelected }) => {
   const { id } = useParams();
-  const { data, isLoading, isError, error } = useGetUserPermission(id);
+  const { data, isLoading, isError } = useGetUserPermission(id);
 
   useEffect(() => {
     if (data?.body) {
@@ -98,7 +100,8 @@ const UserPermissionTable = ({ permissions, setPermissions, selected, setSelecte
     <Table>
       <Table.Thead>
         <Table.Tr>
-          <Table.Th style={{ width: '2%' }}></Table.Th>
+          <Table.Th style={{ width: '2%' }}>
+          </Table.Th>
           <Table.Th>Name</Table.Th>
           <Table.Th style={{ textAlign: 'center' }}>Permission</Table.Th>
         </Table.Tr>
@@ -122,6 +125,8 @@ const UserPermission = () => {
     delete: false
   });
   const savePermissionMutation = useSavePermissionMutation();
+  const { refetch } = useGetUserPermission(id);
+  const queryClient = useQueryClient();
 
   const handleBulkActionChange = (action, value) => {
     setBulkActions(prev => ({
@@ -162,14 +167,14 @@ const UserPermission = () => {
   };
 
   const handleSave = async () => {
-    console.log(permissions);
     savePermissionMutation.mutate(permissions, {
-      onSuccess: (response) => {
-        console.log(response)
+      onSuccess: () => {
         setNotification({
           type: 'success',
           message: 'Permissions saved successfully'
         });
+        queryClient.invalidateQueries([QueryKeys.USER_PERMISSION, id])
+        refetch();
       },
       onError: () => {
         setNotification({
