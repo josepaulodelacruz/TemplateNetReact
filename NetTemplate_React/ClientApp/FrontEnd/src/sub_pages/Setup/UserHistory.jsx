@@ -7,7 +7,6 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-
 const CollapsibleHistory = () => {
   const [opened, { toggle }] = useDisclosure(false);
 

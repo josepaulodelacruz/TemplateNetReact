@@ -114,6 +114,7 @@ namespace NetTemplate_React
             app.UseCookiePolicy();
 
             //app.UseAPILogger();
+            app.UseLoggerMIddleware();
 
 
             app.UseCors("AllowSpecificOrigin");
