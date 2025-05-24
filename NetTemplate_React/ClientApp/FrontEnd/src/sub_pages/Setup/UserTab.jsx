@@ -1,16 +1,24 @@
 import { Avatar, Flex, Pill, Stack, Container, Text, Card, Group, Title, UnstyledButton, Box, Tabs, Switch, Divider } from "@mantine/core";
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
-import { Outlet, useNavigate, useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router";
 import StringRoutes from "~/constants/StringRoutes";
 import UserCard from "./components/UserCard";
-import useGetUserById from "~/hooks/Setup/User/useGetUserById";
 
 
 const UserTab = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [currentPath, setCurrentPath] = useState(`${StringRoutes.users_permission}/${id}`); // initial active tab
+
+  useEffect(() => {
+    if(pathname.includes(`${StringRoutes.users_permission}/${id}`)) {
+      setCurrentPath(`${StringRoutes.users_permission}/${id}`);
+      return;
+    } 
+    setCurrentPath(`${StringRoutes.users_history}/${id}`);
+  }, [pathname])
 
   return (
     <Container fluid >

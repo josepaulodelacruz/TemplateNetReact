@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NetTemplate_React.Services.Setup;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -35,8 +36,10 @@ namespace NetTemplate_React.Controllers.Setup
 
         // GET api/<UserController>/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
+        public async Task<IActionResult> Get(string id = null)
         {
+            if (id.Contains("null")) return BadRequest("id must not be null");
+
             var response = await _service.GetUsers(id);
 
             if (!response.Success) return new BadRequestObjectResult(response);

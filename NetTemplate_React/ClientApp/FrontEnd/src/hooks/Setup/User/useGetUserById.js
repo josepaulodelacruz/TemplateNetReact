@@ -7,7 +7,6 @@ const useGetUserById = (id = null) => {
   return useQuery({
     queryKey: [QueryKeys.USER_ID, id],
     queryFn: async () => {
-      console.lo
       const response = await client.get("/User/" + id);
       return response.data;
     }
