@@ -3,20 +3,43 @@ import {
   Timeline,
   Text,
   Paper,
-  Collapse
+  Collapse,
+  Loader,
+  Center,
+  JsonInput,
+  CheckIcon,
+  CloseIcon
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import moment from "moment";
+import { useParams } from "react-router";
+import ErrorElement from "~/components/ErrorElement";
+import useGetUserHistoryById from "~/hooks/Setup/History/useGetUserHistoryById";
 
-const CollapsibleHistory = () => {
+const CollapsibleHistory = ({ item }) => {
   const [opened, { toggle }] = useDisclosure(false);
 
+  const isError = item.responseStatusCode <= 200 || item.responseStatusCode > 400;
+
   return (
-    <Timeline.Item onClick={toggle} style={{cursor: 'pointer'}} >
+    <Timeline.Item bullet={isError ? <CheckIcon color="teal" size={12}/> : <CloseIcon color="red" />} onClick={toggle} style={{ cursor: 'pointer' }} >
       <Paper shadow="none">
-        <Text c="dimmed" size="sm">You&apos;ve created new branch <Text variant="link" component="span" inherit>fix-notifications</Text> from master</Text>
-        <Text size="xs" mt={4}>2 hours ago</Text>
+        <Text size="sm">{item.requestMethod} <Text variant="link" component="span">{item.requestPath} </Text> 
+          <Text size="sm" component="span" c="dimmed">{item.duration}s</Text>
+        </Text>
+        <Text size="xs" c="dimmed">REF ID: {item.id}</Text>
+        <Text c="dimmed" size="xs" mt={4}> 
+          <Text component="span" c={isError ? 'teal' : 'red'}>status: {item.responseStatusCode} </Text>
+          {moment(item.timestamp).calendar()}
+        </Text>
         <Collapse in={opened} >
-          <Text>Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim. Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis.</Text>
+          <JsonInput 
+            size="xs"
+            description="Response"
+            value={item.body}
+            autosize={true}
+            formatOnBlur
+          />
         </Collapse>
       </Paper>
     </Timeline.Item>
@@ -24,16 +47,38 @@ const CollapsibleHistory = () => {
 }
 
 const UserHistory = () => {
+  const { id } = useParams();
+  const { data, isLoading, isError, error } = useGetUserHistoryById(id);
+
+  if (isLoading) {
+    return (
+      <Container fluid>
+        <Center>
+          <Loader />
+        </Center>
+      </Container>
+    )
+  }
+
+  if (isError) {
+    return (
+      <ErrorElement>
+        {error.response.data.message || error.message}
+      </ErrorElement>
+    )
+
+  }
+
   return (
     <Container fluid>
-      <Timeline active={1} bulletSize={24} lineWidth={2}>
-        <CollapsibleHistory />
-        <CollapsibleHistory />
-        <CollapsibleHistory />
-        <CollapsibleHistory />
-        <CollapsibleHistory />
-        <CollapsibleHistory />
-        <CollapsibleHistory />
+      <Timeline active={0} bulletSize={24} lineWidth={2}>
+        {
+          data.body?.map((item, index) => {
+            return (
+              <CollapsibleHistory key={index} item={item} />
+            )
+          })
+        }
       </Timeline>
     </Container>
   )

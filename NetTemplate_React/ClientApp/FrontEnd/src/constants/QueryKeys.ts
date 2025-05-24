@@ -8,6 +8,9 @@ enum QueryKeys {
   //permision
   USER_PERMISSION = 'setup_user-permission',
 
+  //HISTORY
+  USER_HISTORY = 'setup_user-history',
+
   //modules 
   MODULE_ITEMS = 'setup_module-items',
   MODULE_ITEM_ID = 'setup_module-item-id',

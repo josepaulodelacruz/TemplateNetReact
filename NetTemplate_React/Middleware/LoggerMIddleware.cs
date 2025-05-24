@@ -28,7 +28,7 @@ namespace NetTemplate_React.Middleware
         public async Task Invoke(HttpContext httpContext)
         {
             // Only process API requests
-            if (!httpContext.Request.Path.StartsWithSegments("/api"))
+            if (!httpContext.Request.Path.StartsWithSegments("/api") || httpContext.Request.Path.StartsWithSegments("/api/UserHistory"))
             {
                 await _next(httpContext);
                 return;

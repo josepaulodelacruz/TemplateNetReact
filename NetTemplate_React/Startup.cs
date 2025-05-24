@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using NetTemplate_React.Middleware;
 using NetTemplate_React.Services;
@@ -54,7 +55,8 @@ namespace NetTemplate_React
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            var conString = Configuration.GetConnectionString("DEV");
+            bool IsLive = bool.Parse(Configuration.GetConnectionString("ISLive"));
+            var conString = !IsLive ? Configuration.GetConnectionString("DEV") : Configuration.GetConnectionString("PROD");
 
             //injected services
             services.AddScoped<IAuthService, AuthService>(options => new AuthService(conString: conString, configuration: Configuration));
@@ -63,6 +65,7 @@ namespace NetTemplate_React
             services.AddScoped<IModuleItemService, ModuleItemService>(options => new ModuleItemService(conString: conString, configuration: Configuration));
             services.AddScoped<IUserService, UserService>(options => new UserService(conString: conString, configuration: Configuration));
             services.AddScoped<IUserPermissionService, UserPermissionService>(options => new UserPermissionService(conString: conString, config: Configuration));
+            services.AddScoped<IUserHistoryService, UserHistoryService>(options => new UserHistoryService(conString: conString, logger: new LoggerFactory()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
