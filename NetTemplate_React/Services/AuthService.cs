@@ -166,7 +166,8 @@ namespace NetTemplate_React.Services
                 "ON usr.[ID] = usp.[USER_ID] " +
                 "LEFT JOIN ModuleItems mdl " +
                 "ON usp.[MODULE_ID] = mdl.[ID]" +
-                "WHERE usr.[USERNAME] = @username";
+                "WHERE usr.[USERNAME] = @username " +
+                "AND IS_ACTIVE = 1";
             try
             {
                 using (SqlConnection con = new SqlConnection(_conString))

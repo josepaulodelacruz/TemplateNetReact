@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace NetTemplate_React.Services.Setup
@@ -12,6 +13,8 @@ namespace NetTemplate_React.Services.Setup
     public interface IUserService
     {
         Task<Response> GetUsers(string id = null);
+
+        Task<Response> ChangeUserStatus(int id, bool isActive);
     }
 
     public class UserService : IUserService
@@ -45,7 +48,7 @@ namespace NetTemplate_React.Services.Setup
                 {
                     await con.OpenAsync();
 
-                    using (SqlCommand cmd = new SqlCommand(commandText, con))
+                    using (SqlCommand cmd = new SqlCommand(commandText.ToString(), con))
                     {
                         cmd.Parameters.AddWithValue("@ID", (object)id ?? DBNull.Value);
 
@@ -71,7 +74,7 @@ namespace NetTemplate_React.Services.Setup
 
                 return new Response(
                     success: true,
-                    debugScript: commandText,
+                    debugScript: commandText.ToString(),
                     message: "Successfully fetch users",
                     body: Users
                 );
@@ -80,7 +83,7 @@ namespace NetTemplate_React.Services.Setup
             {
                 return new Response(
                     success: false,
-                    debugScript: commandText,
+                    debugScript: commandText.ToString(),
                     message: Ex.Message,
                     body: null
                 );
@@ -96,6 +99,53 @@ namespace NetTemplate_React.Services.Setup
             }
         } 
 
+        public async Task<Response> ChangeUserStatus(int id, bool isActive = true)
+        {
+            var commandText = new StringBuilder();
+            commandText.AppendLine("UPDATE USERS");
+            commandText.AppendLine("SET");
+            commandText.AppendLine("IS_ACTIVE = @IsActive");
+            commandText.AppendLine("WHERE ID = @ID");
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conString))
+                {
+                    await con.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand(commandText.ToString(), con))
+                    {
+                        cmd.Parameters.AddWithValue("@IsActive", isActive);
+                        cmd.Parameters.AddWithValue("@ID", id);
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                return new Response(
+                    success: true,
+                    debugScript: commandText.ToString(),
+                    message: "Succesfully updated user status",
+                    body: null
+                );
+
+            }
+            catch (SqlException Ex)
+            {
+                return new Response(
+                    success: false,
+                    debugScript: commandText.ToString(),
+                    message: Ex.Message,
+                    body: null
+                );
+            }
+            catch (Exception Ex)
+            {
+                return new Response(
+                    success: false,
+                    debugScript: commandText.ToString(),
+                    message: Ex.Message,
+                    body: null
+                );
+            }
+        }
 
     }
 }

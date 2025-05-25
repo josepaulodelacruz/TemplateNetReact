@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NetTemplate_React.Models;
 using NetTemplate_React.Services.Setup;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -48,10 +50,15 @@ namespace NetTemplate_React.Controllers.Setup
 
         }
 
-        // POST api/<UserController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        //PUT api/<UserController/5
+        [HttpPut("change-status/{id}")]
+        public async Task<IActionResult> ChangeUserStatus(int id, [FromQuery] bool is_active)
         {
+            var response = await _service.ChangeUserStatus(id, is_active);
+
+            if (!response.Success) new BadRequestObjectResult(response);
+
+            return Ok(response);
         }
 
         // PUT api/<UserController>/5

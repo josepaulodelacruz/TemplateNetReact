@@ -1,4 +1,4 @@
-import { Avatar, Flex, Pill, Stack, Container, Text, Card, Group, Title, UnstyledButton, Box, Tabs, Switch, Divider } from "@mantine/core";
+import {Container, Group, Title, UnstyledButton, Box, Tabs } from "@mantine/core";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router";

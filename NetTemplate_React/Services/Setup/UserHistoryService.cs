@@ -78,9 +78,6 @@ namespace NetTemplate_React.Services.Setup
                     body: null
                 );
             }
-
-            
-
         }
     }
 }

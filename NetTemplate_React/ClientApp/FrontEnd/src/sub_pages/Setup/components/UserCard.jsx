@@ -2,11 +2,25 @@ import { Avatar, Container, Space, Flex, Pill, Stack, Text, Card, Group, Title, 
 import ErrorElement from "~/components/ErrorElement";
 import useGetUserById from "~/hooks/Setup/User/useGetUserById";
 import moment from "moment";
+import { useEffect, useState } from "react";
+import { notifications } from "@mantine/notifications";
+import useUserUpdateStatusMutation from "~/hooks/Setup/User/useUserUpdateStatusMutation";
+import { useQueryClient } from "@tanstack/react-query";
+import QueryKeys from "~/constants/QueryKeys";
 
 const UserCard = ({
   id = null
 }) => {
-  const { data, isLoading, isError, error } = useGetUserById(id);
+  const { data, isLoading, isError, error, isSuccess } = useGetUserById(id);
+  const [isActive, setIsActive] = useState(false);
+  const useUserStatusMutation = useUserUpdateStatusMutation();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (isSuccess) {
+      setIsActive(data.body[0]?.is_active);
+    }
+  }, [isSuccess, data])
 
   if (isLoading) {
     return (
@@ -20,21 +34,47 @@ const UserCard = ({
             </Stack>
           </Flex>
           <Stack>
-              <Space size="lg"/>
-              <Skeleton h={30} />
-              <Skeleton h={30} />
+            <Space size="lg" />
+            <Skeleton h={30} />
+            <Skeleton h={30} />
           </Stack>
         </Card>
       </Box>
     )
   }
 
-  if(isError) {
+  if (isError) {
     return <ErrorElement>{error.response.data?.message || error.message}</ErrorElement>
   }
 
-  if(data.body.length <= 0) {
+  if (data.body.length <= 0) {
     return <ErrorElement>No user found</ErrorElement>
+  }
+
+  const onMangeUpdateUserStatus = (e) => {
+    setIsActive(e.currentTarget.checked);
+    const request = {
+      id: id,
+      is_active: e.currentTarget.checked,
+    }
+    useUserStatusMutation.mutate(request, {
+      onSuccess: () => {
+        notifications.show({
+          color: 'green',
+          title: "Success",
+          message: "Successfully update user status"
+        });
+        queryClient.invalidateQueries([QueryKeys.USER_ID, id])
+      },
+      onError: (error) => {
+        const errorMessage = error.response?.data?.message || error.message;
+        notifications.show({
+          color: 'red',
+          title: "Failed Login Attempt",
+          message: errorMessage
+        })
+      }
+    });
   }
 
   return (
@@ -50,7 +90,9 @@ const UserCard = ({
               <Text fw={300} color="blue">delacruzjosepaulo@gmail.com</Text>
             </Stack>
           </Flex>
-          <Switch size="xl" checked={data.body[0]?.is_active} onLabel="Active" offLabel="Inactive" />
+          {
+            <Switch size="xl" checked={isActive} onChange={onMangeUpdateUserStatus} onLabel="Active" offLabel="Inactive" />
+          }
         </Flex>
 
         <Divider my={15} />

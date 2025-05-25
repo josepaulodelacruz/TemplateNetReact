@@ -1,5 +1,5 @@
 ﻿@hostname=localhost:44393
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwidW5pcXVlX25hbWUiOiJkZXYiLCJqdGkiOiJkMzlmYTA4ZC02ODk0LTQwZWMtYjRiYi01YzNmMDg5Y2FmMTUiLCJleHAiOjE3NDgwOTY2ODksImlzcyI6IllvdXJBcGkiLCJhdWQiOiJZb3VyQ2xpZW50cyJ9.8sV9KoveOHgebI9Cbi2BK4erskmV0hUdPRNBB0nNfzE
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwidW5pcXVlX25hbWUiOiJkZXYiLCJqdGkiOiJkMGM2NjcxZC05MzkxLTQ4ZmMtODlkZC0wNzQzMzRjZTFkYzciLCJleHAiOjE3NDgxNDIzOTksImlzcyI6IllvdXJBcGkiLCJhdWQiOiJZb3VyQ2xpZW50cyJ9.bE0tCvABAhYUiQCXooSLXE0HoKIp3zrSn9y-fzgf27Y
 
 ###
 GET https://{{hostname}}/api/User/
@@ -8,7 +8,14 @@ Authorization: Bearer {{token}}
 ###
 
 ###
-GET https://{{hostname}}/api/User/null
+GET https://{{hostname}}/api/User/5
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+###
+
+
+###
+PUT https://{{hostname}}/api/User/change-status/5?is_active=true
 Content-Type: application/json
 Authorization: Bearer {{token}} 
 ###
