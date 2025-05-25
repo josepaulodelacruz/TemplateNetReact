@@ -5,11 +5,22 @@ import {
   Box,
   Card,
   Group,
+  Button,
+  Stack,
 } from "@mantine/core";
 import UserTable from "./components/UserTable";
-
+import { notificationWithCrashReportButton } from "~/utils/notification";
 
 const User = () => {
+
+  const handleTest = () => {
+    notificationWithCrashReportButton({
+      color: 'red',
+      title: "Failure to login",
+
+    });
+  }
+
   return (
     <Container fluid>
       <Group>
@@ -22,6 +33,9 @@ const User = () => {
           variant="default"
           placeholder="User"
         />
+        <Button variant="light" color="red"  onClick={handleTest}>
+          crash report 
+        </Button>
       </Box>
       <Card p={0} shadow="xs">
         <UserTable />
