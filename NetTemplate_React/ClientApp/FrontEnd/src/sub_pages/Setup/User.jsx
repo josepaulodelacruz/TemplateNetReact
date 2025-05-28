@@ -42,9 +42,6 @@ const User = () => {
           variant="default"
           placeholder="User"
         />
-        <Button variant="light" color="red"  onClick={handleTest}>
-          crash report 
-        </Button>
       </Box>
       <Card p={0} shadow="xs">
         <UserTable />
