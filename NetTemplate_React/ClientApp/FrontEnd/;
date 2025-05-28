@@ -25,7 +25,7 @@ const User = () => {
       color: 'red',
       title: "Failure to login",
       onClick: () => {
-        onTriggerCrashReportModal();
+        onOpenCrashReportModal();
       }
     });
   }
