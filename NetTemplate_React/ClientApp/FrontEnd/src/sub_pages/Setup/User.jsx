@@ -17,7 +17,6 @@ const User = () => {
   const { onTriggerCrashReportModal, isCrashReportModal } = useCrashReport();
 
   useEffect(() => {
-    console.log(isCrashReportModal);
   }, [isCrashReportModal])
 
   const handleTest = () => {
@@ -43,6 +42,9 @@ const User = () => {
           placeholder="User"
         />
       </Box>
+      <Button onClick={handleTest}>
+        Crash report
+      </Button>
       <Card p={0} shadow="xs">
         <UserTable />
       </Card>

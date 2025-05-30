@@ -8,6 +8,7 @@ import '../index.css';
 import useAuth from '~/hooks/Auth/useAuth';
 import { useEffect } from 'react';
 import packageJson from '../../package.json';
+import CrashReport from '~/components/Modal/CrashReport';
 
 const DashboardLayout = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
@@ -60,7 +61,7 @@ const DashboardLayout = () => {
         </ScrollArea>
         <Menu position="top-end">
           <Menu.Target>
-            <Paper  style={{cursor: 'pointer'}} radius="xs">
+            <Paper style={{ cursor: 'pointer' }} radius="xs">
               <Group justify='space-between'>
                 <Text>Default User</Text>
                 <ChevronRight />
@@ -75,12 +76,15 @@ const DashboardLayout = () => {
               Logout
             </Menu.Item>
           </Menu.Dropdown>
-
         </Menu>
-
       </AppShell.Navbar>
       <AppShell.Main>
         <Outlet />
+
+        {
+          //open crash report
+          <CrashReport />
+        }
       </AppShell.Main>
     </AppShell>
   );
