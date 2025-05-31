@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { parseUserAgent } from "~/utils";
 
 const useAuth = create(
   persist(
@@ -10,9 +11,13 @@ const useAuth = create(
         set({ token: null });
       },
       onSetUserDetails: (data, token = null) => {
+        const agent = parseUserAgent(window.navigator.userAgent);
         set({
           token: token,
-          user: data
+          user: {
+            ...data,
+            agent: agent,
+          },
         })
       },
     }),

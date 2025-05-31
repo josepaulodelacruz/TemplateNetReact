@@ -26,10 +26,11 @@ import {
   Button
 
 } from '@mantine/core'
-import { AlertTriangle, Bug, Clock, Copy, Mail, MapPin, Monitor, X, RotateCcw, Send, User, Info, } from 'lucide-react';
+import { useForm } from '@mantine/form';
+import { AlertTriangle, Bug, Clock, Copy, Mail, MapPin, Monitor, X, RotateCcw, Send, User, Info, Delete, Trash, } from 'lucide-react';
 import { useState } from 'react';
+import useAuth from '~/hooks/Auth/useAuth';
 import useCrashReport from '~/hooks/CrashReport/useCrashReport';
-
 
 const crashData = {
   errorId: 'CR-2025-0530-001',
@@ -63,11 +64,19 @@ const severityColors = {
   critical: 'red'
 }
 
-const CrashReport = () => {
+const FormReport = () => {
+  const { onCloseCrashReportModal } = useCrashReport();
   const [severity, setSeverity] = useState('medium');
-  const { isCrashReportModal, onCloseCrashReportModal } = useCrashReport();
-  const [value, setValue] = useState('');
   const [pastedImages, setPastedImages] = useState([]);
+  const form = useForm({
+    mode: 'uncontrolled',
+    initialValues: {
+      email: '',
+      severity: '',
+      scenario: '',
+      details: ''
+    }
+  })
 
   const handlePaste = async (event) => {
     const clipboardItems = event.clipboardData.items;
@@ -94,20 +103,154 @@ const CrashReport = () => {
     }
   };
 
+  const handleSubmit = () => {
+    form.setValues({ severity: severity })
+    // const a = parseUserAgent(window.navigator.userAgent);
+    // console.log(a);
+  }
+
+
+  return (
+    <form>
+      <Stack gap="md">
+        <TextInput
+          label="Email Address"
+          placeholder='your.email@example.com'
+          leftSection={<Mail size={16} />}
+          description="We'll notifiy you when this issue is resolved"
+          key={form.key('email')}
+          {...form.getInputProps('email')}
+        />
+        <Select
+          label="Severity Level"
+          defaultValue="medium"
+          onChange={setSeverity}
+          data={[
+            { value: 'low', label: '🟢 Low - Minor inconvenience' },
+            { value: 'medium', label: '🟡 Medium - Affects functionality' },
+            { value: 'high', label: '🟠 High - Blocks important features' },
+            { value: 'critical', label: '🔴 Critical - App unusable' }
+          ]}
+          description="How severely does this issue affect your work?"
+        />
+      </Stack>
+
+      <Textarea
+        label="What were you doing when this happened?"
+        description="Input the scenario of what you were doing. IMAGES (optional) *Copy paste the Image from your clipboard*"
+        placeholder="Describe what you were trying to do when the error occured"
+        onPaste={handlePaste}
+        minRows={4}
+        key={form.key('scenario')}
+        {...form.getInputProps('scenario')}
+      />
+      {pastedImages.length > 0 && (
+        <div>
+          <Text size="sm" fw={500} mb="xs">Pasted Images:</Text>
+          <Group>
+            {pastedImages.map((img, index) => (
+              <Box style={{
+                position: 'relative', 
+                width: 100,
+                height: 100
+              }}>
+                {/* The parent Box needs to be positioned relative to contain the absolutely positioned Trash icon */}
+                <Button
+                  onClick={() => {
+                    setPastedImages((state) => {
+                      const _state = state.filter((_, i) => i != index);
+                      return _state;
+                    })
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: 5, // Adjust as needed
+                    left: '65%', // Adjust as needed
+                    zIndex: 1, // Ensure it's above the image
+                  }}
+                  size="xs" color="red" variant='transparent'>
+                  <Trash
+                    size={18}
+                  />
+                </Button>
+
+                <Image
+                  src={img.src}
+                  alt={img.name}
+                  width={100}
+                  height={100}
+                  fit="contain"
+                  style={{
+                    position: 'relative', // Image itself can be relative, or static if it's the only content
+                    zIndex: 0, // Ensure image is below the trash icon
+                  }}
+                />
+              </Box>
+
+            ))}
+          </Group>
+        </div>
+      )}
+
+      <Textarea
+        label="Steps to Reproduce (Optional)"
+        description="Help us reproduce this issue by providing the data inputs or step-by-step instructions"
+        placeholder="1. Go to Products page&#10;2. Click on 'Load More' button&#10;3. Error appears..."
+        minRows={3}
+        maxRows={6}
+        key={form.key('details')}
+        {...form.getInputProps('details')}
+      />
+      {/* Action Buttons */}
+      <Group justify="space-between" pt="md">
+        <Group>
+          <Button
+            onClick={onCloseCrashReportModal}
+            variant="subtle"
+            color="gray"
+            leftSection={<X size={16} />}
+          >
+            Close
+          </Button>
+          <Button
+            variant="light"
+            color="blue"
+            leftSection={<RotateCcw size={16} />}
+          >
+            Try Again
+          </Button>
+        </Group>
+
+        <Button
+          onClick={handleSubmit}
+          leftSection={<Send size={16} />}
+          loaderProps={{ type: 'dots' }}
+        >
+          Send Report
+        </Button>
+      </Group>
+    </form>
+  )
+}
+
+const CrashReport = () => {
+  const { isCrashReportModal, onCloseCrashReportModal } = useCrashReport();
+  const { user } = useAuth();
+
   return (
     <>
-      <Modal size="xl" opened={isCrashReportModal} onClose={onCloseCrashReportModal} title={
-        <Group gap="sm">
-          <ThemeIcon size="lg" color="red" variant='light' >
-            <Bug size={20} />
-          </ThemeIcon>
-          <Container p={0} m={0}>
-            <Title order={3}>Crash Report</Title>
-            <Text size="sm" c="dimmed">Help us fix this issue</Text>
-          </Container>
-        </Group>
-      }>
+      <Modal size="xl" opened={isCrashReportModal} onClose={onCloseCrashReportModal} withCloseButton={false} >
         <Stack gap="lg">
+          <Group gap="sm">
+            <ThemeIcon size="lg" color="red" variant='light' >
+              <Bug size={20} />
+            </ThemeIcon>
+            <Container p={0} m={0}>
+              <Title order={3}>Crash Report</Title>
+              <Text size="sm" c="dimmed">Help us fix this issue</Text>
+            </Container>
+          </Group>
+
           <Alert
             icon={<AlertTriangle size={20} />}
             color="red" variant="light"
@@ -194,21 +337,21 @@ const CrashReport = () => {
                 <Stack gap="sm">
                   <Flex justify="space-between">
                     <Text size="sm" fw={500}>Browser:</Text>
-                    <Text size="sm">{crashData.browserInfo.name} {crashData.browserInfo.version}</Text>
+                    <Text size="sm">{user.agent.Browser}</Text>
                   </Flex>
                   <Flex justify="space-between">
                     <Text size="sm" fw={500}>Operating System:</Text>
-                    <Text size="sm">{crashData.browserInfo.os}</Text>
+                    <Text size="sm">{user.agent["Operating System"]}</Text>
                   </Flex>
                   <Flex justify="space-between">
                     <Text size="sm" fw={500}>User Agent:</Text>
                     <Text size="sm" style={{ wordBreak: 'break-all' }}>
-                      {crashData.userAgent}
+                      {user.agent["User Agent"]}
                     </Text>
                   </Flex>
                   <Flex justify="space-between">
                     <Text size="sm" fw={500}>Session Duration:</Text>
-                    <Text size="sm">{crashData.sessionInfo.duration}</Text>
+                    <Text size="sm">12:40</Text>
                   </Flex>
                 </Stack>
               </Accordion.Panel>
@@ -227,88 +370,9 @@ const CrashReport = () => {
             </Box>
           </Group>
 
-          <Stack gap="md">
-            <TextInput
-              label="Email Address"
-              placeholder='your.email@example.com'
-              leftSection={<Mail size={16} />}
-              description="We'll notifiy you when this issue is resolved"
-            />
-            <Select
-              label="Severity Level"
-              value={severity}
-              onChange={setSeverity}
-              data={[
-                { value: 'low', label: '🟢 Low - Minor inconvenience' },
-                { value: 'medium', label: '🟡 Medium - Affects functionality' },
-                { value: 'high', label: '🟠 High - Blocks important features' },
-                { value: 'critical', label: '🔴 Critical - App unusable' }
-              ]}
-              description="How severely does this issue affect your work?"
-            />
-          </Stack>
+          <FormReport />
 
-          <Textarea
-            label="What were you doing when this happened?"
-            description="Input the scenario of what you were doing. IMAGES (optional) *Copy paste the Image from your clipboard*"
-            placeholder="Describe what you were trying to do when the error occured"
-            value={value}
-            onChange={(event) => setValue(event.currentTarget.value)}
-            onPaste={handlePaste}
-            minRows={4}
-          />
-          {pastedImages.length > 0 && (
-            <div>
-              <Text size="sm" fw={500} mb="xs">Pasted Images:</Text>
-              <Group>
-                {pastedImages.map((img) => (
-                  <Image
-                    key={img.id}
-                    src={img.src}
-                    alt={img.name}
-                    width={100}
-                    height={100}
-                    fit="cover"
-                  />
-                ))}
-              </Group>
-            </div>
-          )}
 
-          <Textarea
-            label="Steps to Reproduce (Optional)"
-            description="Help us reproduce this issue by providing the data inputs or step-by-step instructions"
-            placeholder="1. Go to Products page&#10;2. Click on 'Load More' button&#10;3. Error appears..."
-            minRows={3}
-            maxRows={6}
-          />
-
-          {/* Action Buttons */}
-          <Group justify="space-between" pt="md">
-            <Group>
-              <Button
-                variant="subtle"
-                color="gray"
-                leftSection={<X size={16} />}
-              >
-                Close
-              </Button>
-              <Button
-                variant="light"
-                color="blue"
-                leftSection={<RotateCcw size={16} />}
-              >
-                Try Again
-              </Button>
-            </Group>
-
-            <Button
-              leftSection={<Send size={16} />}
-              loaderProps={{ type: 'dots' }}
-            >
-              Send Report
-            </Button>
-          </Group>
           {/* Footer Info */}
           <Alert
             variant="light"
