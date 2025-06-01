@@ -19,7 +19,7 @@ Content-Type: application/json
 POST https://{{hostname}}/api/auth/login
 Content-Type: application/json
 {
-  "username": "dev",
+  "username": "admin",
   "password": "password"
 }
 

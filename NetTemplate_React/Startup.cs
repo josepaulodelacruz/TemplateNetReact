@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using NetTemplate_React.Middleware;
 using NetTemplate_React.Services;
+using NetTemplate_React.Services.Reports;
 using NetTemplate_React.Services.Setup;
 
 namespace NetTemplate_React
@@ -66,6 +67,9 @@ namespace NetTemplate_React
             services.AddScoped<IUserService, UserService>(options => new UserService(conString: conString, configuration: Configuration));
             services.AddScoped<IUserPermissionService, UserPermissionService>(options => new UserPermissionService(conString: conString, config: Configuration));
             services.AddScoped<IUserHistoryService, UserHistoryService>(options => new UserHistoryService(conString: conString, logger: new LoggerFactory()));
+
+            //reports
+            services.AddScoped<ICrashReportService, CrashReportService>(options => new CrashReportService(conString: conString, logger: new LoggerFactory()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

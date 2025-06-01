@@ -1,0 +1,25 @@
+﻿@hostname=localhost:44393
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImRkNmVmMzUyLTY4MjItNDVmMS04ZjhhLTA3N2NmNTY5MmI2OSIsImV4cCI6MTc0ODc0NTYzMywiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.-vxtvF6F4HEIlFJ203tHdUoWx_qf2neOSrD71POrcJg
+
+GET https://{{hostname}}/api/Reports/CrashReport
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+
+###
+
+POST https://{{hostname}}/api/Reports/CrashReport
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+{
+  "when": "2025-01-06",
+  "where": "/dashboard",
+  "what": "TESTING SAMPLE",
+  "severity_level": "Medium",
+  "created_by": 1
+
+}
+
+###
+
+
+
