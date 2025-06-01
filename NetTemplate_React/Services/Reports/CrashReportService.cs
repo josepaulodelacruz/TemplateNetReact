@@ -35,6 +35,7 @@ namespace NetTemplate_React.Services.Reports
         {
             
             var commandText = new StringBuilder();
+            commandText.Append("");
             using (SqlConnection con = new SqlConnection(_conString))
             {
                 await con.OpenAsync();
