@@ -23,16 +23,13 @@ namespace NetTemplate_React.Controllers.Reports
 
         // GET: api/<CrashReportController>
         [HttpGet]
-        public string[] Get()
+        public async Task<IActionResult> Get([FromQuery] int page = 1)
         {
-            return new string[] { "value1", "value2" };
-        }
+            var response = await _service.GetCrashReport(page);
 
-        // GET api/<CrashReportController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            if (!response.Success) return new BadRequestObjectResult(response);
+
+            return new OkObjectResult(response);
         }
 
         // POST api/<CrashReportController>

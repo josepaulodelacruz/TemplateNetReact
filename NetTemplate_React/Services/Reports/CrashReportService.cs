@@ -13,7 +13,7 @@ namespace NetTemplate_React.Services.Reports
 
     public interface ICrashReportService
     {
-        Task<Response> GetCrashReport();
+        Task<Response> GetCrashReport(int page = 1);
 
         Task<Response> CreateReport();
 
@@ -31,17 +31,20 @@ namespace NetTemplate_React.Services.Reports
             _logger = logger.CreateLogger<CrashReportService>();
         }
 
-        public async Task<Response> GetCrashReport()
+        public async Task<Response> GetCrashReport(int page = 1)
         {
             
-            var commandText = new StringBuilder();
-            commandText.Append("");
+            var commandText = "[dbo].[NSP_CrashReport]";
             using (SqlConnection con = new SqlConnection(_conString))
             {
                 await con.OpenAsync();
 
-                using (SqlCommand cmd = new SqlCommand(commandText.ToString(), con))
+                using (SqlCommand cmd = new SqlCommand(commandText, con))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@FLAG", "GET REPORTS");
+                    cmd.Parameters.AddWithValue("@PageNumber", page);
+
                     try
                     {
                         List<CrashReport> reports = new List<CrashReport>();
@@ -52,11 +55,10 @@ namespace NetTemplate_React.Services.Reports
                         }
 
                         reports = CrashReport.TransformCrashReport(dataTable);
-                        
 
                         return new Response(
                             success: true,
-                            debugScript: commandText.ToString(),
+                            debugScript: commandText,
                             message: "Successfully fetch reports",
                             body: reports
                         );
@@ -65,7 +67,7 @@ namespace NetTemplate_React.Services.Reports
                     {
                         return new Response(
                             success: false,
-                            debugScript: commandText.ToString(),
+                            debugScript: commandText,
                             message: Ex.Message,
                             body: Ex.StackTrace
                         );

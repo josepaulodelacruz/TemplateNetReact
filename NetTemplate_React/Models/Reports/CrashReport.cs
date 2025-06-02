@@ -28,7 +28,17 @@ namespace NetTemplate_React.Models.Reports
 
         public CrashReportLin CrashReportLin { get; set; }
 
-        public List<CrashReportIMG> Images { get; set; } 
+        public List<CrashReportIMG> Images { get; set; }
+
+        [JsonProperty("total_count")]
+        public int TotalCount { get; set; }
+
+        [JsonProperty("current_page")]
+        public int CurrentPage { get; set; }
+
+        [JsonProperty("total_pages")]
+        public int TotalPages { get; set; }
+
 
         /// <summary>
         /// Transforms a DataTable to a list of CrashReport objects
@@ -52,7 +62,10 @@ namespace NetTemplate_React.Models.Reports
                     What = GetValue<string>(row, "what"),
                     SeverityLevel = GetValue<string>(row, "severity_level"),
                     CreatedBy = GetValue<int>(row, "created_by"),
-                    Images = new List<CrashReportIMG>()
+                    Images = new List<CrashReportIMG>(),
+                    TotalCount = GetValue<int>(row, "total_count"),
+                    CurrentPage = GetValue<int>(row, "current_page"),
+                    TotalPages = GetValue<int>(row, "total_pages"),
                 };
 
                 // Handle CrashReportLin nested object
@@ -108,6 +121,9 @@ namespace NetTemplate_React.Models.Reports
 
                     if (typeof(T) == typeof(DateTime))
                         return (T)(object)Convert.ToDateTime(value);
+
+                    if (typeof(T) == typeof(bool))
+                        return (T)(object)Convert.ToBoolean(value);
 
                     return (T)Convert.ChangeType(value, typeof(T));
                 }
