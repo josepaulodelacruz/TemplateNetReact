@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -28,7 +29,8 @@ namespace NetTemplate_React.Models.Reports
 
         public CrashReportLin CrashReportLin { get; set; }
 
-        public List<CrashReportIMG> Images { get; set; }
+        [JsonProperty("images")]
+        public List<IFormFile> Images { get; set; }
 
         [JsonProperty("total_count")]
         public int TotalCount { get; set; }
@@ -62,7 +64,7 @@ namespace NetTemplate_React.Models.Reports
                     What = GetValue<string>(row, "what"),
                     SeverityLevel = GetValue<string>(row, "severity_level"),
                     CreatedBy = GetValue<int>(row, "created_by"),
-                    Images = new List<CrashReportIMG>(),
+                    Images = null,
                     TotalCount = GetValue<int>(row, "total_count"),
                     CurrentPage = GetValue<int>(row, "current_page"),
                     TotalPages = GetValue<int>(row, "total_pages"),

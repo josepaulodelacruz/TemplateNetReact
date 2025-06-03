@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using NetTemplate_React.Models.Reports;
 using NetTemplate_React.Services.Reports;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -34,9 +36,22 @@ namespace NetTemplate_React.Controllers.Reports
 
         // POST api/<CrashReportController>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CrashReport body)
+        public async Task<IActionResult> Post([FromForm] CrashReport body)
         {
-            return new OkObjectResult(body);
+            List<byte[]> _imagesBin = new List<byte[]>();
+            if (body.Images != null && body.Images.Count > 0)
+            {
+                foreach (var item in body.Images)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await item.CopyToAsync(memoryStream);
+                        _imagesBin.Add(memoryStream.ToArray());
+                    }
+                }
+            }
+
+            return new OkObjectResult(_imagesBin);
         }
 
         // PUT api/<CrashReportController>/5
