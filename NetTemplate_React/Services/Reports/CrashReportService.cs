@@ -15,7 +15,7 @@ namespace NetTemplate_React.Services.Reports
     {
         Task<Response> GetCrashReport(int page = 1);
 
-        Task<Response> CreateReport();
+        Task<Response> CreateReport(CrashReport body);
 
     }
 
@@ -85,14 +85,26 @@ namespace NetTemplate_React.Services.Reports
             }
         }
 
-        public async Task<Response> CreateReport() 
+        public async Task<Response> CreateReport(CrashReport body) 
         {
-            string commandText = "[dbo].[NSP_CrashReport] "; 
+            string commandText = "[dbo].[NSP_CrashReport]";
+
+            var dt = new DataTable();
+
+            dt.Columns.Add("IMG", typeof(string)); // Specify the column type
+
+            foreach (var imageBytes in body.ImageBin)
+            {
+                if (imageBytes != null && imageBytes.Length > 0)
+                {
+                    string base64String = Convert.ToBase64String(imageBytes);
+                    dt.Rows.Add(base64String);
+                }
+            }
+
             using (SqlConnection con = new SqlConnection(_conString))
             {
                 await con.OpenAsync();
-
-                var transaction = con.BeginTransaction();
 
                 using (SqlCommand cmd = new SqlCommand(commandText, con))
                 {
@@ -100,21 +112,32 @@ namespace NetTemplate_React.Services.Reports
                     {
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("@FLAG", "CREATE CRASH REPORT");
+                        cmd.Parameters.AddWithValue("@WHEN", body.When);
+                        cmd.Parameters.AddWithValue("@WHERE", body.Where);
+                        cmd.Parameters.AddWithValue("@WHAT", body.What);
+                        cmd.Parameters.AddWithValue("@SEVERITY", body.SeverityLevel);
+                        cmd.Parameters.AddWithValue("@CREATED_BY", body.CreatedBy);
+                        cmd.Parameters.AddWithValue("@STACK_TRACE", "TESTING STACK TRACE");
+                        cmd.Parameters.AddWithValue("@OS", "WINDOWS");
+                        cmd.Parameters.AddWithValue("@BROWSER", "CHROME");
+                        cmd.Parameters.AddWithValue("@USER_AGENT", "TEST");
+                        cmd.Parameters.AddWithValue("@EMAIL", "admin@email.com");
+                        cmd.Parameters.AddWithValue("@SCENARIO", "TESTING SCENARIO");
+                        cmd.Parameters.AddWithValue("@DETAILS", "TESTING DETAILS");
+                        cmd.Parameters.AddWithValue("@IMG_TABLE", dt);
 
                         await cmd.ExecuteNonQueryAsync();
-                        transaction.Commit();
 
                         return new Response(
                             success: true,
                             debugScript: commandText,
                             message: "Successfully Create a Bug Splat Report.",
-                            body: null
+                            body: dt 
                         );
                         
                     } 
                     catch (SqlException Ex)
                     {
-                        transaction.Rollback();
                         return new Response(
                             success: false,
                             debugScript: commandText,
@@ -124,7 +147,6 @@ namespace NetTemplate_React.Services.Reports
                     }
                     catch (Exception Ex)
                     {
-                        transaction.Rollback();
                         return new Response(
                             success: false,
                             debugScript: commandText,

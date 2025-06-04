@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NetTemplate_React.Models.Reports;
 using NetTemplate_React.Services.Reports;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -51,7 +52,14 @@ namespace NetTemplate_React.Controllers.Reports
                 }
             }
 
-            return new OkObjectResult(_imagesBin);
+            body.ImageBin = _imagesBin;
+
+            var response = await _service.CreateReport(body);
+
+            if (!response.Success) return new BadRequestObjectResult(response);
+
+            return new OkObjectResult(response);
+
         }
 
         // PUT api/<CrashReportController>/5

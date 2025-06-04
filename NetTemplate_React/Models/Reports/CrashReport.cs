@@ -32,6 +32,9 @@ namespace NetTemplate_React.Models.Reports
         [JsonProperty("images")]
         public List<IFormFile> Images { get; set; }
 
+        [JsonProperty("images_bin")]
+        public List<byte[]> ImageBin { get; set; }
+
         [JsonProperty("total_count")]
         public int TotalCount { get; set; }
 
@@ -81,6 +84,32 @@ namespace NetTemplate_React.Models.Reports
                     Scenario = GetValue<string>(row, "scenario"),
                     Detils = GetValue<string>(row, "details")
                 };
+
+                /* note to be continued to implement
+                    1. Decode the base64 string to bytes
+                    byte[] imageBytes = Convert.FromBase64String(base64String);
+
+                    // 2. Determine the Content-Type (MIME type)
+                    // This is crucial. You might store this in your database alongside the base64 string.
+                    // For demonstration, let's assume it's a PNG.
+                    string contentType = "image/png"; // Or "image/jpeg", "image/gif", etc.
+
+                    // If you need to infer content type:
+                    // using SixLabors.ImageSharp; // You'd need to install SixLabors.ImageSharp NuGet package
+                    // using (MemoryStream ms = new MemoryStream(imageBytes))
+                    // {
+                    //     var imageInfo = Image.Identify(ms);
+                    //     if (imageInfo != null)
+                    //     {
+                    //         contentType = imageInfo.Metadata.DecodedImageFormat.DefaultMimeType;
+                    //     }
+                    // }
+
+                    // 3. Return the file bytes with the correct content type
+                    // FileContentResult is suitable for returning byte arrays.
+                    return File(imageBytes, contentType);
+                 */
+
 
                 // Handle Images - assuming comma-separated image URLs in a single column
                 //var imageData = GetValue<string>(row, "images");
