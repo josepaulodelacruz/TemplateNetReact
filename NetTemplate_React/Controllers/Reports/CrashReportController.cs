@@ -52,9 +52,7 @@ namespace NetTemplate_React.Controllers.Reports
                 }
             }
 
-            body.ImageBin = _imagesBin;
-
-            var response = await _service.CreateReport(body);
+            var response = await _service.CreateReport(body, _imagesBin);
 
             if (!response.Success) return new BadRequestObjectResult(response);
 

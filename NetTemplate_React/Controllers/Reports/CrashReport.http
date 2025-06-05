@@ -1,7 +1,7 @@
 ﻿@hostname=localhost:44393
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjI4MGVhOWRmLWUxOTMtNGYxNy05ZTgyLTdiMTYyMzQ3ZWJmZSIsImV4cCI6MTc0OTA0NTI5MCwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.XdNEUhw3d5b8JqXZSDn7RTDlMb15EmPWhN6AvL7qaxM
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjRjZmY0NDdmLTdmYmMtNDA2ZS04NmI5LTIyY2JkMjQ2YmI4ZCIsImV4cCI6MTc0OTEzMTA3MCwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.-sanSNNNXUYpcPHBlOfqHqbLiWcoyC6A08JM_LUOtis
 
-GET https://{{hostname}}/api/Reports/CrashReport?page=2
+GET https://{{hostname}}/api/Reports/CrashReport?page=1
 Content-Type: application/json
 Authorization: Bearer {{token}} 
 
@@ -16,7 +16,6 @@ Authorization: Bearer {{token}}
   "what": "TESTING SAMPLE",
   "severity_level": "Medium",
   "created_by": 1
-
 }
 
 ###

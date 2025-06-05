@@ -15,7 +15,7 @@ namespace NetTemplate_React.Services.Reports
     {
         Task<Response> GetCrashReport(int page = 1);
 
-        Task<Response> CreateReport(CrashReport body);
+        Task<Response> CreateReport(CrashReport body, List<byte[]> imagebins);
 
     }
 
@@ -85,7 +85,7 @@ namespace NetTemplate_React.Services.Reports
             }
         }
 
-        public async Task<Response> CreateReport(CrashReport body) 
+        public async Task<Response> CreateReport(CrashReport body, List<byte[]> imageBins) 
         {
             string commandText = "[dbo].[NSP_CrashReport]";
 
@@ -93,7 +93,7 @@ namespace NetTemplate_React.Services.Reports
 
             dt.Columns.Add("IMG", typeof(string)); // Specify the column type
 
-            foreach (var imageBytes in body.ImageBin)
+            foreach (var imageBytes in imageBins)
             {
                 if (imageBytes != null && imageBytes.Length > 0)
                 {
