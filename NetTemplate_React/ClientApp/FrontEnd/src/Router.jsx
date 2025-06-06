@@ -13,7 +13,7 @@ import UserTab from "./sub_pages/Setup/UserTab";
 import UserPermission from "./sub_pages/Setup/UserPermission";
 import UserHistory from "./sub_pages/Setup/UserHistory";
 import Reports from "~/pages/Reports";
-import CrashReport from '~/sub_pages/Rerports/CrashReport'
+import CrashReport from '~/sub_pages/Reports/CrashReport'
 
 const DASHBOARD_ROUTES = [
 

@@ -14,6 +14,9 @@ enum QueryKeys {
   //modules 
   MODULE_ITEMS = 'setup_module-items',
   MODULE_ITEM_ID = 'setup_module-item-id',
+
+  //Reports
+  REPORTS_CRASH = 'reports_crash',
 }
 
 export default QueryKeys;

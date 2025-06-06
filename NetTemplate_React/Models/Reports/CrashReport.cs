@@ -69,9 +69,9 @@ namespace NetTemplate_React.Models.Reports
                     SeverityLevel = GetValue<string>(row, "severity_level"),
                     CreatedBy = GetValue<int>(row, "created_by"),
                     Images = null,
-                    TotalCount = GetValue<int>(row, "total_count"),
-                    CurrentPage = GetValue<int>(row, "current_page"),
-                    TotalPages = GetValue<int>(row, "total_pages"),
+                    TotalCount = GetValue<int>(row, "totalcount"),
+                    CurrentPage = GetValue<int>(row, "currentpage"),
+                    TotalPages = GetValue<int>(row, "totalpages"),
                     ImageCover = GetValue<string>(row, "img"),
                 };
 
