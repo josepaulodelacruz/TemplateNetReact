@@ -12,6 +12,8 @@ import Login from "./pages/Auth/Login";
 import UserTab from "./sub_pages/Setup/UserTab";
 import UserPermission from "./sub_pages/Setup/UserPermission";
 import UserHistory from "./sub_pages/Setup/UserHistory";
+import Reports from "~/pages/Reports";
+import CrashReport from '~/sub_pages/Rerports/CrashReport'
 
 const DASHBOARD_ROUTES = [
 
@@ -45,8 +47,14 @@ const DASHBOARD_ROUTES = [
         ]
       }
     ]
-
   },
+  {
+    path: StringRoutes.report,
+    Component: Reports,
+    children: [
+      { path: StringRoutes.report_crash, Component: CrashReport}
+    ]
+  }
 ]
 
 const router = createBrowserRouter([

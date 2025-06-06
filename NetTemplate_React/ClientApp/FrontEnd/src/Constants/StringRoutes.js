@@ -17,6 +17,10 @@ class StringRoutes {
   static modules = '/setup/modules';
   static modules_form = '/setup/modules/form';
 
+  //reports
+  static report = '/reports';
+  static report_crash = '/reports/crash';
+
 
 }
 

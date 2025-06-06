@@ -3,7 +3,7 @@ import { useDisclosure, useHeadroom } from '@mantine/hooks';
 import { NavItems } from '~/components/NavItems';
 import { NavLink, Outlet, useNavigate } from 'react-router';
 import StringRoutes from '~/constants/StringRoutes';
-import { ChevronRight, HistoryIcon, LayoutDashboardIcon, LogOutIcon, WrenchIcon } from 'lucide-react';
+import { BarChart, ChevronRight, HistoryIcon, LayoutDashboardIcon, LogOutIcon, WrenchIcon } from 'lucide-react';
 import '../index.css';
 import useAuth from '~/hooks/Auth/useAuth';
 import { useEffect } from 'react';
@@ -57,6 +57,9 @@ const DashboardLayout = () => {
           <NavItems leftIcon={<WrenchIcon size={18} />} label="Setup" >
             <NavLink to={StringRoutes.users}> Users </NavLink>
             <NavLink to={StringRoutes.modules}> Modules </NavLink>
+          </NavItems>
+          <NavItems leftIcon={<BarChart size={18}/>} label="Reports">
+            <NavLink to={StringRoutes.report_crash}> Crash Reports </NavLink>
           </NavItems>
         </ScrollArea>
         <Menu position="top-end">

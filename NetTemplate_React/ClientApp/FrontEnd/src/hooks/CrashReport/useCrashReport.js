@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 const useCrashReport = create((set) => ({
-  isCrashReportModal: true,
+  isCrashReportModal: false,
   onOpenCrashReportModal: () => set({ isCrashReportModal: true }),
   onCloseCrashReportModal: () => set({ isCrashReportModal: false }),
   onTriggerCrashReportModal: () => {

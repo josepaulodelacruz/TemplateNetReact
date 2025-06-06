@@ -132,7 +132,7 @@ namespace NetTemplate_React.Services.Reports
                             success: true,
                             debugScript: commandText,
                             message: "Successfully Create a Bug Splat Report.",
-                            body: dt 
+                            body: null
                         );
                         
                     } 
