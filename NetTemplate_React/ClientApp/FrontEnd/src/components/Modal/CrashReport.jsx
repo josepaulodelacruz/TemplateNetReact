@@ -27,10 +27,12 @@ import {
 
 } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { AlertTriangle, Bug, Clock, Copy, Mail, MapPin, Monitor, X, RotateCcw, Send, User, Info, Delete, Trash, } from 'lucide-react';
+import { AlertTriangle, Bug, Clock, Copy, Mail, MapPin, Monitor, X, RotateCcw, Send, User, Info, Trash, } from 'lucide-react';
 import { useState } from 'react';
 import useAuth from '~/hooks/Auth/useAuth';
 import useCrashReport from '~/hooks/CrashReport/useCrashReport';
+import moment from 'moment'
+import useCrashReportAddMutation from '~/hooks/CrashReport/useCrashReportAddMutation';
 
 const crashData = {
   errorId: 'CR-2025-0530-001',
@@ -64,17 +66,28 @@ const severityColors = {
   critical: 'red'
 }
 
-const FormReport = () => {
+const FormReport = ({
+  error = null
+}) => {
   const { onCloseCrashReportModal } = useCrashReport();
   const [severity, setSeverity] = useState('medium');
   const [pastedImages, setPastedImages] = useState([]);
+  const addReportMutation = useCrashReportAddMutation(); 
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
       email: '',
       severity: '',
       scenario: '',
-      details: ''
+      details: '',
+      when: '',
+      where: '',
+      what: '',
+      stackTrace: '',
+      browser: '',
+      os: '',
+      userAgent: '',
+      images: null,
     }
   })
 
@@ -103,10 +116,41 @@ const FormReport = () => {
     }
   };
 
+
   const handleSubmit = () => {
-    form.setValues({ severity: severity })
-    // const a = parseUserAgent(window.navigator.userAgent);
-    // console.log(a);
+
+    form.setValues({
+      when: error.when,
+      where: error.where,
+      what: error.what,
+      severity: severity,
+      stackTrace: error.stackTrace,
+      browser: error.userAgent["Browser"],
+      os: error.userAgent["Operating System"],
+      userAgent: error.userAgent["Operating System"],
+      images: pastedImages,
+    })
+    const values = form.getValues();
+
+    const formData = new FormData();
+
+    formData.append("when", values.when);
+    console.log(formData);
+
+    return onManageSubmitReport(formData)
+  }
+
+  const onManageSubmitReport = (formData) => {
+
+    addReportMutation.mutate(formData, {
+      onSuccess: (response) => {
+        console.log('success')
+        console.log(response);
+      },
+      onError: (error) => {
+        console.log(error);
+      }
+    })
   }
 
 
@@ -149,8 +193,8 @@ const FormReport = () => {
           <Text size="sm" fw={500} mb="xs">Pasted Images:</Text>
           <Group>
             {pastedImages.map((img, index) => (
-              <Box style={{
-                position: 'relative', 
+              <Box key={index} style={{
+                position: 'relative',
                 width: 100,
                 height: 100
               }}>
@@ -234,7 +278,7 @@ const FormReport = () => {
 }
 
 const CrashReport = () => {
-  const { isCrashReportModal, onCloseCrashReportModal } = useCrashReport();
+  const { errorDetails, isCrashReportModal, onCloseCrashReportModal } = useCrashReport();
   const { user } = useAuth();
 
   return (
@@ -281,19 +325,19 @@ const CrashReport = () => {
                 bullet={<Clock size={12} />}
                 title="When"
               >
-                <Text size="sm" c="dimmed">5/31/2025, 8:33:13 AM</Text>
+                <Text size="sm" c="dimmed">{moment().format("MM/DD/YYYY, hh:mm A")}</Text>
               </Timeline.Item>
               <Timeline.Item
                 bullet={<MapPin size={12} />}
                 title="Where"
               >
-                <Text size="sm" c="dimmed">/dashboard</Text>
+                <Text size="sm" c="dimmed">{errorDetails.where}</Text>
               </Timeline.Item>
               <Timeline.Item
                 bullet={<AlertTriangle size={12} />}
                 title="What"
               >
-                <Text size="sm" c="dimmed">TypeError: Cannot read property 'map' of undefined</Text>
+                <Text size="sm" c="dimmed">{errorDetails.error.name}: {errorDetails.error.message}</Text>
               </Timeline.Item>
             </Timeline>
           </Card>
@@ -323,7 +367,7 @@ const CrashReport = () => {
                     </CopyButton>
                   </Group>
                   <Code block>
-                    {crashData.stackTrace}
+                    {errorDetails.stackTrace}
                   </Code>
                 </Paper>
               </Accordion.Panel>
@@ -349,10 +393,6 @@ const CrashReport = () => {
                       {user.agent["User Agent"]}
                     </Text>
                   </Flex>
-                  <Flex justify="space-between">
-                    <Text size="sm" fw={500}>Session Duration:</Text>
-                    <Text size="sm">12:40</Text>
-                  </Flex>
                 </Stack>
               </Accordion.Panel>
             </Accordion.Item>
@@ -370,7 +410,7 @@ const CrashReport = () => {
             </Box>
           </Group>
 
-          <FormReport />
+          <FormReport error={errorDetails} />
 
 
           {/* Footer Info */}

@@ -42,9 +42,6 @@ const User = () => {
           placeholder="User"
         />
       </Box>
-      <Button onClick={handleTest}>
-        Crash report
-      </Button>
       <Card p={0} shadow="xs">
         <UserTable />
       </Card>

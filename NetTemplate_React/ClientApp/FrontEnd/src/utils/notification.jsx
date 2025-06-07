@@ -1,17 +1,20 @@
 
 import { Group, Button } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
+import { useEffect } from "react";
+import useCrashReport from "~/hooks/CrashReport/useCrashReport"
 
 export const notificationWithCrashReportButton = ({
   color = 'red',
   title = "Error",
-  onClick 
+  message = "Something went wrong",
+  onClick
 }) => {
-  notifications.show({
+  return notifications.show({
     color: color,
     title: title,
     message: <Group justify="space-between">
-      <span>Something went wrong.</span>
+      <span>{message}</span>
       <Button onClick={onClick} color="red" variant="light">Sumbit Crash report</Button>
     </Group>
   })

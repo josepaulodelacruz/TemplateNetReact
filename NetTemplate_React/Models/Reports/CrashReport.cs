@@ -29,7 +29,26 @@ namespace NetTemplate_React.Models.Reports
         [JsonProperty("created_by")]
         public int CreatedBy { get; set; }
 
-        public CrashReportLin CrashReportLin { get; set; }
+        [JsonProperty("lin_id")]
+        public int LinId { get; set; }
+
+        [JsonProperty("stack_trace")]
+        public string StackTrace { get; set; }
+
+        [JsonProperty("browser")]
+        public string Browser { get; set; }
+
+        [JsonProperty("os")]
+        public string Os { get; set; }
+
+        [JsonProperty("user_agent")]
+        public string UserAgent { get; set; }
+
+        [JsonProperty("scenario")]
+        public string Scenario { get; set; }
+
+        [JsonProperty("details")]
+        public string Details { get; set; }
 
         public List<IFormFile> Images { get; set; }
 
@@ -68,23 +87,18 @@ namespace NetTemplate_React.Models.Reports
                     What = GetValue<string>(row, "what"),
                     SeverityLevel = GetValue<string>(row, "severity_level"),
                     CreatedBy = GetValue<int>(row, "created_by"),
-                    Images = null,
-                    TotalCount = GetValue<int>(row, "totalcount"),
-                    CurrentPage = GetValue<int>(row, "currentpage"),
-                    TotalPages = GetValue<int>(row, "totalpages"),
-                    ImageCover = GetValue<string>(row, "img"),
-                };
-
-                // Handle CrashReportLin nested object
-                crashReport.CrashReportLin = new CrashReportLin
-                {
                     LinId = GetValue<int>(row, "lin_id"),
                     StackTrace = GetValue<string>(row, "stack_trace"),
                     Browser = GetValue<string>(row, "browser"),
                     Os = GetValue<string>(row, "os"),
                     UserAgent = GetValue<string>(row, "user_agent"),
                     Scenario = GetValue<string>(row, "scenario"),
-                    Detils = GetValue<string>(row, "details")
+                    Details = GetValue<string>(row, "details"),
+                    Images = null,
+                    TotalCount = GetValue<int>(row, "totalcount"),
+                    CurrentPage = GetValue<int>(row, "currentpage"),
+                    TotalPages = GetValue<int>(row, "totalpages"),
+                    ImageCover = GetValue<string>(row, "img"),
                 };
 
                 crashReports.Add(crashReport);
@@ -132,31 +146,6 @@ namespace NetTemplate_React.Models.Reports
 
             return defaultValue;
         }
-
-    }
-
-    public class CrashReportLin
-    {
-        [JsonProperty("lin_id")]
-        public int LinId { get; set; }
-
-        [JsonProperty("stack_trace")]
-        public string StackTrace { get; set; }
-
-        [JsonProperty("browser")]
-        public string Browser { get; set; }
-
-        [JsonProperty("os")]
-        public string Os { get; set; }
-
-        [JsonProperty("user_agent")]
-        public string UserAgent { get; set; }
-
-        [JsonProperty("scenario")]
-        public string Scenario { get; set; }
-
-        [JsonProperty("details")]
-        public string Detils { get; set; }
 
     }
 

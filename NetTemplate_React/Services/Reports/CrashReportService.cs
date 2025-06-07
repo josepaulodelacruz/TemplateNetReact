@@ -117,13 +117,13 @@ namespace NetTemplate_React.Services.Reports
                         cmd.Parameters.AddWithValue("@WHAT", body.What);
                         cmd.Parameters.AddWithValue("@SEVERITY", body.SeverityLevel);
                         cmd.Parameters.AddWithValue("@CREATED_BY", body.CreatedBy);
-                        cmd.Parameters.AddWithValue("@STACK_TRACE", "TESTING STACK TRACE");
-                        cmd.Parameters.AddWithValue("@OS", "WINDOWS");
-                        cmd.Parameters.AddWithValue("@BROWSER", "CHROME");
-                        cmd.Parameters.AddWithValue("@USER_AGENT", "TEST");
-                        cmd.Parameters.AddWithValue("@EMAIL", "admin@email.com");
-                        cmd.Parameters.AddWithValue("@SCENARIO", "TESTING SCENARIO");
-                        cmd.Parameters.AddWithValue("@DETAILS", "TESTING DETAILS");
+                        cmd.Parameters.AddWithValue("@STACK_TRACE", body.StackTrace);
+                        cmd.Parameters.AddWithValue("@OS", body.Os);
+                        cmd.Parameters.AddWithValue("@BROWSER", body.Browser);
+                        cmd.Parameters.AddWithValue("@USER_AGENT", body.UserAgent);
+                        cmd.Parameters.AddWithValue("@EMAIL", "testingemail");
+                        cmd.Parameters.AddWithValue("@SCENARIO", body.Scenario);
+                        cmd.Parameters.AddWithValue("@DETAILS", body.Details);
                         cmd.Parameters.AddWithValue("@IMG_TABLE", dt);
 
                         await cmd.ExecuteNonQueryAsync();
