@@ -46,27 +46,27 @@ namespace NetTemplate_React.Controllers.Reports
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] CrashReport body)
         {
-            //List<byte[]> _imagesBin = new List<byte[]>();
-            //if (body.Images != null && body.Images.Count > 0)
-            //{
-            //    foreach (var item in body.Images)
-            //    {
-            //        using (var memoryStream = new MemoryStream())
-            //        {
-            //            await item.CopyToAsync(memoryStream);
-            //            _imagesBin.Add(memoryStream.ToArray());
-            //        }
-            //    }
-            //}
+            List<byte[]> _imagesBin = new List<byte[]>();
+            if (body.Images != null && body.Images.Count > 0)
+            {
+                foreach (var item in body.Images)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await item.CopyToAsync(memoryStream);
+                        _imagesBin.Add(memoryStream.ToArray());
+                    }
+                }
+            }
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             body.CreatedBy = int.Parse(userId);
 
-            //var response = await _service.CreateReport(body, _imagesBin);
+            var response = await _service.CreateReport(body, _imagesBin);
 
-            //if (!response.Success) return new BadRequestObjectResult(response);
+            if (!response.Success) return new BadRequestObjectResult(response);
 
-            return new OkObjectResult(body);
+            return new OkObjectResult(response);
 
         }
 

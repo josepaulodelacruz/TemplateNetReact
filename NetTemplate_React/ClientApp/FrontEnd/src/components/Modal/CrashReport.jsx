@@ -72,7 +72,7 @@ const FormReport = ({
   const { onCloseCrashReportModal } = useCrashReport();
   const [severity, setSeverity] = useState('medium');
   const [pastedImages, setPastedImages] = useState([]);
-  const addReportMutation = useCrashReportAddMutation(); 
+  const addReportMutation = useCrashReportAddMutation();
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -90,6 +90,18 @@ const FormReport = ({
       images: null,
     }
   })
+
+  function base64ToBlob(base64, mime = 'image/png') {
+    const byteString = atob(base64.split(',')[1]);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const intArray = new Uint8Array(arrayBuffer);
+
+    for (let i = 0; i < byteString.length; i++) {
+      intArray[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([intArray], { type: mime });
+  }
 
   const handlePaste = async (event) => {
     const clipboardItems = event.clipboardData.items;
@@ -135,8 +147,21 @@ const FormReport = ({
     const formData = new FormData();
 
     formData.append("when", values.when);
-    console.log(formData);
+    formData.append("where", values.where);
+    formData.append("what", values.what);
+    formData.append("SeverityLevel", values.severity);
+    formData.append("stackTrace", values.stackTrace);
+    formData.append("browser", values.browser);
+    formData.append("os", values.os);
+    formData.append("UserAgent", values.userAgent);
+    formData.append("details", values.details);
+    formData.append("scenario", values.scenario);
 
+    // Append each image to formData
+    pastedImages.forEach((image, index) => {
+      const blob = base64ToBlob(image.src);
+      formData.append('Images', blob, image.name || `file${index}.png`);
+    });
     return onManageSubmitReport(formData)
   }
 
