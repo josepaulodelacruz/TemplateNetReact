@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using NetTemplate_React.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -27,7 +28,13 @@ namespace NetTemplate_React.Controllers.Reports
         [HttpGet("Test")]
         public async Task<IActionResult> Get()
         {
-            return new BadRequestObjectResult("TESTING ERROR");
+            var response = new Response(
+                    success: false,
+                    message: "FAILED",
+                    debugScript: "TESTING ONLY",
+                    body: null
+                );
+            return new BadRequestObjectResult(response);
         }
 
 

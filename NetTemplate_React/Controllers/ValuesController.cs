@@ -28,8 +28,13 @@ namespace NetTemplate_React.Controllers
         public async Task<Response> Get()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            Debug.WriteLine($"User ID: {userId}");
-            return await _service.Test();
+            var response = new Response(
+                    success: true,
+                    message: "values",
+                    debugScript: "TESTING",
+                    body: userId.ToString()
+                );
+            return response;
         }
 
         // GET api/<ValuesController>/5

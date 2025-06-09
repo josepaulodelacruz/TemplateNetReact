@@ -8,6 +8,9 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace NetTemplate_React.Middleware
 {
@@ -76,11 +79,25 @@ namespace NetTemplate_React.Middleware
                     };
 
                     // Log to database (fire and forget)
-                    _ = Task.Run(() => LogToDatabaseAsync(logEntry));
+                    //_ = Task.Run(() => LogToDatabaseAsync(logEntry));
+                    int? referenceId = await LogToDatabaseAsync(logEntry);
 
-                    // Copy the response body back to the original stream
-                    responseBody.Seek(0, SeekOrigin.Begin);
-                    await responseBody.CopyToAsync(originalBodyStream);
+                    // Add reference ID to response headers
+                    if (referenceId.HasValue)
+                    {
+                        httpContext.Response.Headers.Add("X-Log-Reference-Id", referenceId.Value.ToString());
+                    }
+                    var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(responseBodyText);
+
+                    jsonObject["reference_id"] = referenceId;
+
+                    // Serialize it back to string
+                    var modifiedResponse = jsonObject.ToString(Newtonsoft.Json.Formatting.None);
+
+                    // Write the modified response back to the original stream
+                    httpContext.Response.Body = originalBodyStream;
+                    httpContext.Response.ContentLength = Encoding.UTF8.GetByteCount(modifiedResponse);
+                    await httpContext.Response.WriteAsync(modifiedResponse);
                 }
                 catch (Exception ex)
                 {
@@ -122,7 +139,7 @@ namespace NetTemplate_React.Middleware
             return null;
         }
 
-        private async Task LogToDatabaseAsync(LogEntry logEntry)
+        private async Task<int?> LogToDatabaseAsync(LogEntry logEntry)
         {
             try
             {
@@ -134,6 +151,7 @@ namespace NetTemplate_React.Middleware
                     commandText.AppendLine("(Timestamp, Message, RequestPath, RequestMethod, Body, ResponseStatusCode, Duration, UserId)");
                     commandText.AppendLine("VALUES");
                     commandText.AppendLine("(@Timestamp, @Message, @RequestPath, @RequestMethod, @Body, @ResponseStatusCode, @Duration, @UserId)");
+                    commandText.AppendLine("SELECT CAST(SCOPE_IDENTITY() AS INT);");
 
                     using (SqlCommand cmd = new SqlCommand(commandText.ToString(), con))
                     {
@@ -146,13 +164,17 @@ namespace NetTemplate_React.Middleware
                         cmd.Parameters.AddWithValue("@Duration", (object)logEntry.Duration ?? DBNull.Value);
                         cmd.Parameters.AddWithValue("@UserId", (object)logEntry.UserId ?? DBNull.Value);
 
-                        await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        var result = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
+                        return result != null ? (int?)Convert.ToInt32(result) : null;
                     }
                 }
+
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error logging to database");
+                return null;
             }
         }
     }
