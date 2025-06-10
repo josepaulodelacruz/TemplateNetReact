@@ -67,10 +67,12 @@ const severityColors = {
 }
 
 const FormReport = ({
-  error = null
+  error = null,
+  onChangeSeverity,
+  severity = "medium"
 }) => {
   const { onCloseCrashReportModal } = useCrashReport();
-  const [severity, setSeverity] = useState('medium');
+  //const [severity, setSeverity] = useState('medium');
   const [pastedImages, setPastedImages] = useState([]);
   const addReportMutation = useCrashReportAddMutation();
   const form = useForm({
@@ -162,7 +164,7 @@ const FormReport = ({
       const blob = base64ToBlob(image.src);
       formData.append('Images', blob, image.name || `file${index}.png`);
     });
-    return onManageSubmitReport(formData)
+    //return onManageSubmitReport(formData)
   }
 
   const onManageSubmitReport = (formData) => {
@@ -178,9 +180,13 @@ const FormReport = ({
     })
   }
 
+  const changeSeverityLevel = (e) => {
+    onChangeSeverity(e);
+  }
+
 
   return (
-    <form>
+    <form onSubmit={form.onSubmit((values) => console.log(values))}>
       <Stack gap="md">
         <TextInput
           label="Email Address"
@@ -191,9 +197,10 @@ const FormReport = ({
           {...form.getInputProps('email')}
         />
         <Select
+          allowDeselect={false}
           label="Severity Level"
           defaultValue="medium"
-          onChange={setSeverity}
+          onChange={(e) => changeSeverityLevel(e)}
           data={[
             { value: 'low', label: '🟢 Low - Minor inconvenience' },
             { value: 'medium', label: '🟡 Medium - Affects functionality' },
@@ -205,6 +212,8 @@ const FormReport = ({
       </Stack>
 
       <Textarea
+        withAsterisk
+        required={true}
         label="What were you doing when this happened?"
         description="Input the scenario of what you were doing. IMAGES (optional) *Copy paste the Image from your clipboard*"
         placeholder="Describe what you were trying to do when the error occured"
@@ -262,6 +271,8 @@ const FormReport = ({
       )}
 
       <Textarea
+        required={true}
+        withAsterisk
         label="Steps to Reproduce (Optional)"
         description="Help us reproduce this issue by providing the data inputs or step-by-step instructions"
         placeholder="1. Go to Products page&#10;2. Click on 'Load More' button&#10;3. Error appears..."
@@ -304,6 +315,7 @@ const FormReport = ({
 
 const CrashReport = () => {
   const { errorDetails, isCrashReportModal, onCloseCrashReportModal } = useCrashReport();
+  const [severity, setSeverity] = useState('medium');
   const { user } = useAuth();
 
   return (
@@ -338,11 +350,11 @@ const CrashReport = () => {
                 </ThemeIcon>
                 <Box>
                   <Text fw={600}>Error Details</Text>
-                  <Text size="sm" c="dimmed">ID: 4021</Text>
+                  <Text size="sm" c="dimmed">ID: {errorDetails.error?.response?.data?.reference_id || ""}</Text>
                 </Box>
               </Group>
-              <Badge color={severityColors.medium} size="sm" variant='light'>
-                Medium
+              <Badge color={severityColors[severity]} size="sm" variant='light'>
+                {severity?.toUpperCase()}
               </Badge>
             </Group>
             <Timeline active={-1} bulletSize={24} lineWidth={2}>
@@ -435,8 +447,10 @@ const CrashReport = () => {
             </Box>
           </Group>
 
-          <FormReport error={errorDetails} />
-
+          <FormReport
+            severity={severity}
+            onChangeSeverity={setSeverity}
+            error={errorDetails} />
 
           {/* Footer Info */}
           <Alert

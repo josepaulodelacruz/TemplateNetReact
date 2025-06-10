@@ -34,7 +34,7 @@ namespace NetTemplate_React.Controllers.Reports
                     debugScript: "TESTING ONLY",
                     body: null
                 );
-            return new BadRequestObjectResult(response);
+            return StatusCode(500, response);
         }
 
 

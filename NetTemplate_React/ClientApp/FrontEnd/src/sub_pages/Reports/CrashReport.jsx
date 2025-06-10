@@ -83,7 +83,7 @@ const CrashReportCardSection = ({
   return (
     <Flex wrap="wrap" gap="md">
       {
-        data.body?.map((report, index) => {
+        data.body !== undefined && Array.isArray(data.body) && data.body?.map((report, index) => {
           return <CrashReportCard report={report} key={index} />
         })
       }
