@@ -15,7 +15,7 @@ namespace NetTemplate_React.Services.Reports
     {
         Task<Response> GetCrashReport(int page = 1);
 
-        Task<Response> CreateReport(CrashReport body, List<byte[]> imagebins);
+        Task<Response> CreateReport(CrashReport body, List<byte[]> imagebins, int createdBy);
 
     }
 
@@ -85,7 +85,7 @@ namespace NetTemplate_React.Services.Reports
             }
         }
 
-        public async Task<Response> CreateReport(CrashReport body, List<byte[]> imageBins) 
+        public async Task<Response> CreateReport(CrashReport body, List<byte[]> imageBins, int createdBy) 
         {
             string commandText = "[dbo].[NSP_CrashReport]";
 
@@ -116,7 +116,7 @@ namespace NetTemplate_React.Services.Reports
                         cmd.Parameters.AddWithValue("@WHERE", body.Where);
                         cmd.Parameters.AddWithValue("@WHAT", body.What);
                         cmd.Parameters.AddWithValue("@SEVERITY", body.SeverityLevel);
-                        cmd.Parameters.AddWithValue("@CREATED_BY", body.CreatedBy);
+                        cmd.Parameters.AddWithValue("@CREATED_BY", createdBy);
                         cmd.Parameters.AddWithValue("@STACK_TRACE", body.StackTrace);
                         cmd.Parameters.AddWithValue("@OS", body.Os);
                         cmd.Parameters.AddWithValue("@BROWSER", body.Browser);
@@ -124,6 +124,7 @@ namespace NetTemplate_React.Services.Reports
                         cmd.Parameters.AddWithValue("@EMAIL", "testingemail");
                         cmd.Parameters.AddWithValue("@SCENARIO", body.Scenario);
                         cmd.Parameters.AddWithValue("@DETAILS", body.Details);
+                        cmd.Parameters.AddWithValue("@LOG_ID", body.LogId);
                         cmd.Parameters.AddWithValue("@IMG_TABLE", dt);
 
                         await cmd.ExecuteNonQueryAsync();

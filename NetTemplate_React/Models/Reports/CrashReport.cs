@@ -27,7 +27,7 @@ namespace NetTemplate_React.Models.Reports
         public string SeverityLevel { get; set; }
 
         [JsonProperty("created_by")]
-        public int CreatedBy { get; set; }
+        public string CreatedBy { get; set; }
 
         [JsonProperty("lin_id")]
         public int LinId { get; set; }
@@ -55,6 +55,9 @@ namespace NetTemplate_React.Models.Reports
         [JsonProperty("image_cover")]
         public string ImageCover { get; set; }
 
+        [JsonProperty("log_id")]
+        public int LogId { get; set; }
+
         [JsonProperty("total_count")]
         public int TotalCount { get; set; }
 
@@ -79,6 +82,7 @@ namespace NetTemplate_React.Models.Reports
 
             foreach (DataRow row in dataTable.Rows)
             {
+                Debug.WriteLine(GetValue<int>(row, "log_id"));
                 var crashReport = new CrashReport
                 {
                     Id = GetValue<int>(row, "id"),
@@ -86,7 +90,7 @@ namespace NetTemplate_React.Models.Reports
                     Where = GetValue<string>(row, "where"),
                     What = GetValue<string>(row, "what"),
                     SeverityLevel = GetValue<string>(row, "severity_level"),
-                    CreatedBy = GetValue<int>(row, "created_by"),
+                    CreatedBy = GetValue<string>(row, "created_by"),
                     LinId = GetValue<int>(row, "lin_id"),
                     StackTrace = GetValue<string>(row, "stack_trace"),
                     Browser = GetValue<string>(row, "browser"),
@@ -99,6 +103,8 @@ namespace NetTemplate_React.Models.Reports
                     CurrentPage = GetValue<int>(row, "currentpage"),
                     TotalPages = GetValue<int>(row, "totalpages"),
                     ImageCover = GetValue<string>(row, "img"),
+                    LogId = GetValue<int>(row, "log_id")
+                    
                 };
 
                 crashReports.Add(crashReport);

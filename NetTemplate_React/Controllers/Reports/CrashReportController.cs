@@ -67,9 +67,9 @@ namespace NetTemplate_React.Controllers.Reports
             }
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            body.CreatedBy = int.Parse(userId);
+            int createdBy = int.Parse(userId);
 
-            var response = await _service.CreateReport(body, _imagesBin);
+            var response = await _service.CreateReport(body, _imagesBin, createdBy);
 
             if (!response.Success) return new BadRequestObjectResult(response);
 

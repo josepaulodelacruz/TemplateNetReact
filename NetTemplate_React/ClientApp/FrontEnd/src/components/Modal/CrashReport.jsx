@@ -33,38 +33,8 @@ import useAuth from '~/hooks/Auth/useAuth';
 import useCrashReport from '~/hooks/CrashReport/useCrashReport';
 import moment from 'moment'
 import useCrashReportAddMutation from '~/hooks/CrashReport/useCrashReportAddMutation';
-
-const crashData = {
-  errorId: 'CR-2025-0530-001',
-  timestamp: new Date().toISOString(),
-  errorType: 'TypeError',
-  errorMessage: 'Cannot read property \'map\' of undefined',
-  stackTrace: `TypeError: Cannot read property 'map' of undefined
-    at ProductList.render (ProductList.jsx:42:18)
-    at ReactDOMComponent.render (react-dom.js:1234:56)
-    at Component.performUnitOfWork (react-reconciler.js:789:12)
-    at workLoop (scheduler.js:456:23)
-    at flushWork (scheduler.js:398:11)`,
-  url: 'https://myapp.com/products',
-  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-  browserInfo: {
-    name: 'Chrome',
-    version: '122.0.6261.112',
-    os: 'Windows 10'
-  },
-  sessionInfo: {
-    userId: 'user_12345',
-    sessionId: 'sess_abc123',
-    duration: '15:42'
-  }
-};
-
-const severityColors = {
-  low: 'green',
-  medium: 'yellow',
-  high: 'orange',
-  critical: 'red'
-}
+import { severityColors } from '~/constants/data';
+import { notifications } from '@mantine/notifications';
 
 const FormReport = ({
   error = null,
@@ -72,14 +42,14 @@ const FormReport = ({
   severity = "medium"
 }) => {
   const { onCloseCrashReportModal } = useCrashReport();
-  //const [severity, setSeverity] = useState('medium');
   const [pastedImages, setPastedImages] = useState([]);
   const addReportMutation = useCrashReportAddMutation();
+
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
       email: '',
-      severity: '',
+      severity: severity,
       scenario: '',
       details: '',
       when: '',
@@ -90,7 +60,27 @@ const FormReport = ({
       os: '',
       userAgent: '',
       images: null,
-    }
+
+    },
+    validate: {
+      email: (value) => {
+        if (!value) return 'Email is required';
+        if (!/^\S+@\S+$/.test(value)) return 'Invalid email format';
+        return null;
+      },
+      scenario: (value) => {
+        if (!value || value.trim().length === 0) return 'Please describe what you were doing when this happened';
+        if (value.trim().length < 10) return 'Please provide more details (at least 10 characters)';
+        return null;
+      },
+      details: (value) => {
+        if (!value || value.trim().length === 0) return 'Steps to reproduce are required';
+        if (value.trim().length < 15) return 'Please provide more detailed steps (at least 15 characters)';
+        return null;
+      }
+    },
+    validateInputOnBlur: true,
+    validateInputOnChange: true,
   })
 
   function base64ToBlob(base64, mime = 'image/png') {
@@ -130,77 +120,102 @@ const FormReport = ({
     }
   };
 
+  const handleSubmit = async (values) => {
+    // Validate form before submission
+    const validation = form.validate();
+    if (validation.hasErrors) {
+      return;
+    }
 
-  const handleSubmit = () => {
-
-    form.setValues({
-      when: error.when,
-      where: error.where,
-      what: error.what,
+    // Set additional values from error object
+    const submissionData = {
+      ...values,
+      when: error?.when || '',
+      where: error?.where || '',
+      what: error?.what || '',
       severity: severity,
-      stackTrace: error.stackTrace,
-      browser: error.userAgent["Browser"],
-      os: error.userAgent["Operating System"],
-      userAgent: error.userAgent["Operating System"],
+      stackTrace: error?.stackTrace || '',
+      browser: error?.userAgent?.["Browser"] || '',
+      os: error?.userAgent?.["Operating System"] || '',
+      userAgent: error?.userAgent?.["Operating System"] || '',
       images: pastedImages,
-    })
-    const values = form.getValues();
+    };
 
     const formData = new FormData();
 
-    formData.append("when", values.when);
-    formData.append("where", values.where);
-    formData.append("what", values.what);
-    formData.append("SeverityLevel", values.severity);
-    formData.append("stackTrace", values.stackTrace);
-    formData.append("browser", values.browser);
-    formData.append("os", values.os);
-    formData.append("UserAgent", values.userAgent);
-    formData.append("details", values.details);
-    formData.append("scenario", values.scenario);
+    formData.append("when", submissionData.when);
+    formData.append("where", submissionData.where);
+    formData.append("what", submissionData.what);
+    formData.append("SeverityLevel", submissionData.severity);
+    formData.append("stackTrace", submissionData.stackTrace);
+    formData.append("browser", submissionData.browser);
+    formData.append("os", submissionData.os);
+    formData.append("UserAgent", submissionData.userAgent);
+    formData.append("details", submissionData.details);
+    formData.append("scenario", submissionData.scenario);
+    formData.append("email", submissionData.email);
+    formData.append("logId", error.error?.response?.data?.reference_id);
 
     // Append each image to formData
     pastedImages.forEach((image, index) => {
       const blob = base64ToBlob(image.src);
       formData.append('Images', blob, image.name || `file${index}.png`);
     });
-    //return onManageSubmitReport(formData)
+
+    await onManageSubmitReport(formData);
+
   }
 
-  const onManageSubmitReport = (formData) => {
-
-    addReportMutation.mutate(formData, {
+  const onManageSubmitReport = async (formData) => {
+    await addReportMutation.mutateAsync(formData, {
       onSuccess: (response) => {
-        console.log('success')
-        console.log(response);
+        notifications.show({
+          color: 'green',
+          title: "Success",
+          message: response.message,
+        });
+        form.reset();
+        setPastedImages([]);
+        onCloseCrashReportModal();
       },
       onError: (error) => {
-        console.log(error);
+        notifications.show({
+          color: "red",
+          title: "Ooops",
+          message: error.message
+        })
       }
     })
   }
 
   const changeSeverityLevel = (e) => {
+    form.setFieldValue('severity', e);
     onChangeSeverity(e);
   }
 
+  const resetForm = () => {
+    form.reset();
+    setPastedImages([]);
+  }
 
   return (
-    <form onSubmit={form.onSubmit((values) => console.log(values))}>
+    <form onSubmit={form.onSubmit(handleSubmit)}>
       <Stack gap="md">
         <TextInput
+          withAsterisk
           label="Email Address"
           placeholder='your.email@example.com'
           leftSection={<Mail size={16} />}
-          description="We'll notifiy you when this issue is resolved"
+          description="We'll notify you when this issue is resolved"
           key={form.key('email')}
           {...form.getInputProps('email')}
         />
+
         <Select
           allowDeselect={false}
           label="Severity Level"
-          defaultValue="medium"
-          onChange={(e) => changeSeverityLevel(e)}
+          value={severity}
+          onChange={changeSeverityLevel}
           data={[
             { value: 'low', label: '🟢 Low - Minor inconvenience' },
             { value: 'medium', label: '🟡 Medium - Affects functionality' },
@@ -209,78 +224,78 @@ const FormReport = ({
           ]}
           description="How severely does this issue affect your work?"
         />
+
+        <Textarea
+          withAsterisk
+          label="What were you doing when this happened?"
+          description="Input the scenario of what you were doing. IMAGES (optional) *Copy paste the Image from your clipboard*"
+          placeholder="Describe what you were trying to do when the error occurred (minimum 10 characters)"
+          onPaste={handlePaste}
+          minRows={4}
+          key={form.key('scenario')}
+          {...form.getInputProps('scenario')}
+        />
+
+        {pastedImages.length > 0 && (
+          <div>
+            <Text size="sm" fw={500} mb="xs">Pasted Images:</Text>
+            <Group>
+              {pastedImages.map((img, index) => (
+                <Box key={index} style={{
+                  position: 'relative',
+                  width: 100,
+                  height: 100
+                }}>
+                  <Button
+                    onClick={() => {
+                      setPastedImages((state) => {
+                        const _state = state.filter((_, i) => i != index);
+                        return _state;
+                      })
+                    }}
+                    style={{
+                      position: 'absolute',
+                      top: 5,
+                      left: '65%',
+                      zIndex: 1,
+                    }}
+                    size="xs"
+                    color="red"
+                    variant='transparent'
+                  >
+                    <Trash size={18} />
+                  </Button>
+
+                  <Image
+                    src={img.src}
+                    alt={img.name}
+                    width={100}
+                    height={100}
+                    fit="contain"
+                    style={{
+                      position: 'relative',
+                      zIndex: 0,
+                    }}
+                  />
+                </Box>
+              ))}
+            </Group>
+          </div>
+        )}
+
+        <Textarea
+          required
+          withAsterisk
+          label="Steps to Reproduce"
+          description="Help us reproduce this issue by providing the data inputs or step-by-step instructions (minimum 15 characters)"
+          placeholder="1. Go to Products page&#10;2. Click on 'Load More' button&#10;3. Error appears..."
+          minRows={3}
+          maxRows={6}
+          key={form.key('details')}
+          {...form.getInputProps('details')}
+        />
       </Stack>
 
-      <Textarea
-        withAsterisk
-        required={true}
-        label="What were you doing when this happened?"
-        description="Input the scenario of what you were doing. IMAGES (optional) *Copy paste the Image from your clipboard*"
-        placeholder="Describe what you were trying to do when the error occured"
-        onPaste={handlePaste}
-        minRows={4}
-        key={form.key('scenario')}
-        {...form.getInputProps('scenario')}
-      />
-      {pastedImages.length > 0 && (
-        <div>
-          <Text size="sm" fw={500} mb="xs">Pasted Images:</Text>
-          <Group>
-            {pastedImages.map((img, index) => (
-              <Box key={index} style={{
-                position: 'relative',
-                width: 100,
-                height: 100
-              }}>
-                {/* The parent Box needs to be positioned relative to contain the absolutely positioned Trash icon */}
-                <Button
-                  onClick={() => {
-                    setPastedImages((state) => {
-                      const _state = state.filter((_, i) => i != index);
-                      return _state;
-                    })
-                  }}
-                  style={{
-                    position: 'absolute',
-                    top: 5, // Adjust as needed
-                    left: '65%', // Adjust as needed
-                    zIndex: 1, // Ensure it's above the image
-                  }}
-                  size="xs" color="red" variant='transparent'>
-                  <Trash
-                    size={18}
-                  />
-                </Button>
-
-                <Image
-                  src={img.src}
-                  alt={img.name}
-                  width={100}
-                  height={100}
-                  fit="contain"
-                  style={{
-                    position: 'relative', // Image itself can be relative, or static if it's the only content
-                    zIndex: 0, // Ensure image is below the trash icon
-                  }}
-                />
-              </Box>
-
-            ))}
-          </Group>
-        </div>
-      )}
-
-      <Textarea
-        required={true}
-        withAsterisk
-        label="Steps to Reproduce (Optional)"
-        description="Help us reproduce this issue by providing the data inputs or step-by-step instructions"
-        placeholder="1. Go to Products page&#10;2. Click on 'Load More' button&#10;3. Error appears..."
-        minRows={3}
-        maxRows={6}
-        key={form.key('details')}
-        {...form.getInputProps('details')}
-      />
       {/* Action Buttons */}
       <Group justify="space-between" pt="md">
         <Group>
@@ -293,18 +308,21 @@ const FormReport = ({
             Close
           </Button>
           <Button
+            onClick={resetForm}
             variant="light"
             color="blue"
             leftSection={<RotateCcw size={16} />}
           >
-            Try Again
+            Reset Form
           </Button>
         </Group>
 
         <Button
-          onClick={handleSubmit}
+          type="submit"
           leftSection={<Send size={16} />}
           loaderProps={{ type: 'dots' }}
+          loading={addReportMutation.isLoading}
+          disabled={!form.isValid()}
         >
           Send Report
         </Button>
@@ -389,7 +407,7 @@ const CrashReport = () => {
                 <Paper p="sm" bg="gray.0" radius="sm">
                   <Group justify="space-between" mb="xs">
                     <Text size="sm" fw={500}>Error Stack</Text>
-                    <CopyButton value={crashData.stackTrace}>
+                    <CopyButton value={errorDetails.stackTrace}>
                       {({ copied, copy }) => (
                         <Tooltip label={copied ? 'Copied' : 'Copy'}>
                           <ActionIcon

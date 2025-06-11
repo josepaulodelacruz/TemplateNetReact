@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Routing;
 
 namespace NetTemplate_React.Middleware
 {
@@ -30,6 +31,13 @@ namespace NetTemplate_React.Middleware
 
         public async Task Invoke(HttpContext httpContext)
         {
+
+            if(!httpContext.User.Identity.IsAuthenticated)
+            {
+                await _next(httpContext);
+                return;
+            }
+
             // Only process API requests
             if (!httpContext.Request.Path.StartsWithSegments("/api") || httpContext.Request.Path.StartsWithSegments("/api/UserHistory"))
             {
@@ -43,6 +51,7 @@ namespace NetTemplate_React.Middleware
                 await _next(httpContext);
                 return;
             }
+
 
             var stopwatch = Stopwatch.StartNew();
             var originalBodyStream = httpContext.Response.Body;
@@ -83,10 +92,6 @@ namespace NetTemplate_React.Middleware
                     int? referenceId = await LogToDatabaseAsync(logEntry);
 
                     // Add reference ID to response headers
-                    if (referenceId.HasValue)
-                    {
-                        httpContext.Response.Headers.Add("X-Log-Reference-Id", referenceId.Value.ToString());
-                    }
                     var jsonObject = Newtonsoft.Json.Linq.JObject.Parse(responseBodyText);
 
                     jsonObject["reference_id"] = referenceId;

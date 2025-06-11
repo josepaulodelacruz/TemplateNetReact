@@ -9,7 +9,8 @@ import {
   Text,
   Image
 } from '@mantine/core';
-import { AppleIcon } from 'lucide-react';
+import moment from 'moment';
+import { severityColors } from '~/constants/data';
 
 const CrashReportCard = ({
   report = null
@@ -26,27 +27,27 @@ const CrashReportCard = ({
 
   return (
     <Paper shadow="xs" m={0} p={0}>
-      <Box w={{ base: '100%', md: '350' }} >
+      <Box w="100%" >
         <Box h="250" bg="primary">
           <ReportCoverPhoto />
         </Box>
         <Box p={10}>
           <Flex direction={"row"} justify="space-between" align="center">
             <Flex direction="column" >
-              <Text size="xs" fw={300} c="dimmed" >Reported by: <Text fw={600} span size="xs" inherit>delacruzjosepaulo@gmail.com</Text> </Text>
-              <Text size="xs" fw={300} c="dimmed" >Date: <Text fw={600} span size="xs" inherit>March 3rd, 2025 4:50 pm</Text> </Text>
+              <Text size="xs" fw={300} c="dimmed" >Reported by: <Text fw={600} span size="xs" inherit>{report.created_by}</Text> </Text>
+              <Text size="xs" fw={300} c="dimmed" >Date: <Text fw={600} span size="xs" inherit>{moment(report.when, 'MM/DD/yyyy h:mm:ss a a').format("MMMM Do, YYYY h:mm a")}</Text> </Text>
             </Flex>
-            <Badge color="yellow" size="xs">Medium</Badge>
+            <Badge color={severityColors[report.severity_level]} size="xs">{report.severity_level}</Badge>
           </Flex>
           <Divider my={5} />
           <Group justify='space-between'>
-            <Text size="xs" c="dimmed">Reference ID: <Text span>29231</Text> </Text>
-            <Badge variant='light'>Edge</Badge>
+            <Text size="xs" c="dimmed">Reference ID: <Text span>{report.log_id}</Text> </Text>
+            <Badge color="gray" variant='light'>{report.browser}</Badge>
           </Group>
           <Group my={12}>
-            <Badge variant='dot'><Text size="xs" inherit c="dimmed">Windows 10</Text></Badge>
+            <Badge variant='dot'><Text size="xs" inherit c="dimmed">{report.os}</Text></Badge>
           </Group>
-          <Text lineClamp={2} size="xs">Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim. Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis.</Text>
+          <Text lineClamp={2} size="xs">{report.details} {report.scenario}</Text>
           <Group justify="end" mt={5}>
             <Button variant="subtle" size="compact-xs">
               See more...

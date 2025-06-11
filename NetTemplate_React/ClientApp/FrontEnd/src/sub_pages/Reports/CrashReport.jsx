@@ -56,7 +56,7 @@ const CrashReportCardSection = ({
       notificationWithCrashReportButton({
         color: 'red',
         title: "Failed",
-        message: error.message, 
+        message: error.message,
         onClick: () => {
           onTriggerCrashReportModal({
             error: error,
@@ -83,8 +83,12 @@ const CrashReportCardSection = ({
   return (
     <Flex wrap="wrap" gap="md">
       {
-        data.body !== undefined && Array.isArray(data.body) && data.body?.map((report, index) => {
-          return <CrashReportCard report={report} key={index} />
+        data?.body !== undefined && Array.isArray(data.body) && data.body?.map((report, index) => {
+          return (
+            <Box key={index} style={{ flexBasis: 'calc(25% - 12px)', minWidth: '300' }}>
+              <CrashReportCard report={report} />
+            </Box>
+          )
         })
       }
     </Flex>
@@ -96,11 +100,12 @@ const CrashReport = () => {
   const [page, onChange] = useState(1);
   const [totalPage, setTotalPage] = useState();
   const { data, isSuccess } = useCrashReportFetch(page)
+  const { onTriggerCrashReportModal } = useCrashReport();
 
 
   useEffect(() => {
     if (isSuccess) {
-      setTotalPage(data?.body[0].total_pages);
+      setTotalPage(data?.body[0]?.total_pages);
     }
   }, [isSuccess, data])
 
@@ -112,7 +117,11 @@ const CrashReport = () => {
     try {
       onChange('test');
     } catch (err) {
-      console.log(err);
+      onTriggerCrashReportModal({
+        pathname: pathname,
+        userAgent: user.agent,
+      });
+
     }
   }
 
