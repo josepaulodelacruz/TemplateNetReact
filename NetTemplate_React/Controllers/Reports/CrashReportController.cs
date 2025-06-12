@@ -25,17 +25,17 @@ namespace NetTemplate_React.Controllers.Reports
             _service = service;
         }
 
-        [HttpGet("Test")]
-        public async Task<IActionResult> Get()
-        {
-            var response = new Response(
-                    success: false,
-                    message: "FAILED",
-                    debugScript: "TESTING ONLY",
-                    body: null
-                );
-            return StatusCode(500, response);
-        }
+        //[HttpGet("Test")]
+        //public async Task<IActionResult> Get()
+        //{
+        //    var response = new Response(
+        //            success: false,
+        //            message: "FAILED",
+        //            debugScript: "TESTING ONLY",
+        //            body: null
+        //        );
+        //    return StatusCode(500, response);
+        //}
 
 
         // GET: api/<CrashReportController>
@@ -45,6 +45,19 @@ namespace NetTemplate_React.Controllers.Reports
             var response = await _service.GetCrashReport(page);
 
             if (!response.Success) return new BadRequestObjectResult(response);
+
+            return new OkObjectResult(response);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
+        {
+            var response = await _service.GetCrashReportById(id);
+
+            if(!response.Success && response.IsCrash)
+                return StatusCode(500, response);
+            else if (!response.Success)
+                return new BadRequestObjectResult(response);
 
             return new OkObjectResult(response);
         }

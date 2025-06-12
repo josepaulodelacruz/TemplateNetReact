@@ -24,6 +24,9 @@ namespace NetTemplate_React.Models
         [Required(ErrorMessage = "Body cannot be null.")]
         public dynamic Body { get; }
 
+        [JsonIgnore]
+        public bool IsCrash { get; set; }
+
         // Enforce required values via constructor
         public Response(bool success, string debugScript, string message, dynamic body)
         {

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,8 @@ namespace NetTemplate_React.Services.Reports
     public interface ICrashReportService
     {
         Task<Response> GetCrashReport(int page = 1);
+
+        Task<Response> GetCrashReportById(string id);
 
         Task<Response> CreateReport(CrashReport body, List<byte[]> imagebins, int createdBy);
 
@@ -83,6 +86,65 @@ namespace NetTemplate_React.Services.Reports
                     }
                 }
             }
+        }
+
+        public async Task<Response> GetCrashReportById(string id)
+        {
+            string commandText = "[dbo].[NSP_CrashReport]";
+            var dataTable = new DataTable();
+
+            using (SqlConnection con = new SqlConnection(_conString))
+            {
+                await con.OpenAsync();
+
+                using (SqlCommand cmd = new SqlCommand(commandText, con))
+                {
+                    try
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@FLAG", "GET REPORT BY ID");
+                        cmd.Parameters.AddWithValue("@REPORT_ID", id);
+
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            dataTable.Load(reader);
+                        }
+
+                        List<CrashReport > report = CrashReport.TransformCrashReportWithImage(dataTable); 
+
+                        return new Response(
+                            success: true,
+                            debugScript: commandText,
+                            message: "Successfully fetch report.",
+                            body: report 
+                        );
+                    } 
+                    catch (SqlException Ex)
+                    {
+                        return new Response(
+                            success: false,
+                            debugScript: commandText,
+                            message: Ex.Message,
+                            body: Ex.StackTrace
+                        )
+                        {
+                            IsCrash = true
+                        };
+                    }
+                    catch (Exception Ex)
+                    {
+                        return new Response(
+                            success: false,
+                            debugScript: commandText,
+                            message: Ex.Message,
+                            body: Ex.StackTrace 
+                        );
+                    }
+
+                }
+            }
+
+
         }
 
         public async Task<Response> CreateReport(CrashReport body, List<byte[]> imageBins, int createdBy) 

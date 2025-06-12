@@ -1,5 +1,6 @@
 ﻿@hostname=localhost:44393
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjczYzIzMTA5LWFjNDQtNGY2Yi1iZjA3LTMzNjBkZGM5MDI1YiIsImV4cCI6MTc0OTU2NTI4OSwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.nWSH4WCQwG6X9oeSprsUDc2aIqV30c7a0IIRBl-rmxc
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjQ4NjgxZjJkLTkwZjgtNGM5Ni1hNThlLTU3ODI5YmFhYjQwMyIsImV4cCI6MTc0OTY5ODcwMiwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.oP9psLB1nVMXjTgh7dZLen-SuQrN4tX7Jt5qHo82Cf4
+
 
 ###
 
@@ -8,11 +9,15 @@ Content-Type: "application/json"
 Authorization: Bearer {{token}}
 
 ###
-
 GET https://{{hostname}}/api/Reports/CrashReport?page=1
 Content-Type: application/json
 Authorization: Bearer {{token}} 
+###
 
+###
+GET https://{{hostname}}/api/Reports/CrashReport/69
+Content-Type: application/json
+Authorization: Bearer {{token}} 
 ###
 
 POST https://{{hostname}}/api/Reports/CrashReport

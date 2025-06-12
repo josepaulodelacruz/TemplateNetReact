@@ -5,6 +5,7 @@ using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Security.Cryptography.Xml;
 
 namespace NetTemplate_React.Models.Reports
@@ -50,7 +51,11 @@ namespace NetTemplate_React.Models.Reports
         [JsonProperty("details")]
         public string Details { get; set; }
 
+        //needed to be ignore
         public List<IFormFile> Images { get; set; }
+
+        [JsonProperty("image_bins")]
+        public List<string> ImageBins { get; set; }
 
         [JsonProperty("image_cover")]
         public string ImageCover { get; set; }
@@ -82,7 +87,6 @@ namespace NetTemplate_React.Models.Reports
 
             foreach (DataRow row in dataTable.Rows)
             {
-                Debug.WriteLine(GetValue<int>(row, "log_id"));
                 var crashReport = new CrashReport
                 {
                     Id = GetValue<int>(row, "id"),
@@ -104,13 +108,63 @@ namespace NetTemplate_React.Models.Reports
                     TotalPages = GetValue<int>(row, "totalpages"),
                     ImageCover = GetValue<string>(row, "img"),
                     LogId = GetValue<int>(row, "log_id")
-                    
                 };
 
                 crashReports.Add(crashReport);
             }
 
             return crashReports;
+        }
+
+        // Group crash reports by ID and collect all images into ImageBins array
+        public static List<CrashReport> TransformCrashReportWithImage(DataTable dataTable)
+        {
+            if (dataTable == null || dataTable.Rows.Count == 0)
+                return new List<CrashReport>();
+
+            var crashReportsDict = new Dictionary<int, CrashReport>();
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var id = GetValue<int>(row, "id");
+
+                if (!crashReportsDict.ContainsKey(id))
+                {
+                    // Create new crash report with all properties and empty ImageBins
+                    crashReportsDict[id] = new CrashReport
+                    {
+                        Id = id,
+                        When = GetValue<string>(row, "when"),
+                        Where = GetValue<string>(row, "where"),
+                        What = GetValue<string>(row, "what"),
+                        SeverityLevel = GetValue<string>(row, "severity_level"),
+                        CreatedBy = GetValue<string>(row, "created_by"),
+                        LinId = GetValue<int>(row, "lin_id"),
+                        StackTrace = GetValue<string>(row, "stack_trace"),
+                        Browser = GetValue<string>(row, "browser"),
+                        Os = GetValue<string>(row, "os"),
+                        UserAgent = GetValue<string>(row, "user_agent"),
+                        Scenario = GetValue<string>(row, "scenario"),
+                        Details = GetValue<string>(row, "details"),
+                        Images = null,
+                        TotalCount = GetValue<int>(row, "totalcount"),
+                        CurrentPage = GetValue<int>(row, "currentpage"),
+                        TotalPages = GetValue<int>(row, "totalpages"),
+                        //ImageCover = GetValue<string>(row, "img"),
+                        LogId = GetValue<int>(row, "log_id"),
+                        ImageBins = new List<string>()
+                    };
+                }
+
+                // Add image to the ImageBins array if it exists and isn't already added
+                var imageValue = GetValue<string>(row, "img");
+                if (!string.IsNullOrEmpty(imageValue) && !crashReportsDict[id].ImageBins.Contains(imageValue))
+                {
+                    crashReportsDict[id].ImageBins.Add(imageValue);
+                }
+            }
+
+            return crashReportsDict.Values.ToList();
         }
 
         /// <summary>
