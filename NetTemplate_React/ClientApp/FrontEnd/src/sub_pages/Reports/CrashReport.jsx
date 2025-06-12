@@ -6,9 +6,8 @@ import CrashReportLineChart from "./components/CrashReportLineChart";
 import useCrashReportFetch from "~/hooks/Reports/useCrashReportsFetch";
 import ErrorElement from "~/components/ErrorElement";
 import useCrashReport from "~/hooks/CrashReport/useCrashReport";
-import { notifications } from "@mantine/notifications";
 import { notificationWithCrashReportButton } from "~/utils/notification";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import useAuth from "~/hooks/Auth/useAuth";
 
 const PercentageColorIndicator = () => {
@@ -47,7 +46,7 @@ const CrashReportCardSection = ({
   page = 1
 }) => {
   const { data, isLoading, isError, error } = useCrashReportFetch(page)
-  const { onTriggerCrashReportModal, isCrashReportModal } = useCrashReport();
+  const { onTriggerCrashReportModal } = useCrashReport();
   const { pathname } = useLocation()
   const { user } = useAuth();
 
@@ -101,6 +100,7 @@ const CrashReport = () => {
   const [totalPage, setTotalPage] = useState();
   const { data, isSuccess } = useCrashReportFetch(page)
   const { onTriggerCrashReportModal } = useCrashReport();
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -128,7 +128,7 @@ const CrashReport = () => {
   return (
     <Container fluid>
       <Group>
-        <Title size={50} fw={700} style={{ viewTransitionName: 'rpt-header' }}>Crash Reports</Title>
+        <Title component={'span'} size={50} fw={700} >Crash Reports</Title>
       </Group>
 
       <Group justify="space-between">
@@ -139,10 +139,6 @@ const CrashReport = () => {
           <Button onClick={() => handleFilterRange('month')} variant={range === 'month' ? 'light' : 'default'} >Month</Button>
           <Button onClick={() => handleFilterRange('all')} variant={range === 'all' ? 'light' : 'default'} >All Time</Button>
         </Button.Group>
-
-        <Button onClick={handleTestError} color="red" variant="outline">
-          Test error
-        </Button>
       </Group>
 
       <Flex gap="lg" direction={{ base: 'column', md: 'row' }} >
@@ -173,15 +169,12 @@ const CrashReport = () => {
           />
         </Box>
       </Group>
-
       <CrashReportCardSection page={page} />
       <Group justify="end">
         <Box py={20}>
           <Pagination onChange={onChange} total={totalPage} boundaries={2} />
         </Box>
       </Group>
-
-
     </Container>
   )
 }

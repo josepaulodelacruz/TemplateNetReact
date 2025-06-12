@@ -2,9 +2,7 @@ import { Outlet } from "react-router";
 
 const Reports = () => {
   return (
-    <>
-      <Outlet />
-    </>
+    <Outlet />
   )
 }
 

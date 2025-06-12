@@ -89,7 +89,7 @@ namespace NetTemplate_React.Models.Reports
             {
                 var crashReport = new CrashReport
                 {
-                    Id = GetValue<int>(row, "id"),
+                    Id = GetValue<int>(row, "main_id"),
                     When = GetValue<string>(row, "when"),
                     Where = GetValue<string>(row, "where"),
                     What = GetValue<string>(row, "what"),

@@ -11,14 +11,19 @@ import {
 } from '@mantine/core';
 import moment from 'moment';
 import { severityColors } from '~/constants/data';
+import { Link, useNavigate } from 'react-router';
+import StringRoutes from '~/constants/StringRoutes';
 
 const CrashReportCard = ({
   report = null
 }) => {
+  const navigate = useNavigate();
 
   const ReportCoverPhoto = () => {
     if (!report.image_cover) return
     return <Image 
+      
+      style={{ viewTransitionName: `report-cover-photo-${report.id}`}}
       h={"100%"}
       w="100%"
       fit="cover"
@@ -49,7 +54,11 @@ const CrashReportCard = ({
           </Group>
           <Text lineClamp={2} size="xs">{report.details} {report.scenario}</Text>
           <Group justify="end" mt={5}>
-            <Button variant="subtle" size="compact-xs">
+            <Button
+              component={Link}
+              viewTransition
+              onClick={() => navigate(`${StringRoutes.report_crash}/${report.id}`)}
+              variant="subtle" size="compact-xs">
               See more...
             </Button>
           </Group>
