@@ -54,7 +54,10 @@ const DASHBOARD_ROUTES = [
     Component: Reports,
     children: [
       { path: StringRoutes.report_crash, Component: CrashReport },
-      { path: `${StringRoutes.report_crash}/:id?`, Component: CrashReportView }
+      { 
+        path: `${StringRoutes.report_crash}/:id?`,
+        Component: CrashReportView,
+      }
     ]
   }
 ]

@@ -22,7 +22,6 @@ const CrashReportCard = ({
   const ReportCoverPhoto = () => {
     if (!report.image_cover) return
     return <Image 
-      
       style={{ viewTransitionName: `report-cover-photo-${report.id}`}}
       h={"100%"}
       w="100%"

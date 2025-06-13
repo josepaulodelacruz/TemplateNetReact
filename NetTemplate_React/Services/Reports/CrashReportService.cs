@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -110,13 +111,13 @@ namespace NetTemplate_React.Services.Reports
                             dataTable.Load(reader);
                         }
 
-                        List<CrashReport > report = CrashReport.TransformCrashReportWithImage(dataTable); 
+                        List<CrashReport> report = CrashReport.TransformCrashReportWithImage(dataTable); 
 
                         return new Response(
                             success: true,
                             debugScript: commandText,
                             message: "Successfully fetch report.",
-                            body: report 
+                            body: report.Count > 0 ? report[0] : null
                         );
                     } 
                     catch (SqlException Ex)

@@ -1,4 +1,4 @@
-import { Card, Container, createTheme, Paper, rem, Select } from "@mantine/core";
+import { Card, Container, createTheme, darken, Paper, rem, Select } from "@mantine/core";
 import type { MantineThemeOverride } from "@mantine/core";
 
 const CONTAINER_SIZES: Record<string, string> = {
@@ -35,9 +35,11 @@ export const theme: MantineThemeOverride = createTheme({
     "2xl": rem("28px"),
     "3xl": rem("32px"),
   },
+
+  
   colors: {
     primary: [
-      "#D5EDEE", // Lightest
+      "#f3f3f3", // Lightest
       "#B0DBDC",
       "#8CC9CB",
       "#69B7BA",
