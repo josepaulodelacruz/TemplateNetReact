@@ -9,6 +9,7 @@ import useCrashReport from "~/hooks/CrashReport/useCrashReport";
 import { notificationWithCrashReportButton } from "~/utils/notification";
 import { useLocation, useNavigate } from "react-router";
 import useAuth from "~/hooks/Auth/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
 
 const PercentageColorIndicator = () => {
   return (
@@ -49,6 +50,7 @@ const CrashReportCardSection = ({
   const { onTriggerCrashReportModal } = useCrashReport();
   const { pathname } = useLocation()
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (isError) {
@@ -85,7 +87,7 @@ const CrashReportCardSection = ({
         data?.body !== undefined && Array.isArray(data.body) && data.body?.map((report, index) => {
           return (
             <Box key={index} style={{ flexBasis: 'calc(25% - 12px)', minWidth: '300' }}>
-              <CrashReportCard report={report} />
+              <CrashReportCard queryClient={queryClient} report={report} />
             </Box>
           )
         })
@@ -101,7 +103,6 @@ const CrashReport = () => {
   const { data, isSuccess } = useCrashReportFetch(page)
   const { onTriggerCrashReportModal } = useCrashReport();
   const navigate = useNavigate();
-
 
   useEffect(() => {
     if (isSuccess) {

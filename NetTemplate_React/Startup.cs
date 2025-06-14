@@ -48,8 +48,14 @@ namespace NetTemplate_React
 
             services.AddCors(options =>
             {
+                string[] allowedOrigins = new[]
+                {
+                    "http://localhost:5173",
+                    "http://localhost:4173",
+                };
+
                 options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.WithOrigins("http://localhost:5173") //add front end url if deployed
+                    builder => builder.WithOrigins(allowedOrigins) //add front end url if deployed
                     .AllowAnyHeader()
                     .AllowAnyMethod());
             });

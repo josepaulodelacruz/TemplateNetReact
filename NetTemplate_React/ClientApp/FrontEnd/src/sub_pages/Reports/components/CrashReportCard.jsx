@@ -13,27 +13,42 @@ import moment from 'moment';
 import { severityColors } from '~/constants/data';
 import { Link, useNavigate } from 'react-router';
 import StringRoutes from '~/constants/StringRoutes';
+import QueryKeys from '~/constants/QueryKeys';
+import useCrashReportById from '~/hooks/CrashReport/useCrashReportById';
+import useCrashReport from '~/hooks/CrashReport/useCrashReport';
+
+const ReportCoverPhoto = ({ report }) => {
+  if (!report.image_cover) return
+  return <Image
+    style={{ viewTransitionName: `report-cover-photo-${report.id}` }}
+    h={"100%"}
+    w="100%"
+    fit="cover"
+    src={`data:image/png;base64,${report.image_cover}`} />
+}
 
 const CrashReportCard = ({
-  report = null
+  report = null,
+  queryClient
 }) => {
   const navigate = useNavigate();
+  const { setImageCover } = useCrashReport();
 
-  const ReportCoverPhoto = () => {
-    if (!report.image_cover) return
-    return <Image 
-      style={{ viewTransitionName: `report-cover-photo-${report.id}`}}
-      h={"100%"}
-      w="100%"
-      fit="cover"
-      src={`data:image/png;base64,${report.image_cover}`}/>
+  const handleNavigateTo = async () => {
+    queryClient.prefetchQuery({
+      queryKey: [QueryKeys.REPORTS_CRASH_VIEW, report.id],
+      queryFn: () => useCrashReportById(report.id)
+    })
+
+    setImageCover(`data:image/png;base64,${report.image_cover}`)
+    navigate(`${StringRoutes.report_crash}/${report.id}`);
   }
 
   return (
     <Paper shadow="xs" m={0} p={0}>
       <Box w="100%" >
         <Box h="250" bg="primary">
-          <ReportCoverPhoto />
+          <ReportCoverPhoto report={report} />
         </Box>
         <Box p={10}>
           <Flex direction={"row"} justify="space-between" align="center">
@@ -56,7 +71,8 @@ const CrashReportCard = ({
             <Button
               component={Link}
               viewTransition
-              onClick={() => navigate(`${StringRoutes.report_crash}/${report.id}`)}
+              //onClick={() => navigate(`${StringRoutes.report_crash}/${report.id}`)}
+              onClick={handleNavigateTo}
               variant="subtle" size="compact-xs">
               See more...
             </Button>

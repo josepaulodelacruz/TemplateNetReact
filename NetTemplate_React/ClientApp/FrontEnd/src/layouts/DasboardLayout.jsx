@@ -29,7 +29,8 @@ const DashboardLayout = () => {
 
   return (
     <AppShell
-      header={{ height: 60, collapsed: !pinned, offset: true }}
+      //header={{ height: 60, collapsed: !pinned, offset: true }}
+      header={{ height: 60, offset: true }}
       navbar={{
         width: 300,
         breakpoint: 'sm',

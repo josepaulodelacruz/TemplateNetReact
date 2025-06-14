@@ -54,7 +54,7 @@ const DASHBOARD_ROUTES = [
     Component: Reports,
     children: [
       { path: StringRoutes.report_crash, Component: CrashReport },
-      { 
+      {
         path: `${StringRoutes.report_crash}/:id?`,
         Component: CrashReportView,
       }
@@ -72,7 +72,13 @@ const router = createBrowserRouter([
     path: StringRoutes.login,
     Component: Login,
   }
-])
+],
+  {
+    future: {
+      v7_startTransition: true,
+    }
+  }
+)
 
 export default function Router() {
   return <RouterProvider router={router} />
