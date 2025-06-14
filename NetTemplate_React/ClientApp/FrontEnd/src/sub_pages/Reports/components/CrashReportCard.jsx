@@ -40,7 +40,7 @@ const CrashReportCard = ({
       queryFn: () => useCrashReportById(report.id)
     })
 
-    setImageCover(`data:image/png;base64,${report.image_cover}`)
+    setImageCover(`${report.image_cover}`)
     navigate(`${StringRoutes.report_crash}/${report.id}`);
   }
 
