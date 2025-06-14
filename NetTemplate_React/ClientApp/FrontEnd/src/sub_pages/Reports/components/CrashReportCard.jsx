@@ -54,7 +54,10 @@ const CrashReportCard = ({
           <Flex direction={"row"} justify="space-between" align="center">
             <Flex direction="column" >
               <Text size="xs" fw={300} c="dimmed" >Reported by: <Text fw={600} span size="xs" inherit>{report.created_by}</Text> </Text>
-              <Text size="xs" fw={300} c="dimmed" >Date: <Text fw={600} span size="xs" inherit>{moment(report.when, 'MM/DD/yyyy h:mm:ss a a').format("MMMM Do, YYYY h:mm a")}</Text> </Text>
+              {
+                // <Text size="xs" fw={300} c="dimmed" >Date: <Text fw={600} span size="xs" inherit>{moment(report.when, 'MM/DD/yyyy hh:mm:ss a a').format("MMMM Do, YYYY hh:mm a")}</Text> </Text>
+              }
+              <Text size="xs" fw={300} c="dimmed" >Date: <Text fw={600} span size="xs" inherit>{report.when}</Text> </Text>
             </Flex>
             <Badge color={severityColors[report.severity_level]} size="xs">{report.severity_level}</Badge>
           </Flex>

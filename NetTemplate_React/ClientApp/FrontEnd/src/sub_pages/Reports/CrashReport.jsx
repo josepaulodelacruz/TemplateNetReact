@@ -140,6 +140,10 @@ const CrashReport = () => {
           <Button onClick={() => handleFilterRange('month')} variant={range === 'month' ? 'light' : 'default'} >Month</Button>
           <Button onClick={() => handleFilterRange('all')} variant={range === 'all' ? 'light' : 'default'} >All Time</Button>
         </Button.Group>
+        <Button variant="outline" color="red" onClick={handleTestError}>
+          Test error
+
+        </Button>
       </Group>
 
       <Flex gap="lg" direction={{ base: 'column', md: 'row' }} >

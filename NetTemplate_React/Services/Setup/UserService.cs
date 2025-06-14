@@ -86,7 +86,10 @@ namespace NetTemplate_React.Services.Setup
                     debugScript: commandText.ToString(),
                     message: Ex.Message,
                     body: null
-                );
+                )
+                {
+                    IsCrash = true,
+                };
             }
             catch (Exception Ex)
             {

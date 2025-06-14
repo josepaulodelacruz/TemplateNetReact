@@ -1,12 +1,12 @@
 import { Menu, AppShell, Burger, Chip, Paper, Group, ScrollArea, Space, Text } from '@mantine/core';
 import { useDisclosure, useHeadroom } from '@mantine/hooks';
 import { NavItems } from '~/components/NavItems';
-import { NavLink, Outlet, useNavigate } from 'react-router';
+import { NavLink, useLocation, Outlet, useNavigate, ScrollRestoration, useNavigationType } from 'react-router';
 import StringRoutes from '~/constants/StringRoutes';
 import { BarChart, ChevronRight, HistoryIcon, LayoutDashboardIcon, LogOutIcon, WrenchIcon } from 'lucide-react';
 import '../index.css';
 import useAuth from '~/hooks/Auth/useAuth';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import packageJson from '../../package.json';
 import CrashReport from '~/components/Modal/CrashReport';
 
@@ -16,6 +16,43 @@ const DashboardLayout = () => {
   const pinned = useHeadroom({ fixedAt: 120 })
   const { token, onSetClearToken } = useAuth();
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
+  const scrollPositions = useRef({});
+  const location = useLocation()
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Save current scroll position
+      scrollPositions.current[location.pathname] = window.scrollY;
+    };
+
+    // Add scroll listener to track positions
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [location.pathname]);
+
+  useEffect(() => {
+    // Restore scroll position based on navigation type
+    if (navigationType === 'POP') {
+      // Browser back/forward - let ScrollRestoration handle it
+      return;
+    }
+
+    // For PUSH navigation (clicking links)
+    const savedPosition = scrollPositions.current[location.pathname];
+    if (savedPosition !== undefined) {
+      // Restore to last known position for this route
+      setTimeout(() => {
+        window.scrollTo(0, savedPosition);
+      }, 0);
+    } else {
+      // New route - scroll to top
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, navigationType]);
 
   useEffect(() => {
     if (token === null) {
@@ -59,7 +96,7 @@ const DashboardLayout = () => {
             <NavLink to={StringRoutes.users}> Users </NavLink>
             <NavLink to={StringRoutes.modules}> Modules </NavLink>
           </NavItems>
-          <NavItems leftIcon={<BarChart size={18}/>} label="Reports">
+          <NavItems leftIcon={<BarChart size={18} />} label="Reports">
             <NavLink to={StringRoutes.report_crash}> Crash Reports </NavLink>
           </NavItems>
         </ScrollArea>
@@ -89,6 +126,8 @@ const DashboardLayout = () => {
           //open crash report
           <CrashReport />
         }
+
+        <ScrollRestoration />
       </AppShell.Main>
     </AppShell>
   );

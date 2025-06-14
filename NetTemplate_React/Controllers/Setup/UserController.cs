@@ -28,10 +28,10 @@ namespace NetTemplate_React.Controllers.Setup
         {
             var response = await _service.GetUsers();
 
-            if (!response.Success)
-            {
+            if (!response.Success && response.IsCrash)
+                return StatusCode(500, response);
+            else if (!response.Success)
                 return new BadRequestObjectResult(response);
-            }
 
             return new OkObjectResult(response);
         }

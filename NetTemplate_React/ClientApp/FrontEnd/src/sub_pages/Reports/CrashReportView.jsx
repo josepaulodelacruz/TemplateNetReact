@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Container,
   Image,
   Grid,
@@ -14,9 +15,10 @@ import {
   Box,
   Code,
   ScrollArea,
-  Skeleton
+  Skeleton,
+  Menu
 } from "@mantine/core";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckIcon, ClipboardList, EllipsisVertical, HistoryIcon } from "lucide-react";
 import { useNavigate, useParams, Link } from "react-router";
 import { useElementSize, useMediaQuery } from "@mantine/hooks";
 import CrashReportTimelineCard from "./components/CrashReportTimelineCard";
@@ -25,6 +27,7 @@ import moment from "moment";
 import { severityColors } from "~/constants/data";
 import ErrorElement from "~/components/ErrorElement";
 import useCrashReport from "~/hooks/CrashReport/useCrashReport";
+import CrashReportImageCarousel from "./components/CrashReportImageCarousel";
 
 const CrashReportView = () => {
   const navigate = useNavigate();
@@ -39,7 +42,6 @@ const CrashReportView = () => {
   }
 
   const handleBackNavigation = () => {
-    // Use Link with viewTransition for back navigation
     navigate(-1);
   };
 
@@ -66,15 +68,7 @@ const CrashReportView = () => {
             style={{ height: `calc(100vh - ${height + 95}px)` }}
             bg='#1C1C1C'
           >
-            {
-              <Image
-                style={{ viewTransitionName: `report-cover-photo-${id}` }}
-                h={"100%"}
-                w="100%"
-                fit="contain"
-                src={`data:image/png;base64,${_imageSrc}`}
-              />
-            }
+            <CrashReportImageCarousel height={height} id={id} report={report} imageSrc={_imageSrc} />
           </Container>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 4 }}>
@@ -87,17 +81,36 @@ const CrashReportView = () => {
               >
                 {/* User details */}
                 <Group px={5} py={10}>
-                  <Avatar alt="dp">JM</Avatar>
+                  <Avatar alt="dp">AD</Avatar>
                   <Stack flex={1} justify="center" gap={0}>
                     <Title size="md" fw={600}>{report?.body?.created_by}</Title>
                     <Text size="xs" c="dimmed">{moment().calendar()}</Text>
                   </Stack>
-                  <Badge
-                    color={severityColors[report?.body?.severity_level]}
-                    size="xs"
-                  >
-                    {report?.body?.severity_level}
-                  </Badge>
+                  {
+                    <Menu 
+                      position="bottom-end"
+                    >
+                      <Menu.Target>
+                        <EllipsisVertical />
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        <Menu.Item leftSection={<ClipboardList />}>
+                          View Logs
+                        </Menu.Item>
+                        <Menu.Item leftSection={<CheckIcon color="green"/>}>
+                          Mark as resolved
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                    // <Badge
+                    //   color={severityColors[report?.body?.severity_level]}
+                    //   size="xs"
+                    // >
+                    //   {report?.body?.severity_level}
+                    // </Badge>
+
+                  }
+
                 </Group>
                 <Group px={10} py={0} gap="xs">
                   <Badge size="xs" variant="dot">{report?.body?.os}</Badge>
@@ -112,6 +125,7 @@ const CrashReportView = () => {
                 <CrashReportTimelineCard
                   margin={10}
                   padding={0}
+                  referenceId={report?.reference_id}
                   severity={report?.body?.severity_level}
                   errorDetails={{
                     when: report?.body?.when,
@@ -154,17 +168,19 @@ const CrashDetails = ({
 }) => {
 
   return isMobile ? (
-    <Paper w="100%" p={10} m={0}>
+    <Paper w="100%"
+      p={10} m={0}>
       {children}
     </Paper>
   ) : (
     <ScrollArea h={`calc(100vh - ${height + 95}px)`} w="100%">
       <Paper
         w="100%"
+        h={`calc(100vh - ${height + 95}px)`}
         p={10}
         m={0}
       >
-          {children}
+        {children}
       </Paper>
     </ScrollArea>
   )

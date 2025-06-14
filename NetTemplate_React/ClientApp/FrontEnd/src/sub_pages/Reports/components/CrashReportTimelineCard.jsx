@@ -7,7 +7,8 @@ const CrashReportTimelineCard = ({
   errorDetails = null,
   severity = "",
   padding = null,
-  margin = null
+  margin = null,
+  referenceId = null
 }) => {
 
   const what = errorDetails?.what;
@@ -21,7 +22,7 @@ const CrashReportTimelineCard = ({
           </ThemeIcon>
           <Box>
             <Text fw={600}>Error Details</Text>
-            <Text size="sm" c="dimmed">ID: {errorDetails?.error?.response?.data?.reference_id || ""}</Text>
+            <Text size="sm" c="dimmed">ID: {errorDetails?.error?.response?.data?.reference_id || referenceId}</Text>
           </Box>
         </Group>
         <Badge color={severityColors[severity]} size="sm" variant='light'>

@@ -16,7 +16,7 @@ namespace NetTemplate_React.Models.Reports
         public int Id { get; set; }
 
         [JsonProperty("when")]
-        public string When { get; set; }
+        public DateTime When { get; set; }
 
         [JsonProperty("where")]
         public string Where { get; set; }
@@ -90,7 +90,7 @@ namespace NetTemplate_React.Models.Reports
                 var crashReport = new CrashReport
                 {
                     Id = GetValue<int>(row, "main_id"),
-                    When = GetValue<string>(row, "when"),
+                    When = GetValue<DateTime>(row, "when"),
                     Where = GetValue<string>(row, "where"),
                     What = GetValue<string>(row, "what"),
                     SeverityLevel = GetValue<string>(row, "severity_level"),
@@ -134,7 +134,7 @@ namespace NetTemplate_React.Models.Reports
                     crashReportsDict[id] = new CrashReport
                     {
                         Id = id,
-                        When = GetValue<string>(row, "when"),
+                        When = GetValue<DateTime>(row, "when"),
                         Where = GetValue<string>(row, "where"),
                         What = GetValue<string>(row, "what"),
                         SeverityLevel = GetValue<string>(row, "severity_level"),
