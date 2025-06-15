@@ -11,29 +11,36 @@ import { useLocation, useNavigate } from "react-router";
 import useAuth from "~/hooks/Auth/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 
-const PercentageColorIndicator = () => {
+const PercentageColorIndicator = ({
+  percentage
+}) => {
   return (
     <Button size="compact-md" color="red" variant="light">
       <ArrowUp size={18} />
-      <Text fw={900} size={13}>12.32 %</Text>
+      <Text fw={900} size={13}>{percentage}</Text>
     </Button>
   )
 }
 
 const HeroCard = ({
+  title = "",
+  count = 0,
+  percentage = null
 }) => {
   return (
     <Paper w={'100%'} shadow="xs">
       <Stack>
         <Group>
-          <Title size="lg">Total Crashes</Title>
+          <Title size="lg">{title}</Title>
           <ThemeIcon color="white" variant="light" size="xs">
             <Info size={18} />
           </ThemeIcon>
         </Group>
         <Group>
-          <Title size="h1">12</Title>
-          <PercentageColorIndicator />
+          <Title size="h1">{count}</Title>
+          {percentage && (
+            <PercentageColorIndicator percentage={percentage} />
+          )}
         </Group>
         <Text c="dimmed" size={"xs"}>
           Crashes up <Text inherit span c="red" fw={800}>12.32%</Text> since last month
@@ -106,7 +113,7 @@ const CrashReport = () => {
   const [page, onChange] = useState(1);
   const [totalPage, setTotalPage] = useState();
   const { data, isSuccess } = useCrashReportFetch(page)
-  const { onTriggerCrashReportModal, filterSeverity, setFilterSeverity  } = useCrashReport();
+  const { onTriggerCrashReportModal, filterSeverity, setFilterSeverity } = useCrashReport();
 
   useEffect(() => {
     if (isSuccess) {
@@ -153,12 +160,12 @@ const CrashReport = () => {
       <Flex gap="lg" direction={{ base: 'column', md: 'row' }} >
         <Flex flex={1.2} gap="sm" direction="column">
           <Flex direction="row" gap="sm">
-            <HeroCard />
-            <HeroCard />
+            <HeroCard title="Total Crashes" count={12} percentage="12.32%" />
+            <HeroCard title="Affected Users" count={1} percentage="90%" />
           </Flex>
           <Flex direction="row" gap="sm" >
-            <HeroCard />
-            <HeroCard />
+            <HeroCard title="Crash Free Sessions" count={1832}  />
+            <HeroCard title="Critical System Failure" count={9}  />
           </Flex>
         </Flex>
         <Flex gap="sm" flex={2}>
@@ -180,7 +187,7 @@ const CrashReport = () => {
           />
         </Box>
       </Group>
-      <CrashReportCardSection filters={filterSeverity}  page={page} />
+      <CrashReportCardSection filters={filterSeverity} page={page} />
       <Group justify="end">
         <Box py={20}>
           <Pagination onChange={onChange} total={totalPage} boundaries={2} />

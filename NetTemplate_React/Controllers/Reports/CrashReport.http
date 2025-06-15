@@ -1,5 +1,6 @@
 ﻿@hostname=localhost:44393
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImViMGQ1YmRiLTA3MmItNGRkMi05ODBiLWM5OGJmZDQ3YjYxOSIsImV4cCI6MTc0OTkxMzkzOSwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.okdsHq3P4FMOUuRtABpBOakysOOHqR05CX13Dmm6RsM
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjBhZDVhMzk5LWViNDctNDA2OS1iNWEwLTFjN2FlNGFiNmM5MiIsImV4cCI6MTc0OTk2MTI5NywiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.QtYVR8SWzzCFgEryQpx30Kn7Vp-Fn6w85j1pqnx6JqE
+
 
 ###
 
@@ -9,6 +10,12 @@ Authorization: Bearer {{token}}
 
 ###
 GET https://{{hostname}}/api/Reports/CrashReport?page=1
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+###
+
+###
+GET https://{{hostname}}/api/Reports/CrashReport/metrics
 Content-Type: application/json
 Authorization: Bearer {{token}} 
 ###

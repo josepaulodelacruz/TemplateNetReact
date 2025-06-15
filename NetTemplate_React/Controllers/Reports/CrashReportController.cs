@@ -37,6 +37,16 @@ namespace NetTemplate_React.Controllers.Reports
             return StatusCode(500, response);
         }
 
+        [HttpGet("metrics")]
+        public async Task<IActionResult> GetMetrics()
+        {
+            var response = await _service.GetMetrics();
+
+            if (!response.Success && response.IsCrash) return StatusCode(500, response);
+            else if (!response.Success) return new BadRequestObjectResult(response);
+
+            return new OkObjectResult(response);
+        }
 
         // GET: api/<CrashReportController>
         [HttpGet]

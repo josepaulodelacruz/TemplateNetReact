@@ -214,4 +214,146 @@ namespace NetTemplate_React.Models.Reports
         [JsonProperty("image")]
         public string Image { get; set; }
     }
+
+    public class Metrics
+    {
+        [JsonProperty("crash_counts")]
+        public CrashCounts CrashCounts { get; set; }
+
+        [JsonProperty("line_charts")]
+        List<LineChart> LineCharts { get; set; }
+
+        public Metrics TransformCrashReportMetrics (DataTable dataTable)
+        {
+            var metricsDict = new Dictionary<int, Metrics>();
+            var lineChartDict = new Dictionary<DateTime, LineChart>();
+
+            if (dataTable == null || dataTable.Rows.Count == 0)
+                return new Metrics();
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var id = GetValue<int>(row, "id");
+
+                var date = GetValue<DateTime>(row, "CrashDate");
+
+                lineChartDict[date] = new LineChart()
+                {
+                    Date = GetValue<DateTime>(row, "crashDate"),
+                    DailyCrashes = GetValue<int>(row, "dailyCrashes"),
+                    DailyAffectedUsers = GetValue<int>(row, "dailyAffectedUsers"),
+                    DailyCriticalCrashes = GetValue<int>(row, "dailyCriticalCrashes"),
+                    CumulativeCrashes = GetValue<int>(row, "cumulativeCrashes"),
+                    CumulativeAffectedUsers = GetValue<int>(row, "cumulativeAffectedUsers"),
+                    CumulativeCriticalCrashes = GetValue<int>(row, "cumulativeCriticalCrahes"),
+                };
+
+                metricsDict[id] = new Metrics()
+                {
+                    CrashCounts = new CrashCounts()
+                    {
+                        TotalCrashes = GetValue<int>(row, "totalCrashes"),
+                        AffectedUser = GetValue<int>(row, "affectedUsers"),
+                        CriticalSystemFailures = GetValue<int>(row, "criticalSystemFailures"),
+                        CrashFreeSessions = GetValue<int>(row, "crashFreeSessions"),
+                        CrashesPercentChange = GetValue<decimal>(row, "crashesPercentChange"),
+                        UsersPercentChange = GetValue<decimal>(row, "usersPercentChange"),
+                        CriticalFailuresPercentChange = GetValue<decimal>(row, "criticalFailuresPercentChange"),
+                        CrashesFreeSessionsPercentChange = GetValue<decimal>(row, "crashFreeSessionsPercentChange"),
+                    },
+                    LineCharts = lineChartDict.Values.ToList(),
+                };
+
+
+            }
+
+            return metricsDict[0];
+        }
+
+        private static T GetValue<T>(DataRow row, string columnName, T defaultValue = default(T))
+        {
+            try
+            {
+                if (row.Table.Columns.Contains(columnName) && row[columnName] != DBNull.Value)
+                {
+                    var value = row[columnName];
+
+                    if (typeof(T) == typeof(string))
+                        return (T)(object)value.ToString();
+
+                    if (typeof(T) == typeof(int))
+                        return (T)(object)Convert.ToInt32(value);
+
+                    if (typeof(T) == typeof(DateTime))
+                        return (T)(object)Convert.ToDateTime(value);
+
+                    if (typeof(T) == typeof(bool))
+                        return (T)(object)Convert.ToBoolean(value);
+
+                    return (T)Convert.ChangeType(value, typeof(T));
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log exception if needed
+                Console.WriteLine($"Error converting column '{columnName}': {ex.Message}");
+            }
+
+            return defaultValue;
+        }
+
+    }
+
+    public class LineChart
+    {
+        [JsonProperty("date")]
+        public DateTime Date { get; set; }
+
+        [JsonProperty("daily_crashes")]
+        public int DailyCrashes { get; set; }
+
+        [JsonProperty("daily_affected_users")]
+        public int DailyAffectedUsers { get; set; }
+
+        [JsonProperty("daily_critical_crashes")]
+        public int DailyCriticalCrashes { get; set; }
+
+        [JsonProperty("cumulative_crashes")]
+        public int CumulativeCrashes { get; set; }
+
+        [JsonProperty("cumulative_affected_users")]
+        public int CumulativeAffectedUsers { get; set; }
+
+        [JsonProperty("cumulative_critical_crashes")]
+        public int CumulativeCriticalCrashes { get; set; }
+
+    }
+
+    public class CrashCounts
+    {
+        [JsonProperty("total_crashes")]
+        public int TotalCrashes { get; set; }
+
+        [JsonProperty("affected_users")]
+        public int AffectedUser { get; set; }
+
+        [JsonProperty("critical_system_failures")]
+        public int CriticalSystemFailures { get; set; }
+
+        [JsonProperty("crash_free_sessions")]
+        public int CrashFreeSessions { get; set; }
+
+        [JsonProperty("crashes_percent_change")]
+        public decimal CrashesPercentChange { get; set; }
+
+        [JsonProperty("users_percent_change")]
+        public decimal UsersPercentChange { get; set; }
+
+        [JsonProperty("critical_failures_percent_change")]
+        public decimal CriticalFailuresPercentChange { get; set; }
+
+        [JsonProperty("crashes_free_sessioins_percent_change")]
+        public decimal CrashesFreeSessionsPercentChange { get; set; }
+
+    }
 }

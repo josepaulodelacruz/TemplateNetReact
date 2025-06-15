@@ -15,6 +15,8 @@ namespace NetTemplate_React.Services.Reports
 
     public interface ICrashReportService
     {
+        Task<Response> GetMetrics();
+
         Task<Response> GetCrashReport(int page = 1, string filter = "");
 
         Task<Response> GetCrashReportById(string id);
@@ -33,6 +35,62 @@ namespace NetTemplate_React.Services.Reports
         {
             _conString = conString;
             _logger = logger.CreateLogger<CrashReportService>();
+        }
+
+        public async Task<Response> GetMetrics()
+        {
+            string commandText = "[dbo].[NSP_CrashReport]";
+            var dataTable = new DataTable();
+
+            using (SqlConnection con = new SqlConnection(_conString))
+            {
+                await con.OpenAsync();
+
+                using (SqlCommand cmd = new SqlCommand(commandText, con))
+                {
+                    try
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@FLAG", "GET METRICS");
+
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            dataTable.Load(reader);
+                        }
+
+                        Models.Reports.Metrics metrics = new Metrics().TransformCrashReportMetrics(dataTable);
+
+                        return new Response(
+                            success: true,
+                            debugScript: commandText,
+                            message: "Successfully fetch crash report metrics",
+                            body: metrics 
+                        );
+
+                    } 
+                    catch (SqlException Ex)
+                    {
+                        return new Response(
+                            success: false,
+                            debugScript: commandText,
+                            message: Ex.Message,
+                            body: Ex.StackTrace
+                        )
+                        {
+                            IsCrash = true
+                        };
+                    } 
+                    catch (Exception Ex)
+                    {
+                        return new Response(
+                            success: false,
+                            debugScript: commandText,
+                            message: Ex.Message,
+                            body: null
+                        );
+                    }
+                }
+            }
         }
 
         public async Task<Response> GetCrashReport(int page = 1, string filter = "")
