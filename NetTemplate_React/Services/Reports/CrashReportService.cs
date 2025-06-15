@@ -15,7 +15,7 @@ namespace NetTemplate_React.Services.Reports
 
     public interface ICrashReportService
     {
-        Task<Response> GetCrashReport(int page = 1);
+        Task<Response> GetCrashReport(int page = 1, string filter = "");
 
         Task<Response> GetCrashReportById(string id);
 
@@ -35,7 +35,7 @@ namespace NetTemplate_React.Services.Reports
             _logger = logger.CreateLogger<CrashReportService>();
         }
 
-        public async Task<Response> GetCrashReport(int page = 1)
+        public async Task<Response> GetCrashReport(int page = 1, string filter = "")
         {
             
             var commandText = "[dbo].[NSP_CrashReport]";
@@ -48,6 +48,7 @@ namespace NetTemplate_React.Services.Reports
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@FLAG", "GET REPORTS");
                     cmd.Parameters.AddWithValue("@PageNumber", page);
+                    cmd.Parameters.AddWithValue("@F_Severity", String.IsNullOrEmpty(filter) ? null : filter);
 
                     try
                     {

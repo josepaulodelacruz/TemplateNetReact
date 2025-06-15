@@ -1,7 +1,5 @@
 import {
-  ActionIcon,
   Container,
-  Image,
   Grid,
   Group,
   Paper,
@@ -18,13 +16,12 @@ import {
   Skeleton,
   Menu
 } from "@mantine/core";
-import { ArrowLeft, CheckIcon, ClipboardList, EllipsisVertical, HistoryIcon } from "lucide-react";
+import { ArrowLeft, CheckIcon, ClipboardList, EllipsisVertical } from "lucide-react";
 import { useNavigate, useParams, Link } from "react-router";
 import { useElementSize, useMediaQuery } from "@mantine/hooks";
 import CrashReportTimelineCard from "./components/CrashReportTimelineCard";
 import useCrashReportById from "~/hooks/CrashReport/useCrashReportById";
 import moment from "moment";
-import { severityColors } from "~/constants/data";
 import ErrorElement from "~/components/ErrorElement";
 import useCrashReport from "~/hooks/CrashReport/useCrashReport";
 import CrashReportImageCarousel from "./components/CrashReportImageCarousel";
@@ -40,10 +37,6 @@ const CrashReportView = () => {
   if (isSuccess && !isLoading && !report?.body) {
     return <ErrorElement>No report found</ErrorElement>;
   }
-
-  const handleBackNavigation = () => {
-    navigate(-1);
-  };
 
   const _imageSrc = !imageCover ? report?.body?.image_bins[0] : imageCover;
 
@@ -87,7 +80,7 @@ const CrashReportView = () => {
                     <Text size="xs" c="dimmed">{moment().calendar()}</Text>
                   </Stack>
                   {
-                    <Menu 
+                    <Menu
                       position="bottom-end"
                     >
                       <Menu.Target>
@@ -97,18 +90,11 @@ const CrashReportView = () => {
                         <Menu.Item leftSection={<ClipboardList />}>
                           View Logs
                         </Menu.Item>
-                        <Menu.Item leftSection={<CheckIcon color="green"/>}>
+                        <Menu.Item leftSection={<CheckIcon color="green" />}>
                           Mark as resolved
                         </Menu.Item>
                       </Menu.Dropdown>
                     </Menu>
-                    // <Badge
-                    //   color={severityColors[report?.body?.severity_level]}
-                    //   size="xs"
-                    // >
-                    //   {report?.body?.severity_level}
-                    // </Badge>
-
                   }
 
                 </Group>

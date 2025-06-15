@@ -44,13 +44,18 @@ const HeroCard = ({
 }
 
 const CrashReportCardSection = ({
+  filters = [],
   page = 1
 }) => {
-  const { data, isLoading, isError, error } = useCrashReportFetch(page)
+  const { data, isLoading, isError, error, refetch } = useCrashReportFetch(page, filters)
   const { onTriggerCrashReportModal } = useCrashReport();
   const { pathname } = useLocation()
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    refetch();
+  }, [filters])
 
   useEffect(() => {
     if (isError) {
@@ -101,8 +106,7 @@ const CrashReport = () => {
   const [page, onChange] = useState(1);
   const [totalPage, setTotalPage] = useState();
   const { data, isSuccess } = useCrashReportFetch(page)
-  const { onTriggerCrashReportModal } = useCrashReport();
-  const navigate = useNavigate();
+  const { onTriggerCrashReportModal, filterSeverity, setFilterSeverity  } = useCrashReport();
 
   useEffect(() => {
     if (isSuccess) {
@@ -169,12 +173,14 @@ const CrashReport = () => {
           <MultiSelect
             clearable
             placeholder="Filter"
+            onChange={setFilterSeverity}
+            value={filterSeverity}
             data={['Low', 'Medium', 'High', 'Critical']}
             comboboxProps={{ position: 'bottom', middlewares: { flip: false, shift: false }, offset: 0 }}
           />
         </Box>
       </Group>
-      <CrashReportCardSection page={page} />
+      <CrashReportCardSection filters={filterSeverity}  page={page} />
       <Group justify="end">
         <Box py={20}>
           <Pagination onChange={onChange} total={totalPage} boundaries={2} />

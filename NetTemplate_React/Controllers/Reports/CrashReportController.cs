@@ -40,9 +40,9 @@ namespace NetTemplate_React.Controllers.Reports
 
         // GET: api/<CrashReportController>
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] int page = 1)
+        public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] string filter = "")
         {
-            var response = await _service.GetCrashReport(page);
+            var response = await _service.GetCrashReport(page, filter);
 
             if (!response.Success) return new BadRequestObjectResult(response);
 

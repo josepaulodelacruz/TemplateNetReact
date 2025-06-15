@@ -3,6 +3,10 @@ import { create } from 'zustand';
 const useCrashReport = create((set) => ({
   imageCover: null,
   setImageCover: (img) => set({ imageCover: img }),
+
+  filterSeverity: [],
+  setFilterSeverity: (filters) => set({ filterSeverity: filters }),
+
   isCrashReportModal: false,
   errorDetails: {
     when: "",
