@@ -17,6 +17,7 @@ enum QueryKeys {
 
   //Reports
   REPORTS_CRASH = 'reports_crash',
+  REPORTS_CRASH_METRICS = 'reports_crash_metrics',
   REPORTS_CRASH_VIEW = 'reports_crash_view',
 }
 
