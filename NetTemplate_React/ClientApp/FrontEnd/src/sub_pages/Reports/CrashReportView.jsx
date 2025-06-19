@@ -29,6 +29,7 @@ import useCrashReport from "~/hooks/CrashReport/useCrashReport";
 import CrashReportImageCarousel from "./components/CrashReportImageCarousel";
 import JsonView from '@uiw/react-json-view';
 import { darkTheme } from '@uiw/react-json-view/dark';
+import useCrashReportFetchBackendLog from "~/hooks/CrashReport/useCrashReportFetchBackendLog";
 
 const CrashReportView = () => {
   const navigate = useNavigate();
@@ -115,7 +116,7 @@ const CrashReportView = () => {
                 <CrashReportTimelineCard
                   margin={10}
                   padding={0}
-                  referenceId={report?.reference_id}
+                  referenceId={report?.body?.log_id}
                   severity={report?.body?.severity_level}
                   errorDetails={{
                     when: report?.body?.when,
@@ -143,24 +144,9 @@ const CrashReportView = () => {
                   <Code block>{report?.body?.stack_trace}</Code>
                 </Box>
 
-                <Box p={10}>
-                  <Title size="md" fw={500}>Backend Logs</Title>
-                  <Divider my={5} />
-                  <Space h={10} />
-                  <Group justify="space-between" >
-                    <div>
-                      <Text component="span" fw={400} size="sm" >GET /api/Reports/CrashReports <Text component="span" c="dimmed">102s</Text></Text>
-                      <Text c="dimmed" size="xs">Today 11:00 am</Text>
-                    </div>
-                    <Badge size="xs" color="red">
-                      400
-                    </Badge>
-                  </Group>
+                <CrashReportBackendLog
+                  referenceId={report?.body?.log_id} />
 
-                  <Card h={"100%"} p={10} >
-                    <JsonView style={darkTheme} value={{ "success": true, "debug_script": "SELECT usr.*,latest.[SESSION_DATE] FROM [dbo].[USERS] usr OUTER APPLY (SELECT TOP 1 ss.[SESSION_DATE] FROM [dbo].[UserSessions] ss WHERE ss.[USER_ID] = usr.[ID] ORDER BY ss.[SESSION_DATE] DESC) latest WHERE @ID IS NULL OR usr.ID = @ID", "message": "Successfully fetch users", "body": [{ "permissions": [], "id": 1, "username": "admin", "password": null, "created_at": "0001-01-01T00:00:00", "role": "User", "token": null, "session_date": "2025-06-19T10:32:29.067", "is_active": true }] }} />
-                  </Card>
-                </Box>
               </CrashDetails>
           }
 
@@ -247,6 +233,51 @@ const CrashSkeletonLoading = ({ isMobile, height }) => {
         <Skeleton height={80} radius="md" />
       </Box>
     </Paper>
+  )
+}
+
+const CrashReportBackendLog = ({
+  referenceId
+}) => {
+  const { data, isLoading, isError, error } = useCrashReportFetchBackendLog(referenceId);
+
+  if (isLoading) {
+    <Box p={10}>
+      <Skeleton w={300} h={50} />
+      <Divider my={5} />
+      <Space h={10} />
+    </Box>
+  }
+
+  return (
+    <Box p={10}>
+      <Title size="md" fw={500}>Backend Logs</Title>
+      <Divider my={5} />
+      <Space h={10} />
+
+      {
+        data?.body?.map((item, index) => {
+          console.log(item);
+          return (
+            <div key={index}>
+              <Group justify="space-between" >
+                <div>
+                  <Text component="span" fw={400} size="sm" >{item.requestMethod} {item.requestPath} <Text component="span" c="dimmed">{item.duration}ms</Text></Text>
+                  <Text c="dimmed" size="xs">{moment(item.timestamp).calendar()}</Text>
+                </div>
+                <Badge size="xs" color="red">
+                  400
+                </Badge>
+              </Group>
+
+              <Card h={"100%"} mt={10} p={10} >
+                <JsonView style={darkTheme} value={JSON.parse(item.body)} />
+              </Card>
+            </div>
+          )
+        })
+      }
+    </Box>
   )
 }
 

@@ -15,7 +15,8 @@ namespace NetTemplate_React.Services.Reports
 
     public interface ICrashReportService
     {
-        Task<Response> GetMetrics();
+        Task<Response> GetLogs(string id);
+        Task<Response> GetMetrics(string fitlerType);
 
         Task<Response> GetCrashReport(int page = 1, string filter = "");
 
@@ -37,7 +38,64 @@ namespace NetTemplate_React.Services.Reports
             _logger = logger.CreateLogger<CrashReportService>();
         }
 
-        public async Task<Response> GetMetrics()
+        public async Task<Response> GetLogs(string logId = null)
+        {
+            string commandText = "[dbo].[NSP_CrashReport]";
+            var dataTable = new DataTable();
+
+            using (SqlConnection con = new SqlConnection(_conString))
+            {
+                await con.OpenAsync();
+
+                using (SqlCommand cmd = new SqlCommand(commandText, con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@FLAG", "GET LOG");
+                    cmd.Parameters.AddWithValue("@LOG_ID", logId);
+
+                    try
+                    {
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            dataTable.Load(reader); 
+                        }
+
+                        if (dataTable.Rows.Count == 0) throw new Exception("No logs found");
+
+                        return new Response(
+                                success: true,
+                                debugScript: commandText,
+                                message: "Successfully fetch backend logs",
+                                body: dataTable
+                            );
+                    } 
+                    catch (SqlException Ex)
+                    {
+                        return new Response(
+                            success: false,
+                            debugScript: commandText,
+                            message: Ex.Message,
+                            body: null
+                        )
+                        {
+                            IsCrash = true
+                        };
+                    }
+                    catch (Exception Ex)
+                    {
+                        return new Response(
+                            success: false,
+                            debugScript: commandText,
+                            message: Ex.Message,
+                            body: null
+                        );
+                    }
+
+                }
+            }
+        }
+
+        public async Task<Response> GetMetrics(string filterType)
         {
             string commandText = "[dbo].[NSP_CrashReport]";
             var dataTable = new DataTable();
@@ -52,6 +110,7 @@ namespace NetTemplate_React.Services.Reports
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("@FLAG", "GET METRICS");
+                        cmd.Parameters.AddWithValue("@FilterType", filterType);
 
                         using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {

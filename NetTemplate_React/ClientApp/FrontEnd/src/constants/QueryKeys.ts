@@ -19,6 +19,7 @@ enum QueryKeys {
   REPORTS_CRASH = 'reports_crash',
   REPORTS_CRASH_METRICS = 'reports_crash_metrics',
   REPORTS_CRASH_VIEW = 'reports_crash_view',
+  REPORTS_CRASH_BACKEND_LOGS = 'reports_crash_backend_logs',
 }
 
 export default QueryKeys;

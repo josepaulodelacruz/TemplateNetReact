@@ -8,6 +8,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using NetTemplate_React.Models;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,10 +20,12 @@ namespace NetTemplate_React.Controllers.Reports
     public class CrashReportController : ControllerBase
     {
         private ICrashReportService _service;
+        private ILogger<CrashReportController> _logger;
 
-        public CrashReportController(ICrashReportService service)
+        public CrashReportController(ICrashReportService service, ILogger<CrashReportController> logger)
         {
             _service = service;
+            _logger = logger;
         }
 
         [HttpGet("Test")]
@@ -37,10 +40,27 @@ namespace NetTemplate_React.Controllers.Reports
             return StatusCode(500, response);
         }
 
-        [HttpGet("metrics")]
-        public async Task<IActionResult> GetMetrics()
+        [HttpGet("Logs")]
+        public async Task<IActionResult> GetLogs([FromQuery] string id)
         {
-            var response = await _service.GetMetrics();
+            _logger.LogInformation("==================================GET LOGS ============================================");
+            var response = await _service.GetLogs(id);
+
+            if (!response.Success && response.IsCrash) return StatusCode(500, response);
+            else if (!response.Success) return new BadRequestObjectResult(response);
+            _logger.LogInformation("==================================END GET LOGS ============================================");
+
+            return new OkObjectResult(response);
+        }
+
+        [HttpGet("metrics")]
+        public async Task<IActionResult> GetMetrics([FromQuery] string filterDate = "")
+        {
+            _logger.LogInformation("====================================== GET METRICS ====================================");
+            _logger.LogInformation(filterDate);
+            Debug.WriteLine(filterDate);
+
+            var response = await _service.GetMetrics(filterDate);
 
             if (!response.Success && response.IsCrash) return StatusCode(500, response);
             else if (!response.Success) return new BadRequestObjectResult(response);
