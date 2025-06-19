@@ -14,7 +14,9 @@ import {
   Code,
   ScrollArea,
   Skeleton,
-  Menu
+  Menu,
+  Space,
+  Card
 } from "@mantine/core";
 import { ArrowLeft, CheckIcon, ClipboardList, EllipsisVertical } from "lucide-react";
 import { useNavigate, useParams, Link } from "react-router";
@@ -25,6 +27,8 @@ import moment from "moment";
 import ErrorElement from "~/components/ErrorElement";
 import useCrashReport from "~/hooks/CrashReport/useCrashReport";
 import CrashReportImageCarousel from "./components/CrashReportImageCarousel";
+import JsonView from '@uiw/react-json-view';
+import { darkTheme } from '@uiw/react-json-view/dark';
 
 const CrashReportView = () => {
   const navigate = useNavigate();
@@ -138,6 +142,25 @@ const CrashReportView = () => {
                   <Divider my={5} />
                   <Code block>{report?.body?.stack_trace}</Code>
                 </Box>
+
+                <Box p={10}>
+                  <Title size="md" fw={500}>Backend Logs</Title>
+                  <Divider my={5} />
+                  <Space h={10} />
+                  <Group justify="space-between" >
+                    <div>
+                      <Text component="span" fw={400} size="sm" >GET /api/Reports/CrashReports <Text component="span" c="dimmed">102s</Text></Text>
+                      <Text c="dimmed" size="xs">Today 11:00 am</Text>
+                    </div>
+                    <Badge size="xs" color="red">
+                      400
+                    </Badge>
+                  </Group>
+
+                  <Card h={"100%"} p={10} >
+                    <JsonView style={darkTheme} value={{ "success": true, "debug_script": "SELECT usr.*,latest.[SESSION_DATE] FROM [dbo].[USERS] usr OUTER APPLY (SELECT TOP 1 ss.[SESSION_DATE] FROM [dbo].[UserSessions] ss WHERE ss.[USER_ID] = usr.[ID] ORDER BY ss.[SESSION_DATE] DESC) latest WHERE @ID IS NULL OR usr.ID = @ID", "message": "Successfully fetch users", "body": [{ "permissions": [], "id": 1, "username": "admin", "password": null, "created_at": "0001-01-01T00:00:00", "role": "User", "token": null, "session_date": "2025-06-19T10:32:29.067", "is_active": true }] }} />
+                  </Card>
+                </Box>
               </CrashDetails>
           }
 
@@ -162,7 +185,7 @@ const CrashDetails = ({
     <ScrollArea h={`calc(100vh - ${height + 95}px)`} w="100%">
       <Paper
         w="100%"
-        h={`calc(100vh - ${height + 95}px)`}
+        // h={`calc(100vh - ${height + 95}px)`}
         p={10}
         m={0}
       >

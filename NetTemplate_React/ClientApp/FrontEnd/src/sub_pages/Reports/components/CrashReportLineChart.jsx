@@ -1,7 +1,10 @@
 import { LineChart } from '@mantine/charts';
-import { Paper } from '@mantine/core'
+import { Box, Card, Center, Flex, Paper, Text, Title } from '@mantine/core'
+import { Boxes, LucideBoxes } from 'lucide-react';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
 
-const data = [
+const data22 = [
   {
     date: 'Mar 22',
     Low: 2890,
@@ -39,29 +42,48 @@ const data = [
   },
 ];
 
-const CrashReportLineChart = () => {
+const CrashReportLineChart = ({ lineCharts = [] }) => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const dates = lineCharts?.map((item) => {
+      const date = moment(item.date).format("MMM D");
+      return {
+        ...item,
+        date,
+      };
+    });
+    setData(dates);
+  }, [lineCharts]);
+
   return (
-    <Paper shadow="xs" w={'100%'} h={{ base: '250px', md: '100%' }}>
-      <LineChart
-        h={"100%"}
-        data={data}
-        dataKey="date"
-        series={[
-          { name: 'Low', color: 'green' },
-          { name: 'Medium', color: 'yellow' },
-          { name: 'High', color: 'orange' },
-          { name: 'Critical', color: 'red' },
-        ]}
-        curveType="linear"
-        tickLine="none"
-        gridAxis="none"
-      />
+    <Paper shadow="xs" w="100%" h={{ base: '250px', md: '100%' }}>
+      {!data || data.length === 0 ? (
+        <Card shadow='xs' h="100%" >
+          <Flex direction="column" justify="center" align="center" h="100%" w="100%">
+            <Text component={'span'} fw={500} size="lg" c="dimmed">No Data to Show.</Text>
+            <Boxes size={120} />
+          </Flex>
+        </Card>
+      ) : (
+        <LineChart
+          h="100%"
+          data={data}
+          dataKey="date"
+          series={[
+            { name: 'daily_affected_users', color: 'green' },
+            { name: 'daily_crashes', color: 'orange' },
+            { name: 'daily_critical_crashes', color: 'red' },
+          ]}
+          curveType="linear"
+          tickLine="none"
+          gridAxis="none"
+        />
+      )
+      }
+    </Paper >
+  );
+};
 
-    </Paper>
-
-
-  )
-
-}
 
 export default CrashReportLineChart;

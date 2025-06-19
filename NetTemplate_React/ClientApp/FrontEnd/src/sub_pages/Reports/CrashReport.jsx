@@ -70,7 +70,7 @@ const CrashReportCardSection = ({
 }
 
 const CrashReport = () => {
-  const [range, setRange] = useState('today')
+  const [range, setRange] = useState('MONTH') // TODAY, YESTERDAY, WEEK, MONTH, ALL_TIME
   const [page, onChange] = useState(1);
   const [totalPage, setTotalPage] = useState();
   const { data, isSuccess } = useCrashReportFetch(page)
@@ -106,18 +106,18 @@ const CrashReport = () => {
 
       <Group justify="space-between">
         <Button.Group my={12} size="compact-xs">
-          <Button onClick={() => handleFilterRange('today')} variant={range === 'today' ? 'light' : 'default'}>Today</Button>
-          <Button onClick={() => handleFilterRange('yesterday')} variant={range === 'yesterday' ? 'light' : 'default'} >Yesterday</Button>
-          <Button onClick={() => handleFilterRange('week')} variant={range === 'week' ? 'light' : 'default'}>Week</Button>
-          <Button onClick={() => handleFilterRange('month')} variant={range === 'month' ? 'light' : 'default'} >Month</Button>
-          <Button onClick={() => handleFilterRange('all')} variant={range === 'all' ? 'light' : 'default'} >All Time</Button>
+          <Button onClick={() => handleFilterRange('TODAY')} variant={range === 'TODAY' ? 'light' : 'default'}>Today</Button>
+          <Button onClick={() => handleFilterRange('YESTERDAY')} variant={range === 'YESTERDAY' ? 'light' : 'default'} >Yesterday</Button>
+          <Button onClick={() => handleFilterRange('WEEK')} variant={range === 'WEEK' ? 'light' : 'default'}>Week</Button>
+          <Button onClick={() => handleFilterRange('MONTH')} variant={range === 'MONTH' ? 'light' : 'default'} >Month</Button>
+          <Button onClick={() => handleFilterRange('ALL_TIME')} variant={range === 'ALL_TIME' ? 'light' : 'default'} >All Time</Button>
         </Button.Group>
         <Button variant="outline" color="red" onClick={handleTestError}>
           Test error
         </Button>
       </Group>
 
-      <CrashReportMetrics />
+      <CrashReportMetrics filterDate={range} />
 
       <Space h={15} />
 

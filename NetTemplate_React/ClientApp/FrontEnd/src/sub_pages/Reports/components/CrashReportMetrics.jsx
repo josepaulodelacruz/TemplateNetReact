@@ -3,6 +3,7 @@ import { ArrowUp, Info } from "lucide-react";
 import CrashReportLineChart from "./CrashReportLineChart";
 import useCrashReportFetchMetrics from "~/hooks/CrashReport/useCrashReportFetchMetrics";
 import ErrorElement from "~/components/ErrorElement";
+import { useEffect } from "react";
 
 
 const PercentageColorIndicator = ({
@@ -44,9 +45,9 @@ const HeroCard = ({
   )
 }
 
-const CrashReportMetrics = () => {
-  const { data, isLoading, isSuccess, error, isError } = useCrashReportFetchMetrics();
-  
+const CrashReportMetrics = ({ filterDate = 'MONTH' }) => {
+  const { data, isLoading, isSuccess, error, isError } = useCrashReportFetchMetrics(filterDate);
+
   if(isLoading) {
     return <CrashReportMetricsSkeleton />
   }
@@ -68,7 +69,7 @@ const CrashReportMetrics = () => {
         </Flex>
       </Flex>
       <Flex gap="sm" flex={2}>
-        <CrashReportLineChart />
+        <CrashReportLineChart lineCharts={data?.body?.line_charts} />
       </Flex>
     </Flex>
 
