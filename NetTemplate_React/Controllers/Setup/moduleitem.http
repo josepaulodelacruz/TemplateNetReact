@@ -1,9 +1,8 @@
 ﻿@hostname=localhost:44393
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjdjOTFmN2M3LTQzZTEtNDg4MS1hN2ViLTE0MzhhZDM5N2FlYiIsImV4cCI6MTc0NjUxMDgzNiwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.9QVZkOlyJsZaS_TvmSbkLaJHPrehb53fBDOwbT917Dg
-
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImIyZTZmZGI3LTA1NDUtNGVmOC1iODQ4LWU4NmYwMzc1MDJkNyIsImV4cCI6MTc1MDQ3Njk0NCwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.ZnRKd8AADulBBCEHXguNbTgAFtcJYbWs9-NsaAaWFb0
 
 ###
-GET https://{{hostname}}/api/ModuleItems
+GET https://{{hostname}}/api/ModuleItems/1,2
 Content-Type: application/json
 Authorization: Bearer {{token}} 
 ###

@@ -51,7 +51,7 @@ namespace NetTemplate_React
                 string[] allowedOrigins = new[]
                 {
                     "http://localhost:5173",
-                    //"http://localhost:4173",
+                    "http://localhost:4173",
                 };
 
                 options.AddPolicy("AllowSpecificOrigin",

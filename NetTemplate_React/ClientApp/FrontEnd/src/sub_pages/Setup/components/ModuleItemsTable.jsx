@@ -8,7 +8,12 @@ import useModuleItems from "~/hooks/Setup/Modules/useModuleItems";
 
 const ModuleItemsTable = () => {
   const { onSetModules } = useModuleItems();
-  const { data, isLoading, isSuccess, isError, error } = useGetModuleItems();
+  const { filterModules } = useModuleItems();
+  const { data, isLoading, isSuccess, isError, error, refetch } = useGetModuleItems(filterModules);
+
+  useEffect(() => {
+    refetch();
+  }, [filterModules])
 
   useEffect(() => {
     if (isSuccess) {

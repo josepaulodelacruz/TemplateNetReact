@@ -43,7 +43,9 @@ namespace NetTemplate_React.Services.Setup
                     "sec.[NAME] AS [PARENT_NAME] " +
                 "FROM [dbo].[ModuleItems] main " +
                 "LEFT JOIN [dbo].[ModuleItems] sec ON main.[PARENT_ID] = sec.[ID] " +
-                "WHERE @ID IS NULL OR main.[ID] = @ID";
+                "WHERE (@SEARCH IS NULL OR @SEARCH = '')" +
+                "OR main.[NAME] in (SELECT Value FROM dbo.[fnSplitString](@SEARCH))" +
+                "OR CAST(main.[ID] AS VARCHAR(80)) IN (SELECT Value FROM dbo.[fnSplitString](@SEARCH))";
             try
             {
                 List<ModuleItem> ModuleItems = new List<ModuleItem>();
@@ -51,10 +53,9 @@ namespace NetTemplate_React.Services.Setup
                 {
                     await con.OpenAsync();
 
-
                     using (SqlCommand cmd = new SqlCommand(commandText, con))
                     {
-                        cmd.Parameters.AddWithValue("@ID", (object) id ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@SEARCH", (object) id ?? DBNull.Value);
 
                         using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {

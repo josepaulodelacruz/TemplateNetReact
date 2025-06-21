@@ -13,15 +13,19 @@ import { NavLink } from "react-router";
 import StringRoutes from "~/constants/StringRoutes";
 import ModuleItemsTable from "./components/ModuleItemsTable";
 import useModuleItems from "~/hooks/Setup/Modules/useModuleItems";
+import { useState } from "react";
 
 const ModuleMultiSelect = () => {
   const { modules } = useModuleItems();
+  const { filterModules, onSetFilterModules } = useModuleItems();
 
   return (
     <Box w={{ base: '100%', md: 400 }} >
       <MultiSelect
         clearable
         placeholder="Filter modules"
+        value={filterModules}
+        onChange={onSetFilterModules}
         data={modules}
         comboboxProps={{ position: 'bottom', middlewares: { flip: false, shift: false }, offset: 0 }}
       />
