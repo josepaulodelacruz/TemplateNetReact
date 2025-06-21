@@ -1,14 +1,21 @@
 ﻿@hostname=localhost:44393
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwidW5pcXVlX25hbWUiOiJkZXYiLCJqdGkiOiJkMGM2NjcxZC05MzkxLTQ4ZmMtODlkZC0wNzQzMzRjZTFkYzciLCJleHAiOjE3NDgxNDIzOTksImlzcyI6IllvdXJBcGkiLCJhdWQiOiJZb3VyQ2xpZW50cyJ9.bE0tCvABAhYUiQCXooSLXE0HoKIp3zrSn9y-fzgf27Y
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6IjIyYmM0N2M1LTZmOTMtNDhhNS1hZGRjLWQwYmU3OWZjNTU2NiIsImV4cCI6MTc1MDQ3MTYzNSwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.ZB0M6uMsecxcOnurVXLGRU7DDql_myL2WSpY63yTLew
 
 ###
-GET https://{{hostname}}/api/User/
+GET https://{{hostname}}/api/User/search?user=dev
 Content-Type: application/json
 Authorization: Bearer {{token}} 
 ###
 
 ###
-GET https://{{hostname}}/api/User/5
+GET https://{{hostname}}/api/User/1
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+###
+
+
+###
+GET https://{{hostname}}/api/User?search=jm
 Content-Type: application/json
 Authorization: Bearer {{token}} 
 ###

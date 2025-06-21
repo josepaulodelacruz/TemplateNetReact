@@ -6,27 +6,17 @@ import {
   Card,
   Group,
   Button,
-  Stack,
 } from "@mantine/core";
 import UserTable from "./components/UserTable";
-import { notificationWithCrashReportButton } from "~/utils/notification";
-import useCrashReport from "~/hooks/CrashReport/useCrashReport";
-import { useEffect } from "react";
+import { useState, useRef } from 'react';
+import { SearchIcon } from "lucide-react";
 
 const User = () => {
-  const { onTriggerCrashReportModal, isCrashReportModal } = useCrashReport();
+  const childRef = useRef();
+  const [value, setValue] = useState("");
 
-  useEffect(() => {
-  }, [isCrashReportModal])
-
-  const handleTest = () => {
-    notificationWithCrashReportButton({
-      color: 'red',
-      title: "Failure to login",
-      onClick: () => {
-        onTriggerCrashReportModal();
-      }
-    });
+  const handleSearch = () => {
+    childRef.current?.handleEvent();
   }
 
   return (
@@ -34,16 +24,27 @@ const User = () => {
       <Group>
         <Title size={50} fw={700} style={{ viewTransitionName: 'usr-header' }}>Users Accounts</Title>
       </Group>
-      <Box
-        py={20}
-        w={{ sm: '100%', md: '20em' }} >
-        <TextInput
-          variant="default"
-          placeholder="User"
-        />
-      </Box>
+      <Group>
+        <Box
+          py={20}
+          w={{ sm: '100%', md: '20em' }} >
+          <TextInput
+            value={value}
+            onChange={(event) => setValue(event.currentTarget.value)}
+            variant="default"
+            placeholder="User"
+          />
+
+        </Box>
+        <Button onClick={handleSearch} variant="transparent">
+          <SearchIcon size={12}/>
+          Search
+        </Button>
+
+      </Group>
+
       <Card p={0} shadow="xs">
-        <UserTable />
+        <UserTable ref={childRef} search={value} />
       </Card>
 
     </Container >

@@ -3,14 +3,21 @@ import {
   ScrollArea,
   Table
 } from '@mantine/core'
+import { useEffect, useImperativeHandle } from 'react';
 import { Link } from 'react-router';
 import ErrorElement from '~/components/ErrorElement';
 import TableSkeleton from '~/components/Loading/TableSkeleton';
 import StringRoutes from '~/constants/StringRoutes';
 import useGetUsers from '~/hooks/Setup/User/useGetUsers';
 
-const UserTable = () => {
-  const { data, isLoading, isError, error } = useGetUsers();
+const UserTable = ({ref, search = ""}) => {
+  const { data, isLoading, isError, error, refetch } = useGetUsers(search);
+
+  useImperativeHandle(ref, () => ({
+    handleEvent: () => {
+      refetch();
+    }
+  }))
 
   if (isLoading) {
     return <TableSkeleton rows={3} cols={3} />

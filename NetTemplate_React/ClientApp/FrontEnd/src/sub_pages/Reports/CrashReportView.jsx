@@ -30,18 +30,21 @@ import CrashReportImageCarousel from "./components/CrashReportImageCarousel";
 import JsonView from '@uiw/react-json-view';
 import { darkTheme } from '@uiw/react-json-view/dark';
 import useCrashReportFetchBackendLog from "~/hooks/CrashReport/useCrashReportFetchBackendLog";
+import { useState } from "react";
 
 const CrashReportView = () => {
-  const navigate = useNavigate();
   const { ref, height } = useElementSize();
   const { id } = useParams();
   const { imageCover } = useCrashReport();
   const { data: report, isLoading, isSuccess, isError } = useCrashReportById(id);
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const [isShowBackendLog, setShowBackendLog] = useState(false);
 
   if (isSuccess && !isLoading && !report?.body) {
     return <ErrorElement>No report found</ErrorElement>;
   }
+
+  if(isError) return <ErrorElement></ErrorElement>
 
   const _imageSrc = !imageCover ? report?.body?.image_bins[0] : imageCover;
 
@@ -92,7 +95,7 @@ const CrashReportView = () => {
                         <EllipsisVertical />
                       </Menu.Target>
                       <Menu.Dropdown>
-                        <Menu.Item leftSection={<ClipboardList />}>
+                        <Menu.Item disabled={isShowBackendLog} onClick={() => setShowBackendLog(true)} leftSection={<ClipboardList />}>
                           View Logs
                         </Menu.Item>
                         <Menu.Item leftSection={<CheckIcon color="green" />}>
@@ -144,8 +147,10 @@ const CrashReportView = () => {
                   <Code block>{report?.body?.stack_trace}</Code>
                 </Box>
 
-                <CrashReportBackendLog
-                  referenceId={report?.body?.log_id} />
+                {isShowBackendLog && (
+                  <CrashReportBackendLog
+                    referenceId={report?.body?.log_id} />
+                )}
 
               </CrashDetails>
           }
@@ -257,7 +262,6 @@ const CrashReportBackendLog = ({
 
       {
         data?.body?.map((item, index) => {
-          console.log(item);
           return (
             <div key={index}>
               <Group justify="space-between" >
