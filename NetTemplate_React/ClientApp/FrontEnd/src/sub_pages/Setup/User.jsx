@@ -36,8 +36,8 @@ const User = () => {
           />
 
         </Box>
-        <Button onClick={handleSearch} variant="transparent">
-          <SearchIcon size={12}/>
+        <Button onClick={handleSearch} color="gray" variant="outline">
+          <SearchIcon size={17}/>
           Search
         </Button>
 

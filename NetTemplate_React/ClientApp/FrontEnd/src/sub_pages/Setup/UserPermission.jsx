@@ -198,7 +198,7 @@ const UserPermission = () => {
       )}
 
       <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="flex-end">
-        <Paper shadow="sm" w={{ base: '100%', md: '50%' }} mt={10} radius="xs" p="md">
+        <Paper  shadow="sm" w={{ base: '100%', md: '50%' }} mt={10} radius="xs" p="md">
           <Title size="lg">Actions</Title>
           <Group justify="space-between">
             <Group>

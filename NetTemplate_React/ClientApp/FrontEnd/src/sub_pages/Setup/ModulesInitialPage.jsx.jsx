@@ -13,7 +13,6 @@ import { NavLink } from "react-router";
 import StringRoutes from "~/constants/StringRoutes";
 import ModuleItemsTable from "./components/ModuleItemsTable";
 import useModuleItems from "~/hooks/Setup/Modules/useModuleItems";
-import { useState } from "react";
 
 const ModuleMultiSelect = () => {
   const { modules } = useModuleItems();

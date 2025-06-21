@@ -15,6 +15,9 @@ const useCrashReportById = (id = null) => {
 export const fetchReportById = async (id) => {
   try {
       const response = await client.get(`/Reports/CrashReport/${id}`)
+      
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      
       return response.data;
   } catch (err) {
     throw new Error(err);
