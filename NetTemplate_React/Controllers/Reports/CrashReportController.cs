@@ -28,18 +28,6 @@ namespace NetTemplate_React.Controllers.Reports
             _logger = logger;
         }
 
-        [HttpGet("Test")]
-        public async Task<IActionResult> Get()
-        {
-            var response = new Response(
-                    success: false,
-                    message: "FAILED",
-                    debugScript: "TESTING ONLY",
-                    body: null
-                );
-            return StatusCode(500, response);
-        }
-
         [HttpGet("Logs")]
         public async Task<IActionResult> GetLogs([FromQuery] string id)
         {

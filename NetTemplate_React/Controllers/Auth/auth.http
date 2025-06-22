@@ -10,7 +10,7 @@ Content-Type: application/json
 POST https://{{hostname}}/api/auth/register
 Content-Type: application/json
 {
-  "username": "admin",
+  "username": "dev",
   "password": "password"
 }
 

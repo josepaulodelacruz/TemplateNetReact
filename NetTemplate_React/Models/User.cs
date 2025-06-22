@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Identity.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -117,4 +118,32 @@ namespace NetTemplate_React.Models
             return permissions;
         }
     }
+
+    public class UserHistory
+    {
+        [JsonProperty("id")]
+        public int Id { get; set; }
+        [JsonProperty("requestMethod")]
+        public string RequestMethod { get; set; }
+
+        [JsonProperty("requestPath")]
+        public string RequestPath { get; set; }
+
+        [JsonProperty("responseStatusCode")]
+        public int ResponseStatusCode { get; set; }
+
+        [JsonProperty("timestamp")]
+        public DateTime Timestamp { get; set; }
+
+        [JsonProperty("body")]
+        public string Body { get; set; }
+
+        [JsonProperty("totalPages")]
+        public double TotalPages { get; set; }
+
+        [JsonProperty("duration")]
+        public Int64 Duration { get; set; }
+
+    }
+
 }

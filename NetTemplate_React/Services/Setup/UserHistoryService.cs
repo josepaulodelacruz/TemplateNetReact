@@ -3,10 +3,13 @@ using Microsoft.Extensions.Logging;
 using NetTemplate_React.Models;
 using System;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
 
 namespace NetTemplate_React.Services.Setup
 {
@@ -30,7 +33,8 @@ namespace NetTemplate_React.Services.Setup
         {
             string commandText = "[dbo].[NSP_APILogs]";
 
-            DataTable dataTable = new DataTable();
+            List<UserHistory> histories = new List<UserHistory>();
+            var dataTable = new DataTable();
 
             try
             {
@@ -47,8 +51,24 @@ namespace NetTemplate_React.Services.Setup
 
                         using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
-                            dataTable.Load(reader);
+                            while (await reader.ReadAsync())
+                            {
+                                UserHistory history = new UserHistory
+                                {
+                                    Id = reader.GetInt32("id"),
+                                    RequestMethod = reader.GetString("RequestMethod"),
+                                    RequestPath = reader.GetString("RequestPath"),
+                                    ResponseStatusCode = reader.GetInt32("ResponseStatusCode"),
+                                    Body = reader.GetString("Body"),
+                                    Timestamp = reader.GetDateTime("Timestamp"),
+                                    TotalPages = reader.GetDouble("TotalPages"),
+                                    Duration = reader.GetInt64("Duration")
+                                };
+                                histories.Add(history);
+                            }
+
                         }
+
                     }
                 }
 
@@ -56,7 +76,7 @@ namespace NetTemplate_React.Services.Setup
                     success: true,
                     debugScript: commandText.ToString(),
                     message: "Succesfully fetch user logs",
-                    body: dataTable
+                    body: histories 
                 );
 
             } catch (SqlException Ex)
@@ -79,5 +99,39 @@ namespace NetTemplate_React.Services.Setup
                 );
             }
         }
+
+        private static T GetValue<T>(DataRow row, string columnName, T defaultValue = default(T))
+        {
+            try
+            {
+                if (row.Table.Columns.Contains(columnName) && row[columnName] != DBNull.Value)
+                {
+                    var value = row[columnName];
+
+                    if (typeof(T) == typeof(string))
+                        return (T)(object)value.ToString();
+
+                    if (typeof(T) == typeof(int))
+                        return (T)(object)Convert.ToInt32(value);
+
+                    if (typeof(T) == typeof(DateTime))
+                        return (T)(object)Convert.ToDateTime(value);
+
+                    if (typeof(T) == typeof(bool))
+                        return (T)(object)Convert.ToBoolean(value);
+
+                    return (T)Convert.ChangeType(value, typeof(T));
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log exception if needed
+                Console.WriteLine($"Error converting column '{columnName}': {ex.Message}");
+            }
+
+            return defaultValue;
+        }
     }
+
+
 }

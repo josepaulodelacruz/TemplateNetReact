@@ -1,138 +1,134 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Logging;
-using Microsoft.IO;
-using NetTemplate_React.Middleware;
-using NetTemplate_React.Services;
-using NetTemplate_React.Services.Reports;
-using NetTemplate_React.Services.Setup;
+//using Microsoft.AspNetCore.Builder;
+//using Microsoft.AspNetCore.CookiePolicy;
+//using Microsoft.AspNetCore.Http;
+//using Microsoft.Extensions.Configuration;
+//using Microsoft.Extensions.DependencyInjection;
+//using Microsoft.Extensions.FileProviders;
+//using Microsoft.Extensions.Hosting;
+//using Microsoft.Extensions.Logging;
+//using NetTemplate_React.Middleware;
+//using NetTemplate_React.Services;
+//using NetTemplate_React.Services.Reports;
+//using NetTemplate_React.Services.Setup;
+//using System.IO;
 
-namespace NetTemplate_React
-{
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+//var builder = WebApplication.CreateBuilder(args);
 
-        public IConfiguration Configuration { get; }
+//// Configure services
+//var services = builder.Services;
+//var configuration = builder.Configuration;
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
+//// JWT Token Validation (you'll need to implement this extension method)
+//services.AddJwtTokenValidation(configuration);
 
-            // Other service registrations
-            services.AddJwtTokenValidation(Configuration);
-            services.AddMvc();
+//// Add MVC/Controllers
+//services.AddControllers();
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-                
-            });
+//// Configure Cookie Policy
+//services.Configure<CookiePolicyOptions>(options =>
+//{
+//    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+//    options.CheckConsentNeeded = context => true;
+//    options.MinimumSameSitePolicy = SameSiteMode.None;
+//});
 
-            services.AddCors(options =>
-            {
-                string[] allowedOrigins = new[]
-                {
-                    "http://localhost:5173",
-                    "http://localhost:4173",
-                };
+//// Configure CORS
+//services.AddCors(options =>
+//{
+//    string[] allowedOrigins = new[]
+//    {
+//        "http://localhost:5173",
+//        "http://localhost:4173",
+//    };
 
-                options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.WithOrigins(allowedOrigins) //add front end url if deployed
-                    .AllowAnyHeader()
-                    .AllowAnyMethod());
-            });
+//    options.AddPolicy("AllowSpecificOrigin",
+//        builder => builder.WithOrigins(allowedOrigins) // add front end url if deployed
+//        .AllowAnyHeader()
+//        .AllowAnyMethod());
+//});
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+//// Database connection setup
+//bool isLive = bool.Parse(configuration.GetConnectionString("ISLive") ?? "false");
+//var conString = !isLive ? configuration.GetConnectionString("DEV") : configuration.GetConnectionString("PROD");
 
-            bool IsLive = bool.Parse(Configuration.GetConnectionString("ISLive"));
-            var conString = !IsLive ? Configuration.GetConnectionString("DEV") : Configuration.GetConnectionString("PROD");
+//// Register scoped services
+//services.AddScoped<IAuthService, AuthService>(options => 
+//    new AuthService(conString: conString, configuration: configuration));
 
-            //injected services
-            services.AddScoped<IAuthService, AuthService>(options => new AuthService(conString: conString, configuration: Configuration));
+//// Setup services
+//services.AddScoped<IModuleItemService, ModuleItemService>(options => 
+//    new ModuleItemService(conString: conString, configuration: configuration));
+//services.AddScoped<IUserService, UserService>(options => 
+//    new UserService(conString: conString, configuration: configuration));
+//services.AddScoped<IUserPermissionService, UserPermissionService>(options => 
+//    new UserPermissionService(conString: conString, config: configuration));
+//services.AddScoped<IUserHistoryService, UserHistoryService>(options => 
+//    new UserHistoryService(conString: conString, logger: new LoggerFactory()));
 
-            //setups
-            services.AddScoped<IModuleItemService, ModuleItemService>(options => new ModuleItemService(conString: conString, configuration: Configuration));
-            services.AddScoped<IUserService, UserService>(options => new UserService(conString: conString, configuration: Configuration));
-            services.AddScoped<IUserPermissionService, UserPermissionService>(options => new UserPermissionService(conString: conString, config: Configuration));
-            services.AddScoped<IUserHistoryService, UserHistoryService>(options => new UserHistoryService(conString: conString, logger: new LoggerFactory()));
+//// Reports
+//services.AddScoped<ICrashReportService, CrashReportService>(options => 
+//    new CrashReportService(conString: conString, logger: new LoggerFactory()));
 
-            //reports
-            services.AddScoped<ICrashReportService, CrashReportService>(options => new CrashReportService(conString: conString, logger: new LoggerFactory()));
-        }
+//// Add authentication and authorization
+//services.AddAuthentication();
+//services.AddAuthorization();
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
-            }
+//var app = builder.Build();
 
-            app.UseHttpsRedirection();
-            // Path to React build folder
-            ///important build the front-end first before publishing the .net project
-            var clientAppDist = Path.Combine(Directory.GetCurrentDirectory(), "ClientApp/FrontEnd", "dist"); 
+//// Configure the HTTP request pipeline
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseDeveloperExceptionPage();
+//}
+//else
+//{
+//    app.UseExceptionHandler("/Error");
+//    app.UseHsts();
+//}
 
-            // Serve static files (CSS, JS, images) from React build
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(clientAppDist),
-                RequestPath = ""
-            });
+//app.UseHttpsRedirection();
 
-            // Serve index.html for any unmatched routes (React Router will handle frontend routing)
-            app.Use(async (context, next) =>
-            {
-                await next();
+//// Path to React build folder
+//// Important: build the front-end first before publishing the .net project
+//var clientAppDist = Path.Combine(Directory.GetCurrentDirectory(), "ClientApp/FrontEnd", "dist");
 
-                if (context.Response.StatusCode == 404 &&
-                    !Path.HasExtension(context.Request.Path.Value) &&
-                    !context.Request.Path.Value.StartsWith("/api"))
-                {
-                    context.Response.StatusCode = 200;
-                    await context.Response.SendFileAsync(Path.Combine(clientAppDist, "index.html"));
-                }
-            });
+//// Serve static files (CSS, JS, images) from React build
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = new PhysicalFileProvider(clientAppDist),
+//    RequestPath = ""
+//});
 
-            app.UseAuthentication();
+//// Serve index.html for any unmatched routes (React Router will handle frontend routing)
+//app.Use(async (context, next) =>
+//{
+//    await next();
 
-            // Optional: Custom token validation middleware
-            app.UseMiddleware<TokenValidationMiddleware>();
+//    if (context.Response.StatusCode == 404 &&
+//        !Path.HasExtension(context.Request.Path.Value) &&
+//        !context.Request.Path.Value.StartsWith("/api"))
+//    {
+//        context.Response.StatusCode = 200;
+//        await context.Response.SendFileAsync(Path.Combine(clientAppDist, "index.html"));
+//    }
+//});
 
+//app.UseAuthentication();
+//app.UseAuthorization();
 
-            // Use MVC for API controllers
-            app.UseCookiePolicy();
+//// Custom token validation middleware
+//app.UseMiddleware<TokenValidationMiddleware>();
 
-            //app.UseAPILogger();
-            app.UseLoggerMIddleware();
+//// Use cookie policy
+//app.UseCookiePolicy();
 
+//// Custom logger middleware
+//app.UseLoggerMIddleware();
 
-            app.UseCors("AllowSpecificOrigin");
+//// Use CORS
+//app.UseCors("AllowSpecificOrigin");
 
-            app.UseMvc();
-        }
-    }
-}
+//// Map controllers
+//app.MapControllers();
+
+//app.Run();
