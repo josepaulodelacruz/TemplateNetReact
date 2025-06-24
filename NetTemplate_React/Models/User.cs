@@ -1,5 +1,4 @@
 ﻿using Microsoft.Identity.Client;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,39 +6,40 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.Xml;
+using System.Text.Json.Serialization;
 
 namespace NetTemplate_React.Models
 {
     public class User
     {
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [Required]
-        [JsonProperty("username")]
+        [JsonPropertyName("username")]
         public string Username { get; set; }
 
         [Required]
-        [JsonProperty("password")]
+        [JsonPropertyName("password")]
         public string Password { get; set; }
 
-        [JsonProperty("created_at")]
+        [JsonPropertyName("created_at")]
         public DateTime CreatedAt { get; set; }
 
-        [JsonProperty("role")]
+        [JsonPropertyName("role")]
         public string Role { get; set; }
 
-        [JsonProperty("token")]
+        [JsonPropertyName("token")]
         public string Token { get; set; }
 
-        [JsonProperty("session_date")]
+        [JsonPropertyName("session_date")]
         public DateTime? SessionDate { get; set; }
 
-        [JsonProperty("is_active")]
+        [JsonPropertyName("is_active")]
         public bool IsActive { get; set; }
 
-        [JsonProperty("permissions")]
+        [JsonPropertyName("permissions")]
         public List<UserPermission> Permissions = new List<UserPermission>(); 
 
         public static User TransformUser(DataTable dt)
@@ -121,27 +121,27 @@ namespace NetTemplate_React.Models
 
     public class UserHistory
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
-        [JsonProperty("requestMethod")]
+        [JsonPropertyName("requestMethod")]
         public string RequestMethod { get; set; }
 
-        [JsonProperty("requestPath")]
+        [JsonPropertyName("requestPath")]
         public string RequestPath { get; set; }
 
-        [JsonProperty("responseStatusCode")]
+        [JsonPropertyName("responseStatusCode")]
         public int ResponseStatusCode { get; set; }
 
-        [JsonProperty("timestamp")]
+        [JsonPropertyName("timestamp")]
         public DateTime Timestamp { get; set; }
 
-        [JsonProperty("body")]
+        [JsonPropertyName("body")]
         public string Body { get; set; }
 
-        [JsonProperty("totalPages")]
+        [JsonPropertyName("totalPages")]
         public double TotalPages { get; set; }
 
-        [JsonProperty("duration")]
+        [JsonPropertyName("duration")]
         public Int64 Duration { get; set; }
 
     }

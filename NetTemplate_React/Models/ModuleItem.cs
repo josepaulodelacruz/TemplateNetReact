@@ -1,21 +1,22 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace NetTemplate_React.Models
 {
     public class ModuleItem
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [Required]
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("parent_id")]
+        [JsonPropertyName("parent_id")]
         public string ParentId { get; set; }
 
-        [JsonProperty("parent_name")]
+        [JsonPropertyName("parent_name")]
         public string ParentName { get; set; }
     }
 }

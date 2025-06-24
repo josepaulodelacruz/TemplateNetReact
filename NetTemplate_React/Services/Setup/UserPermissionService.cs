@@ -48,7 +48,7 @@ namespace NetTemplate_React.Services.Setup
                         {
                             while (await reader.ReadAsync())
                             {
-                                permission.Add(new UserPermission()
+                                permission.Add(new UserPermission
                                 {
                                     Id = reader.IsDBNull(reader.GetOrdinal("ID")) ? null : reader["ID"].ToString(),
                                     ModuleId = reader.GetInt32(reader.GetOrdinal("MODULE_ID")),

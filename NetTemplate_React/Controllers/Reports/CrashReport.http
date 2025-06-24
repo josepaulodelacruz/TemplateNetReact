@@ -1,9 +1,8 @@
 ﻿@hostname=localhost:44393
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImNiZDYzMjNjLTFiMjUtNDdjNS05MzgzLTU5ZWFhNTc2ODUyZiIsImV4cCI6MTc1MDMzOTIxOCwiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.6y0Jq1-4B_M1IguS72HcW_UknKpKZamRB3wazNytSso
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiJhZG1pbiIsImp0aSI6ImZmN2VhMGJjLWFkMjUtNGM1MS1hMjc5LThlMTY2NGQ1ZjBiZSIsImV4cCI6MTc1MDc3MjgxMywiaXNzIjoiWW91ckFwaSIsImF1ZCI6IllvdXJDbGllbnRzIn0.2od_39D4uH3lIb5Q7RVtC8xVQBGQlv638TLA9MhU6_8
 
 
 ###
-
 GET https://{{hostname}}/api/Reports/CrashReport/Test
 Content-Type: "application/json" 
 Authorization: Bearer {{token}}
@@ -27,7 +26,7 @@ Authorization: Bearer {{token}}
 ###
 
 ###
-GET https://{{hostname}}/api/Reports/CrashReport/Logs?id=1994
+GET https://{{hostname}}/api/Reports/CrashReport/Logs?id=187
 Content-Type: application/json
 Authorization: Bearer {{token}} 
 ###

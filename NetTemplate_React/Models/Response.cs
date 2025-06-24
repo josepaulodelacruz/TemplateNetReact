@@ -1,26 +1,26 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 using System.Xml.Linq;
 
 namespace NetTemplate_React.Models
 {
     public class Response
     {
-        [JsonProperty("success")]
+        [JsonPropertyName("success")]
         public bool Success { get; set; }
 
-        [JsonProperty("debug_script")]
+        [JsonPropertyName("debug_script")]
         [Required(ErrorMessage = "For debugging purposes, put the SQL script here or SP used for easier tracing.")]
         public string DebugScript { get; }
 
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         [Required(ErrorMessage = "Message is required.")]
         public string Message { get; }
 
-        [JsonProperty("body")]
+        [JsonPropertyName("body")]
         [Required(ErrorMessage = "Body cannot be null.")]
         public dynamic Body { get; }
 

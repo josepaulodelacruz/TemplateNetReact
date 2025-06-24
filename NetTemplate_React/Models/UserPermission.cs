@@ -1,31 +1,34 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace NetTemplate_React.Models
 {
+    [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
     public class UserPermission
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty("module_id")]
+        [JsonPropertyName("module_id")]
         public int ModuleId { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("user_id")]
+        [JsonPropertyName("user_id")]
         public string UserId { get; set; }
 
-        [JsonProperty("create")]
+        [JsonPropertyName("create")]
         public bool Create { get; set; } = false;
 
-        [JsonProperty("read")]
+        [JsonPropertyName("read")]
         public bool Read { get; set; } = false;
 
-        [JsonProperty("update")]
+        [JsonPropertyName("update")]
         public bool Update { get; set; } = false;
 
-        [JsonProperty("delete")]
+        [JsonPropertyName("delete")]
         public bool Delete { get; set; } = false;
 
     }

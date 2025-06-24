@@ -38,6 +38,11 @@ namespace NetTemplate_React.Services.Reports
             _logger = logger.CreateLogger<CrashReportService>();
         }
 
+        /// <summary>
+        /// This throws error due to json format 
+        /// </summary>
+        /// <param name="logId"></param>
+        /// <returns></returns>
         public async Task<Response> GetLogs(string logId = null)
         {
             string commandText = "[dbo].[NSP_CrashReport]";
@@ -117,7 +122,7 @@ namespace NetTemplate_React.Services.Reports
                             dataTable.Load(reader);
                         }
 
-                        Models.Reports.Metrics metrics = new Metrics().TransformCrashReportMetrics(dataTable);
+                        var metrics = Metrics.TransformCrashReportMetrics(dataTable);
 
                         return new Response(
                             success: true,
