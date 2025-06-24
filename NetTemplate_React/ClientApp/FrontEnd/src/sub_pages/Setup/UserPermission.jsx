@@ -18,7 +18,7 @@ import TableSkeleton from "~/components/Loading/TableSkeleton";
 import useGetUserPermission from "~/hooks/Setup/Permissions/useGetUserPermission";
 import useSavePermissionMutation from "~/hooks/Setup/Permissions/useSavePermissionMutation";
 import { useQueryClient } from "@tanstack/react-query";
-import QueryKeys from "~/constants/QueryKeys";
+import QueryKeys from "~/Constants/QueryKeys";
 
 const UserPermissionTable = ({ permissions, setPermissions, selected, setSelected }) => {
   const { id } = useParams();

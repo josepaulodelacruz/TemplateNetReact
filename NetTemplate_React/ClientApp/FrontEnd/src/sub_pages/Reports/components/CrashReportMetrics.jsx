@@ -60,7 +60,7 @@ const CrashReportMetrics = ({ filterDate = 'MONTH' }) => {
     <Flex gap="lg" direction={{ base: 'column', md: 'row' }} >
       <Flex flex={1.2} gap="sm" direction="column">
         <Flex direction="row" gap="sm">
-          <HeroCard title="Total Crashes" count={data?.body?.crash_counts?.total_crashes} percentage={`${data?.body?.crash_counts.crashes_percent_change}%`} />
+          <HeroCard title="Total Crashes" count={data?.body?.crash_counts?.total_crashes} percentage={`${data?.body?.crash_counts?.crashes_percent_change ?? 0}%`} />
           <HeroCard title="Affected Users" count={data?.body?.crash_counts?.affected_users} percentage="90%" />
         </Flex>
         <Flex direction="row" gap="sm" >
